@@ -1,3 +1,4 @@
+
 - name: Create Support dir
   file: path="{{ welder_support_dir }}" state=directory owner="{{ management_user }}" group="{{ welder_group['name'] }}" mode=2775
 
@@ -23,3 +24,18 @@
   notify: Stop wsyak
   notify: Start wsyak
   when: yak_mode == 'wsyak'
+
+- name: Compile Java Message Pump
+  command: mvn compile
+  args:
+     chdir: "{{ welder_support_dir }}/pump_java"
+
+- name: Package Java Message Pump
+  command: mvn package
+  args:
+     chdir: "{{ welder_support_dir }}/pump_java"
+
+- name: Compile and Start Java Kayak
+  command: ./kayak_java.sh start -z "{{ zookeeper_hosts }}"
+  args:
+     chdir: "{{ welder_support_dir }}/kayak_java"

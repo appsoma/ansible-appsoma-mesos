@@ -1,0 +1,22 @@
+- name: Remove OS package if needed
+  apt: pkg=maven state=absent
+
+- name: Create Maven directory
+  file: path=/opt/maven state=directory
+
+- name: Get Maven binary tarball
+  get_url:
+    url: "http://apache.arvixe.com/maven/maven-3/{{ maven_version }}/binaries/apache-maven-{{ maven_version }}-bin.tar.gz"
+    dest: "/opt/maven/apache-maven-{{ maven_version }}-bin.tar.gz"
+
+- name: Expand Maven tareball
+  command: tar -xzvf "/opt/maven/apache-maven-{{ maven_version }}-bin.tar.gz -C /opt/maven/
+
+- name: Create Maven symlink
+  command: update-alternatives --install /usr/bin/mvn mvn "/opt/maven/apache-maven-{{ maven_version }}" 1
+
+- name: Configure Maven symlink
+  command: update-alternatives --config mvn
+
+- name: Place Maven profile.d file
+  template: src=maven.sh.j2 dest=/etc/profile.d/maven.sh
