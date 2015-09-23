@@ -1,8 +1,3 @@
-- name: Make sure Maven is installed
-  no_log: yes
-  apt: pkg=maven state=present update_cache=yes
-  when: ansible_os_family == "Debian"
-
 - name: Make storm-mesos dir
   file: path=/opt/storm state=directory owner="{{ storm_user }}"
 
@@ -27,7 +22,9 @@
 
 - name: Build storm mesos release
   no_log: yes
-  shell: "cd /opt/storm; bin/build-release.sh"
+  shell: ". /etc/profile.d/maven.sh; bin/build-release.sh"
+  args:
+    chdir: "/opt/storm"
   sudo: yes
   sudo_user: "{{ storm_user }}"
   register: storm_build
