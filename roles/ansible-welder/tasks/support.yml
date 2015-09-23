@@ -39,3 +39,4 @@
   shell: ". /etc/profile.d/maven.sh; ./kayak_java.sh start -z {{ zookeeper_hosts }}"
   args:
      chdir: "{{ welder_support_dir }}/kayak_java"
+
