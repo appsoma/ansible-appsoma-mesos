@@ -23,3 +23,8 @@
   notify: Stop wsyak
   notify: Start wsyak
   when: yak_mode == 'wsyak'
+
+#- name: Start Kayak Java
+#  shell: "ZK_HOST_LIST={{ zookeeper_hosts }}; ./kayak_java.sh start"
+#  args:
+#    chdir: "{{ welder_support_dir }}/kayak_java"
