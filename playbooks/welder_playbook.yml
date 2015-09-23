@@ -38,8 +38,6 @@
           {%- endfor %}
 
   roles:
-    - role: ../roles/ansible-maven
-
     - role: ../roles/ansible-welder
       int_ip: "{{ hostvars[inventory_hostname]['private_ip_address'] }}"
       ext_ip: "{{ hostvars[inventory_hostname]['public_ip_address'] }}"
