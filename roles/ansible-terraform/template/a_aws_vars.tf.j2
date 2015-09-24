@@ -1,0 +1,45 @@
+variable "aws_info" {
+  description = "Amazon AWS/EC2/S3 keys and settings"
+  default = {
+	access_key = "{{ aws_access_key }}"
+	secret_key = "{{ aws_secret_key"
+	region = "{{ ec2_region }}"
+	zone = "{{ ec2_zone }}"
+  }
+}
+
+variable "aws_image" {
+  description = "Amazon AMIs for each region"
+  default = {
+	us-east-1 = "ami-7eb2a716"
+	us-west-2 = "ami-ade2da9d"
+	ap-northeast-1 = "ami-aa7da3aa"
+  }
+}
+
+variable "aws_instance_type" {
+  description = "Amazon instance types to use for each kind of node"
+  default = {
+	service = "t2.micro"
+	master = "t2.medium"
+	slave_small = "t2.small"
+	slave_gp = "t2.medium"
+	slave_db = "t2.large"
+  }
+}
+
+variable "aws_data_volume_type" {
+  description = "Type of NFS-mountable data volume created on service node, standard is enough for NFS"
+  default = "{{ data_vol_type }}"
+}
+
+variable "instance_volume_type" {
+  description = "Type of volume for root disk on an instance"
+  default = {
+	service = "standard"
+	master = "standard"
+	slave_small = "standard"
+	slave_gp = "gp2"
+	slave_db = "gp2"
+  }
+}

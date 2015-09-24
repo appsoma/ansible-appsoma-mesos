@@ -1,0 +1,35 @@
+variable "cluster_name" {
+  description = "Name of the cluster to be used for naming resources"
+  default = "test_cluster"
+}
+
+variable "instance_root_disk_size_gb" {
+  description = "Size of volume for root disk on an instance"
+  default = {
+	service = 16
+	master = 64
+	slave_small = 16
+	slave_gp = 32
+	slave_db = 64
+  }
+}
+variable "key_name" {
+  description = "Name of key on AWS to use for instances"
+  default = "terraform"
+}
+
+variable "rack_count" {
+  description = "Amazon instances of each type ('rack' attribute) to create"
+  default = {
+	service = 1
+	master = 1
+	slave_small = 2
+	slave_gp = 0
+	slave_db = 0
+  }
+}
+
+variable "data_volume_size_gb" {
+  description = "Size of NFS-mountable data volume created on service node"
+  default = {{ data_vol_size_gb }}
+}
