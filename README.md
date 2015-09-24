@@ -90,7 +90,7 @@ Next, you'll have to set up the EC2 environment.  If you have an existing Boto c
 Now, test that you can access the EC2 dynamic inventory.  This should produce a list of some contents of your EC2 account.  
 Any errors messages here will prevent you from accessing EC2 and using this playbook:
 
-    inventory/ec2Inventory.py --list
+    inventory/ec2.py --list
 
 ### Running
 
@@ -99,13 +99,13 @@ This will remove the warnings (which require you to type `yes`) when you connect
  
 Now to run the playbook from scratch: 
 
-    ansible-playbook --private-key ~/mykey.pem -i inventory/ec2Inventory.py create_cluster_playbook.yml -e "cluster_name={{ cluster_name }}"
+    ansible-playbook --private-key ~/mykey.pem -i inventory/ec2.py create_cluster_playbook.yml -e "cluster_name={{ cluster_name }}"
 
 You can safely re-run this command multiple times, in the event of an Amazon communication outage, or an error in variables.
 
 If you edit `playbook_vars/users.yml`, you can update the entire cluster by running:
     
-    ansible-playbook --private-key ~/mykey.pem -i inventory/ec2Inventory.py sync_users.yml -e "cluster_name={{ cluster_name }}"
+    ansible-playbook --private-key ~/mykey.pem -i inventory/ec2.py sync_users.yml -e "cluster_name={{ cluster_name }}"
     
 This will add new users, and update existing users (and their passwords).  This fixed password management is the best solution short of a user directory system. (See [To do items](#to-do))
 
