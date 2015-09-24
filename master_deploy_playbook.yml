@@ -151,6 +151,8 @@
 
     - role: ansible-go
 
+    - role: ../roles/ansible-maven
+
     # Install zookeeper
     - role: ansible-zookeeper
       zookeeper_hosts: "{{ groups[inventory_group_master] }}"
