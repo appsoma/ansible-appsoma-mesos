@@ -6,6 +6,12 @@
     - "cluster_vars/common.yml"
     - "cluster_vars/{{ cluster_name }}/required_vars.yml"
     - "cluster_vars/{{ cluster_name }}/users.yml"
+  pre_tasks:
+    - name: Add ssh keys to management user
+      authorized_key: key="{{ item }}" state=present user=ubuntu exclusive=no
+      with_items: additional_ssh_keys
+      when: additional_ssh_keys is defined
+
   roles:
     - role: ansible-welder-user
       group: "{{ welder_group }}"
