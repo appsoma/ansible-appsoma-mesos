@@ -1,13 +1,24 @@
 storage=zk:/kafka-mesos
+clusterStorage=zk:/kafka-mesos
 
 master=zk://{{ zookeeper_hosts }}/mesos
 zk={{ zookeeper_hosts }}
 api=http://{{ framework_host }}:7000
 
+num.network.threads=4
+num.io.threads=8
+socket.send.buffer.bytes=1048576
+socket.receive.buffer.bytes=1048576
+socket.request.max.bytes=104857600
 delete.topic.enable=true
-num.partitions=16
+
+num.partitions=8
 failoverTimeout=60
 
 log.dirs=/tmp/kafka/$id
 log.segment.bytes=1000000
 log.retention.hours=1
+log.cleanup.interval.mins=1
+
+replica.lag.max.messages=10000000
+
