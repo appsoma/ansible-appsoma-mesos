@@ -87,13 +87,8 @@
             {{ comma() }}{{ hostvars[item].private_ip_address }}
           {%- endfor %}
 
-    - name: Set master to run slave
-      set_fact: mesos_mode='master-slave'
-      when: run_slave_on_master is defined and run_slave_on_master
-
-    - name: Set master to not run slave
-      set_fact: mesos_mode='master'
-      when: run_slave_on_master is not defined or not run_slave_on_master
+    - name: Set Mesos master run mode
+      set_fact: mesos_mode="{{ 'master-slave' if run_slave_on_master is defined and run_slave_on_master else 'master' }}"
 
     - name: Add ssh keys to management user
       authorized_key: key="{{ item }}" state=present user=ubuntu exclusive=no
@@ -175,16 +170,22 @@
       zookeeper_host_list: "{{zookeeper_hosts_with_port}}"
       haproxy_pem_file: "cluster_vars/{{ cluster_name }}/haproxy.pem"
 
-    # Install mesos in master mode
+    # Install Mesos
     - role: ansible-mesos
       zookeeper_hostnames: "{{ zookeeper_hosts_with_port  }}"
       mesos_install_mode: "{{ mesos_mode }}"
       mesos_cluster_name: "{{cluster_name}}"
       mesos_hostname: "{{ hostvars[inventory_hostname]['private_ip_address'] }}"
 
-    # Install marathon
+    # Install Marathon
     - role: ansible-marathon
       zookeeper_hostnames: "{{ zookeeper_hosts_with_port  }}"
+      when: inventory_hostname == groups[inventory_group_master][0]
+
+    # Install Appsoma Rhino
+    - role: ../roles/ansible-rhino
+      zookeeper_hostnames: "{{ zookeeper_hosts_with_port }}"
+      db_folder: "{{ data_mount_point }}/rhino_db"
       when: inventory_hostname == groups[inventory_group_master][0]
 
     - role: ansible-mesos-dns
@@ -210,14 +211,17 @@
       marathon_host: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
       mesos_master_list: "{{ zookeeper_hosts_no_port }}"
 
+    - role: ../roles/ansible-kafka-mesos
+      zookeeper_hosts: "{{ zookeeper_hosts_with_port }}"
+      zookeeper_hosts_no_port_list: "{{ zookeeper_hosts_no_port.split(',') }}"
+      framework_host: "{{ hostvars[inventory_hostname]['private_dns_name'] }}"
+      when: "use_kafka is defined and use_kafka and inventory_hostname == groups[inventory_group_master][0]"
 
-- include: playbooks/kafka_playbook.yml
-  when: use_kafka is not defined or use_kafka
-
-- include: playbooks/storm_playbook.yml
-  when: use_storm is not defined or use_storm
-
-- include: playbooks/rhino_playbook.yml
+    - role: ../roles/ansible-storm-mesos
+      zookeeper_hosts: "{{ zookeeper_hosts_with_port }}"
+      zookeeper_hosts_no_port_list: "{{ zookeeper_hosts_no_port.split(',') }}"
+      framework_host: "{{ hostvars[inventory_hostname]['private_dns_name'] }}"
+      when: "use_storm is defined and use_storm and inventory_hostname == groups[inventory_group_master][0]"
 
 - include: playbooks/welder_playbook.yml
 

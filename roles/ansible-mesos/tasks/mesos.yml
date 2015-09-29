@@ -3,14 +3,10 @@
 - name: create work dir
   file: path=/var/mesos state=directory
 
-# == Remove default configs
+# == Remove default master config on slaves
 - name: Remove Default Mesos-Master Config
   file: state=absent path=/etc/mesos-master/
   when: mesos_install_mode == "slave"
-
-- name: Remove Default Mesos-Slave Config
-  file: state=absent path=/etc/mesos-slave/
-  when: mesos_install_mode == "master"
 
 # == Configure and recreate
 - name: Make Mesos dir

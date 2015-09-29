@@ -20,7 +20,6 @@ script
   DAEMON_USER={{ kafka_user }}
 
   export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/libmesos.so
-  #export LIBPROCESS_IP={{ framework_host }}
 
   if [ "x$ENABLE_KAFKA" = "xyes" ]
   then

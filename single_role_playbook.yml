@@ -1,0 +1,51 @@
+---
+- hosts: localhost
+  connection: local
+  vars_files:
+    - "cluster_vars/common.yml"
+    - "cluster_vars/{{ cluster_name }}/required_vars.yml"
+    - "cluster_vars/{{ cluster_name }}/aws_secret_vars.yml"
+  roles:
+    - role: ../roles/ansible-cloud-inventory-parse
+      provider: "{{ cloud_provider }}"
+
+- hosts: [ "{{ group }}" ]
+  remote_user: "{{ management_user }}"
+  sudo: True
+  vars_files:
+    - "cluster_vars/common.yml"
+    - "cluster_vars/{{ cluster_name }}/required_vars.yml"
+    - "cluster_vars/{{ cluster_name }}/users.yml"
+  pre_tasks:
+
+    - name: Add AWS vars
+      include_vars: "cluster_vars/{{ cluster_name }}/aws_secret_vars.yml"
+      no_log: true
+      when: "(cloud_provider is defined and cloud_provider == 'ec2') or (use_docker_registry is defined and use_docker_registry)"
+
+    - name: Find NFS Server IP
+      set_fact: nfsServerIp={{ hostvars[groups[inventory_group_service][0]]['private_ip_address'] }}
+      when: groups[inventory_group_service] is defined
+
+    - name: Set zookeeper private IP list with port
+      set_fact:
+        zookeeper_hosts_with_port: |
+          {% set comma = joiner(':' + zookeeper_client_port + ',') %}
+          {% for item in groups[inventory_group_master] -%}
+            {{ comma() }}{{ hostvars[item].private_ip_address }}:{{ zookeeper_client_port }}
+          {%- endfor %}
+
+    - name: Save zookeeper private IP list to bash profile
+      lineinfile: dest=/etc/profile.d/zookeeper_host_list.sh line="export ZK_HOST_LIST={{ zookeeper_hosts_with_port }}" state=present create=yes
+
+    - name:  Set zookeeper private IP list
+      set_fact:
+        zookeeper_hosts_no_port: |
+          {% set comma = joiner(',') %}
+          {% for item in groups[inventory_group_master] -%}
+            {{ comma() }}{{ hostvars[item].private_ip_address }}
+          {%- endfor %}
+
+  roles:
+    # Install NTP for time sync
+    - role: "{{ role name }}"

@@ -11,8 +11,9 @@
   git:
     repo: https://github.com/mesos/kafka.git
     dest: /opt/kafka
-    version: HEAD
-    update: no
+    version: "{{ kafka_mesos_version if kafka_mesos_version is defined else 'HEAD' }}"
+    update: yes
+    force: yes
   sudo: yes
   sudo_user: "{{ kafka_user }}"
   register: git_pull
@@ -21,6 +22,7 @@
   shell: "./gradlew jar"
   args:
      chdir: /opt/kafka
+  when: git_pull.changed
 
 - name: Download Kafka tarball
   get_url:
