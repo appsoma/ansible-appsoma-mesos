@@ -1,8 +1,4 @@
 ---
-- name: Update apt cache
-  apt: update_cache=yes cache_valid_time={{apt_cache_timeout}}
-  tags: bootstrap
-
 - name: Apt install required system packages.
   apt: pkg={{item}} state=installed
   tags: bootstrap

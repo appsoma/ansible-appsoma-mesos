@@ -1,0 +1,45 @@
+variable "cluster_name" {
+  description = "Name of the cluster to be used for naming resources"
+  default = "{{ cluster_name }}"
+}
+
+variable "dns_domain" {
+  description = "DNS domain to create entries in"
+  default = "{{ route53_zone }}"
+}
+
+variable "subnet_dns_name" {
+  description = "Subnet to use for all cluster DNS names"
+  default = "{{ cluster_name }}.{{ route53_zone }}"
+}
+
+variable "instance_root_disk_size_gb" {
+  description = "Size of volume for root disk on an instance"
+  default = {
+	service = {{ service_nodes.root_volume_size_gb }}
+	master = {{ masters.root_volume_size_gb }}
+{% for s_type in slave_types %}
+	{{ s_type.name }} = "{{ s_type.root_volume_size_gb }}"
+{% endfor %}
+  }
+}
+variable "key_name" {
+  description = "Name of key on AWS to use for instances"
+  default = "terraform"
+}
+
+variable "rack_count" {
+  description = "Amazon instances of each type ('rack' attribute) to create"
+  default = {
+	service = {{ service_nodes.count }}
+	master = {{ masters.count }}
+{% for s_type in slave_types %}
+	{{ s_type.name }} = "{{ s_type.count }}"
+{% endfor %}
+  }
+}
+
+variable "data_volume_size_gb" {
+  description = "Size of NFS-mountable data volume created on service node"
+  default = {{ service_nodes.data_volume_size_gb }}
+}

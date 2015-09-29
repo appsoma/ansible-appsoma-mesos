@@ -1,15 +1,16 @@
 
 - name: Show Service Nodes in groups
-  debug: msg="service nodes {{ groups[inventory_group_service] }}"
-  when: groups[inventory_group_service] is defined
+  debug: msg="service nodes {{ groups[provider_group_prefix[provider] + inventory_group_service] }}"
+  when: provider is defined and groups[provider_group_prefix[provider] + inventory_group_service] is defined
 
 - name: Show Master Nodes in groups
-  debug: msg="master nodes {{ groups[inventory_group_master] }} "
-  when: groups[inventory_group_master] is defined
+  debug: msg="master nodes {{ groups[provider_group_prefix[provider] + inventory_group_master] }}"
+  when: provider is defined and groups[provider_group_prefix[provider] + inventory_group_master] is defined
 
 - name: Show Slave Nodes in groups
-  debug: msg="slave nodes {{ groups[inventory_group_slave] }}"
-  when: groups[inventory_group_slave] is defined
+  debug: msg="slave nodes {{ groups[provider_group_prefix[provider] + inventory_group_slave] }}"
+  when: provider is defined and groups[provider_group_prefix[provider] + inventory_group_slave] is defined
+
 - include: none.yml
   when: provider == 'none'
 

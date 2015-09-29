@@ -3,9 +3,9 @@
   apt_key: id=E56151BF keyserver=keyserver.ubuntu.com state=present
 
 - name: Add Mesosphere repo
-  apt_repository: repo="{{marathon_apt_repo}}" state=present
+  apt_repository: repo="{{marathon_apt_repo}}" state=present update_cache=yes
 
 - name: Install Marathon package
-  apt: pkg=marathon={{marathon_version}}-1.* state=present update_cache=yes
+  apt: pkg=marathon={{marathon_version}}-1.* state=present
   notify:
     - Restart Marathon

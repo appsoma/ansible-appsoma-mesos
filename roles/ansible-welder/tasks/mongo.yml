@@ -5,7 +5,7 @@
   apt_repository: repo="deb {{mongo_repo}} {{ansible_distribution_release}}/mongodb-org/3.0 multiverse" update_cache=yes state=present
 
 - name: Install MongoDB
-  apt: pkg=mongodb-org state=present update_cache=yes
+  apt: pkg=mongodb-org state=present
   register: mongo_install
 
 - name: Create DB directory

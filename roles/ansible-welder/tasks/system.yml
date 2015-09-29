@@ -1,7 +1,7 @@
 - include: mongo.yml
 
 - name: Install PAM dev libraries (Debian/Ubuntu)
-  apt: pkg=libpam0g-dev state=present update_cache=yes
+  apt: pkg=libpam0g-dev state=present
   when: ansible_os_family == "Debian"
 
 - name: Install PAM dev libraries (RedHat/Centos)

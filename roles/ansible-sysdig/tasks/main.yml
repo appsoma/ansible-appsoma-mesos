@@ -12,4 +12,4 @@
   apt: pkg="linux-headers-{{version.stdout}}" state=present
 
 - name: Install sysdig
-  apt: pkg=sysdig update_cache=yes state=present
+  apt: pkg=sysdig state=present

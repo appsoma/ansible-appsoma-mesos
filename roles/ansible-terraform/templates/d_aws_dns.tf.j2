@@ -1,0 +1,51 @@
+resource "aws_route_53_zone" "domain" {
+  name = "${var.dns_domain}"
+}
+
+resource "aws_route_53_record" "wildcard" {
+   zone_id = "${aws_route_53_zone.domain.id}"
+   name = "*.${var.subnet_dns_name}"
+   type = "CNAME"
+   ttl = "300"
+   records = ["${aws_instance.master.public_dns_name}"]
+}
+
+resource "aws_route_53_record" "service" {
+   zone_id = "${aws_route_53_zone.domain.id}"
+   name = "${aws_instance.service.tags.Name}.${var.subnet_dns_name}"
+   type = "CNAME"
+   ttl = "300"
+   records = ["${aws_instance.service.public_dns_name}"]
+}
+
+resource "aws_route_53_record" "master" {
+   zone_id = "${aws_route_53_zone.domain.id}"
+   name = "${aws_instance.master.tags.Name}.${var.subnet_dns_name}"
+   type = "CNAME"
+   ttl = "300"
+   records = ["${aws_instance.master.public_dns_name}"]
+}
+
+resource "aws_route_53_record" "slave_small" {
+   zone_id = "${aws_route_53_zone.domain.id}"
+   name = "${aws_instance.slave_gp.tags.Name}.${var.subnet_dns_name}"
+   type = "CNAME"
+   ttl = "300"
+   records = ["${aws_instance.slave_small.public_dns_name}"]
+}
+
+resource "aws_route_53_record" "slave_gp" {
+   zone_id = "${aws_route_53_zone.domain.id}"
+   name = "${aws_instance.slave_gp.tags.Name}.${var.subnet_dns_name}"
+   type = "CNAME"
+   ttl = "300"
+   records = ["${aws_instance.slave_gp.public_dns_name}"]
+}
+
+resource "aws_route_53_record" "slave_db" {
+   zone_id = "${aws_route_53_zone.domain.id}"
+   name = "${aws_instance.slave_db.tags.Name}.${var.subnet_dns_name}"
+   type = "CNAME"
+   ttl = "300"
+   records = ["${aws_instance.slave_db.public_dns_name}"]
+}

@@ -1,8 +1,8 @@
 - name: Install openvpn
-  apt: pkg=openvpn state=present update_cache=yes
+  apt: pkg=openvpn state=present
 
 - name: Install easy-rsa
-  apt: pkg=easy-rsa state=present update_cache=yes
+  apt: pkg=easy-rsa state=present
 
 - name: Allow IP forwarding
   #lineinfile: dest=/proc/sys/net/ipv4/ip_forward regexp='^1' line='1'

@@ -2,7 +2,7 @@
   apt_repository: repo=ppa:cwchien/gradle state=present update_cache=yes
 
 - name: Install Gradle
-  apt: pkg=gradle state=present update_cache=yes
+  apt: pkg=gradle state=present
 
 - name: Make kafka-mesos dir
   file: path=/opt/kafka state=directory owner="{{ kafka_user }}"

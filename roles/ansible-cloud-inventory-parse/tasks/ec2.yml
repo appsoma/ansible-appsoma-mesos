@@ -1,43 +1,52 @@
 
-- name: Change values for Amazon EC2
-  debug: msg="{{ groups[inventory_group_service] }} ---- {{ groups[inventory_group_master] }} ---- {{ groups[inventory_group_slave] }} "
+- name: Provider group
+  debug: msg="{{ provider_group_prefix[provider] }}"
+
+- name: Group values from Amazon EC2
+  debug: msg="{{ groups[provider_group_prefix[provider] + inventory_group_service] }} "
 
 - name: Add service node variables to host list
   add_host:
-    hostname: "{{ hostvars[item]['ec2_ip_address'] }}"
+    hostname: "{{ item }}"
     groupname: "{{ inventory_group_service }}"
-    system_name: "{{ hostvars[item]['ec2_tag_Name'] }}"
-    id: "{{ hostvars[item]['ec2_tag_id'] }}"
-    public_ip_address: "{{ hostvars[item]['ec2_ip_address'] }}"
-    public_dns_name: "{{ hostvars[item]['ec2_public_dns_name'] }}"
-    private_ip_address: "{{ hostvars[item]['ec2_private_ip_address'] }}"
-    private_dns_name: "{{ hostvars[item]['ec2_private_dns_name'] }}"
-  with_items: groups[inventory_group_service]
-  when: hostvars[item]['ec2_tag_Name'] is defined and groups[inventory_group_service] is defined
+    system_name: "{{ hostvars[item].tags.Name }}"
+    short_name: "{{ hostvars[item].tags.short_name }}"
+    id: "{{ hostvars[item].tags.id }}"
+    public_ip_address: "{{ hostvars[item].public.ip }}"
+    public_dns_name: "{{ hostvars[item].public.dns }}"
+    private_ip_address: "{{ hostvars[item].private.ip }}"
+    private_dns_name: "{{ hostvars[item].private.ip }}"
+  with_items: groups[provider_group_prefix[provider] + inventory_group_service]
+  when: hostvars[item].tags is defined and hostvars[item].tags.Name is defined and groups[provider_group_prefix[provider] + inventory_group_service] is defined
 
 - name: Add master node variables to host list
   add_host:
-    hostname: "{{ hostvars[item]['ec2_ip_address'] }}"
+    hostname: "{{ item }}"
     groupname: "{{ inventory_group_master }}"
-    system_name: "{{ hostvars[item]['ec2_tag_Name'] }}"
-    id: "{{ hostvars[item]['ec2_tag_id'] }}"
-    zoo_id: "{{ hostvars[item]['ec2_tag_zoo_id'] }}"
-    public_ip_address: "{{ hostvars[item]['ec2_ip_address'] }}"
-    public_dns_name: "{{ hostvars[item]['ec2_public_dns_name'] }}"
-    private_ip_address: "{{ hostvars[item]['ec2_private_ip_address'] }}"
-    private_dns_name: "{{ hostvars[item]['ec2_private_dns_name'] }}"
-  with_items: groups[inventory_group_master]
-  when: hostvars[item]['ec2_tag_Name'] is defined and groups[inventory_group_master] is defined
+    system_name: "{{ hostvars[item].tags.Name }}"
+    short_name: "{{ hostvars[item].tags.short_name }}"
+    id: "{{ hostvars[item].tags.id }}"
+    zoo_id: "{{ hostvars[item].tags.zoo_id }}"
+    public_ip_address: "{{ hostvars[item].public.ip }}"
+    public_dns_name: "{{ hostvars[item].public.dns }}"
+    private_ip_address: "{{ hostvars[item].private.ip}}"
+    private_dns_name: "{{ hostvars[item].private.dns}}"
+  with_items: groups[provider_group_prefix[provider] + inventory_group_master]
+  when: hostvars[item].tags is defined and hostvars[item].tags.Name is defined and groups[provider_group_prefix[provider] + inventory_group_master] is defined
 
 - name: Add slave node variables to host list
   add_host:
-    hostname: "{{ hostvars[item]['ec2_ip_address'] }}"
+    hostname: "{{ item }}"
     groupname: "{{ inventory_group_slave }}"
-    system_name: "{{ hostvars[item]['ec2_tag_Name'] }}"
-    id: "{{ hostvars[item]['ec2_tag_id'] }}"
-    public_ip_address: "{{ hostvars[item]['ec2_ip_address'] }}"
-    public_dns_name: "{{ hostvars[item]['ec2_public_dns_name'] }}"
-    private_ip_address: "{{ hostvars[item]['ec2_private_ip_address'] }}"
-    private_dns_name: "{{ hostvars[item]['ec2_private_dns_name'] }}"
-  with_items: groups[inventory_group_slave]
-  when: hostvars[item]['ec2_tag_Name'] is defined and groups[inventory_group_slave] is defined
+    system_name: "{{ hostvars[item].tags.Name }}"
+    short_name: "{{ hostvars[item].tags.short_name }}"
+    id: "{{ hostvars[item].tags.id }}"
+    public_ip_address: "{{ hostvars[item].public.ip }}"
+    public_dns_name: "{{ hostvars[item].public.dns }}"
+    private_ip_address: "{{ hostvars[item].private.ip }}"
+    private_dns_name: "{{ hostvars[item].private.ip }}"
+  with_items: groups[provider_group_prefix[provider] + inventory_group_slave]
+  when: hostvars[item].tags is defined and hostvars[item].tags.Name is defined and groups[provider_group_prefix[provider] + inventory_group_slave] is defined
+
+- name: Change values for Amazon EC2
+  debug: msg="{{ groups[inventory_group_service] }} ---- {{ groups[inventory_group_master] }} ---- {{ groups[inventory_group_slave] }} "

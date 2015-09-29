@@ -1,5 +1,5 @@
 - name: Install collectd
-  apt: pkg=collectd state=present update_cache=yes
+  apt: pkg=collectd state=present
   notify: Restart collectd
 
 - name: Make collect plugin directory

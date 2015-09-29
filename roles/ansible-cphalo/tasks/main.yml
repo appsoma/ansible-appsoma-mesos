@@ -5,7 +5,7 @@
   apt_repository: repo="deb {{ cphalo_repo_url }} debian main" state=present update_cache=yes
 
 - name: Install cphalo
-  apt: pkg=cphalo state=present update_cache=yes
+  apt: pkg=cphalo state=present
 
 - name: Test if cphalo already has a id
   file: path=/opt/cloudpassage/data/id state=file

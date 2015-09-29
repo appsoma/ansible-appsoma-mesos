@@ -38,6 +38,18 @@
         value: "{{ hostvars[groups[inventory_group_master][0]]['public_dns_name'] }}"
       when: use_service_discovery_subnet is defined and use_service_discovery_subnet and use_route53 is defined and use_route53
 
+    - name: Create Master DNS entries
+      route53:
+        command: create
+        overwrite: yes
+        type: CNAME
+        zone: "{{ route53_zone }}"
+        ttl: 30
+        record: "{{ hostvars[item].short_name }}.{{ service_discovery_dns_suffix }}"
+        value: "{{ hostvars[item].public_dns_name }}"
+      with_items: groups[inventory_group_master]
+      when: use_service_discovery_subnet is defined and use_service_discovery_subnet and use_route53 is defined and use_route53
+
 - hosts: [ "{{ inventory_group_master }}" ]
   remote_user: "{{ management_user }}"
   sudo: True

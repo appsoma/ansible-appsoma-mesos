@@ -1,0 +1,35 @@
+- name: Create Terraform dir
+  file: path="terraform/{{ cluster_name }}" state=directory
+
+- name: Create general Terraform variable files from template
+  template: src="{{ item }}.j2" dest="terraform/{{ cluster_name }}/{{ item }}"
+  with_items:
+    - "a_cluster_vars.tf"
+
+- name: Create AWS Terraform files from template
+  template: src="{{ item }}.j2" dest="terraform/{{ cluster_name }}/{{ item }}"
+  with_items:
+    - "a_aws_vars.tf"
+    - "b_aws_network.tf"
+    - "b_aws_resources.tf"
+    - "c_aws_instances.tf"
+  when: cloud_provider == 'ec2'
+
+- name: Run Terraform plan
+  command: terraform plan
+  args:
+    chdir: "terraform/{{ cluster_name }}"
+  register: tf_plan
+  changed_when: tf_plan.stdout.find('No changes. Infrastructure is up-to-date.') == -1
+
+- name: Run Terraform apply
+  command: terraform apply
+  args:
+    chdir: "terraform/{{ cluster_name }}"
+  when: tf_plan.changed
+  register: tf_apply
+  changed_when: tf_apply.stdout.find('0 added, 0 changed,') == -1
+
+- name: Make list of created instances
+  debug: msg="{{ lookup('template', '../templates/instance_list.j2') }}"
+

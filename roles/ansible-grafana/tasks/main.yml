@@ -14,14 +14,14 @@
 #  apt_repository: repo="deb https://packagecloud.io/grafana/stable/debian/ wheezy main" state=present
 
 - name: Install Graphana prerequisite packages
-  apt: pkg="{{item}}" state=present # update_cache=yes
+  apt: pkg="{{item}}" state=present
   with_items:
     - adduser
     - libfontconfig
     - sqlite3
 
 - name: Install Graphana package
-  apt: deb="/opt/grafana/grafana_2.1.0-pre1_amd64.deb" state=present update_cache=yes
+  apt: deb="/opt/grafana/grafana_2.1.0-pre1_amd64.deb" state=present
 
 - name: Make Grafana config file
   template: src=grafana.ini.j2 dest=/etc/grafana/grafana.ini

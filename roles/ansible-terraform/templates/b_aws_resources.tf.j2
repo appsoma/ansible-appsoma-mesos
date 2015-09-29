@@ -1,0 +1,10 @@
+provider "aws" {
+  access_key = "${var.aws_info.access_key}"
+  secret_key = "${var.aws_info.secret_key}"
+  region = "${var.aws_info.region}"
+}
+
+resource "aws_key_pair" "aws_key" {
+  key_name = "${var.key_name}"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6HF9yQFq+v6Olhwy92t64Mzk9fIOZrUP3WHTqVW0axu+kfdt3QlsFF14WOKktwp+sQ0VV+NrLdMsQuGjh3WSKd8zKYv96cmemAkWBeHAWEY03fcvMwhzPVegHk3aD8iMsX8s1K/9MHT1AWuQq6lJJ/9S3WwA4tfpgAktLcV6GAZ3OPERsvN2+OAMKYxazxqsu3JWsRpFP6A0QrMDnFMHLrfWH1HbTJu7rtzrji6L7fanNAvCiVi/uPD/JAhXpKmHF2kkTrsAyls7Onj/0Bzoe12gM7Vq6noLJSWxx6UaqA4eqsMyHtqC+D5Cser7G4cVPj3QrHpkNOkTKFkuUZC/n ${var.key_name}"
+}

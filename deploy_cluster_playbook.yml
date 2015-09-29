@@ -1,0 +1,4 @@
+---
+- include: service_deploy_playbook.yml
+- include: master_deploy_playbook.yml
+- include: slave_deploy_playbook.yml

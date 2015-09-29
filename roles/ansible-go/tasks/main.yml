@@ -5,4 +5,4 @@
   apt_repository: repo="deb http://ppa.launchpad.net/evarlast/golang1.4/ubuntu trusty main" update_cache=yes state=present
 
 - name: Install Go
-  apt: pkg=golang state=present update_cache=yes
+  apt: pkg=golang state=present
