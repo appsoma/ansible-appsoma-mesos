@@ -9,25 +9,6 @@
     - role: ../roles/ansible-cloud-inventory-parse
       provider: "{{ cloud_provider }}"
 
-- hosts: localhost
-  connection: local
-  vars_files:
-    - "cluster_vars/common.yml"
-    - "cluster_vars/{{ cluster_name }}/required_vars.yml"
-    - "cluster_vars/{{ cluster_name }}/aws_secret_vars.yml"
-  tasks:
-    - name: Create Slave DNS entries
-      route53:
-        command: create
-        overwrite: yes
-        type: CNAME
-        zone: "{{ route53_zone }}"
-        ttl: 30
-        record: "{{ hostvars[item].short_name }}.{{ service_discovery_dns_suffix }}"
-        value: "{{ hostvars[item].public_dns_name }}"
-      with_items: groups[inventory_group_slave]
-      when: use_service_discovery_subnet is defined and use_service_discovery_subnet and use_route53 is defined and use_route53
-
 # Check for SSH port function
 - hosts: [ "{{ inventory_group_slave }}" ]
   remote_user: "{{ management_user }}"

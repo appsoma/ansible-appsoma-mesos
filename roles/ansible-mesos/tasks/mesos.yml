@@ -18,19 +18,37 @@
     - Restart mesos-master
     - Restart mesos-slave
 
-- name: Set Mesos Work Dir File
+- name: Set Mesos Hostname (master)
+  template: src=hostname.j2 dest=/etc/mesos-master/hostname
+  notify:
+    - Restart mesos-master
+  when: mesos_install_mode == "master"
+
+- name: Set Mesos Hostname (slave)
+  template: src=hostname.j2 dest=/etc/mesos-slave/hostname
+  notify:
+    - Restart mesos-slave
+  when: mesos_install_mode == "slave" or mesos_install_mode == "master-slave"
+
+- name: Set Mesos Work Dir (master)
   template: src=work_dir.j2 dest=/etc/mesos-master/work_dir
   notify:
     - Restart mesos-master
   when: mesos_install_mode == "master"
 
-- name: Set Mesos Work Dir File
+- name: Set Mesos Work Dir (slave)
   template: src=work_dir.j2 dest=/etc/mesos-slave/work_dir
   notify:
     - Restart mesos-slave
   when: mesos_install_mode == "slave" or mesos_install_mode == "master-slave"
 
-- name: Set Mesos Resources File
+- name: Set Mesos Slave Atributes
+  template: src=slave_attributes.j2 dest=/etc/mesos-slave/attributes
+  notify:
+    - Restart mesos-slave
+  when: mesos_install_mode == "slave" or mesos_install_mode == "master-slave"
+
+- name: Set Mesos Slave Resources
   template: src=slave_resources.j2 dest=/etc/mesos-slave/resources
   notify:
     - Restart mesos-slave

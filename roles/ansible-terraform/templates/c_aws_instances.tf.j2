@@ -1,15 +1,17 @@
 # Resources for defining instances in the cluster
 resource "aws_instance" "service" {
+
   availability_zone = "${var.aws_info.zone}"
   ami = "${lookup(var.aws_image, var.aws_info.region)}"
   instance_type = "${var.aws_instance_type.service}"
-  key_name = "${var.key_name}"
+  key_name = "${var.boot_key.name}"
   subnet_id = "${aws_subnet.subnet.id}"
   vpc_security_group_ids = ["${aws_security_group.slave_sg.id}"]
   associate_public_ip_address = true
   tags {
     Name = "${var.cluster_name}_service_${count.index}"
     short_name =  "service_${count.index}"
+    type = "service"
     id = "${count.index}"
     cluster = "${var.cluster_name}"
     Class = "${var.cluster_name}_service"
@@ -25,20 +27,22 @@ resource "aws_instance" "service" {
     delete_on_termination = true
     device_name = "/dev/xvdf"
   }
-  count = "${var.rack_count.service}"
+  count = "${var.type_count.service}"
 }
 
 resource "aws_instance" "master" {
+
   availability_zone = "${var.aws_info.zone}"
   ami = "${lookup(var.aws_image, var.aws_info.region)}"
   instance_type = "${var.aws_instance_type.master}"
-  key_name = "${var.key_name}"
+  key_name = "${var.boot_key.name}"
   subnet_id = "${aws_subnet.subnet.id}"
   vpc_security_group_ids = ["${aws_security_group.master_sg.id}"]
   associate_public_ip_address = true
   tags {
     Name = "${var.cluster_name}_master_${count.index}"
     short_name =  "master_${count.index}"
+    type = "master"
     id = "${count.index}"
     zoo_id = "${count.index}"
     cluster = "${var.cluster_name}"
@@ -49,24 +53,25 @@ resource "aws_instance" "master" {
     volume_size = "${var.instance_root_disk_size_gb.master}"
     delete_on_termination = true
   }
-  count = "${var.rack_count.master}"
+  count = "${var.type_count.master}"
 }
 
 {% for s_type in slave_types %}
 resource "aws_instance" "{{ s_type.name }}" {
+
   availability_zone = "${var.aws_info.zone}"
   ami = "${lookup(var.aws_image, var.aws_info.region)}"
   instance_type = "${var.aws_instance_type.{{ s_type.name }}}"
-  key_name = "${var.key_name}"
+  key_name = "${var.boot_key.name}"
   subnet_id = "${aws_subnet.subnet.id}"
   vpc_security_group_ids = ["${aws_security_group.slave_sg.id}"]
   associate_public_ip_address = true
   tags {
     Name = "${var.cluster_name}_{{ s_type.name }}_${count.index}"
     short_name =  "{{ s_type.name }}_${count.index}"
+    type = "{{ s_type.name }}"
     id = "${count.index}"
     cluster = "${var.cluster_name}"
-    rack = "{{ s_type.name }}"
     Class = "${var.cluster_name}_slave"
   }
   root_block_device {
@@ -74,7 +79,7 @@ resource "aws_instance" "{{ s_type.name }}" {
     volume_size = "${var.instance_root_disk_size_gb.{{ s_type.name }}}"
     delete_on_termination = true
   }
-  count = "${var.rack_count.{{s_type.name }}}"
+  count = "${var.type_count.{{s_type.name }}}"
 }
 
 {% endfor %}

@@ -1,1 +1,5 @@
+{% if mesos_install_mode == 'master-slave' %}
+ports:[31000-32000]
+{% else %}
 ports:[31000-32000,9160-9160,9042-9042,7199-7199,7000-7001]
+{% endif %}
