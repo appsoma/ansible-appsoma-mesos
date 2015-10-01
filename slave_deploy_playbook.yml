@@ -86,7 +86,7 @@
       nfsserver: "{{ nfsServerIp }}"
       when: nfsServerIp is defined
 
-    # Create an users
+    # Create users
     - role: ansible-welder-user
       group: "{{ welder_group }}"
       user_list: "{{ welder_user_list }}"

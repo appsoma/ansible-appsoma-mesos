@@ -29,14 +29,20 @@
   shell: ". /etc/profile.d/maven.sh; mvn compile"
   args:
      chdir: "{{ welder_support_dir }}/pump_java"
+  sudo: yes
+  sudo_user: "{{ management_user }}"
 
 - name: Package Java Message Pump
   shell: ". /etc/profile.d/maven.sh; mvn package"
   args:
      chdir: "{{ welder_support_dir }}/pump_java"
+  sudo: yes
+  sudo_user: "{{ management_user }}"
 
 - name: Compile and Start Java Kayak
   shell: ". /etc/profile.d/zookeeper_host_list.sh; . /etc/profile.d/maven.sh; ./kayak_java.sh start"
   args:
      chdir: "{{ welder_support_dir }}/kayak_java"
+  sudo: yes
+  sudo_user: "{{ management_user }}"
 

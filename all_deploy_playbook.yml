@@ -20,7 +20,7 @@
     - role: ansible-find-ssh
       when: alternate_ssh_port is defined
 
-- hosts: [ "{{ inventory_group_master }}" ]
+- hosts: [ "{{ inventory_group_master }}",  "{{ inventory_group_slave }}", "{{ inventory_group_service }}"]
   remote_user: "{{ management_user }}"
   sudo: True
   vars_files:
@@ -57,8 +57,8 @@
             {{ comma() }}{{ hostvars[item].private_ip_address }}
           {%- endfor %}
 
-    - name: Set Mesos master run mode
-      set_fact: mesos_mode="{{ 'master-slave' if run_slave_on_master is defined and run_slave_on_master else 'master' }}"
+    - name: Set Mesos Master mode
+      set_fact: mesos_master_mode="{{ 'master-slave' if run_slave_on_master is defined and run_slave_on_master else 'master' }}"
 
     - name: Add ssh keys to management user
       authorized_key: key="{{ item }}" state=present user=ubuntu exclusive=no
@@ -66,6 +66,13 @@
       when: additional_ssh_keys is defined
 
   roles:
+    # Configure node as an NFS server
+    - role: ansible-nfs-server
+      nfs_exports:
+        - "path": "{{ nfs_data_mount }}"
+          "opts": "{{private_lan_subnet}}(rw,sync,no_subtree_check,no_root_squash,nohide)"
+      when: inventory_hostname == groups[inventory_group_service][0]
+
     # Install NTP for time sync
     - role: ansible-ntp
 
@@ -80,7 +87,7 @@
 
     # Add UFW firewall if selected (should not be used with halo)
     - role: ansible-ufw
-      extra_ports: "{{ master_firewall_ports }}"
+      extra_ports: "{{ master_firewall_ports if inventory_hostname in groups[inventory_group_master] else [] }}"
       when: use_ufw is defined and use_ufw
 
     # Install Docker
@@ -88,7 +95,7 @@
       when: use_docker_registry is not defined or not use_docker_registry
 
     - role: ansible-docker
-      registry_host: "master.mesos"
+      registry_host: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
       marathon_host: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
       when: use_docker_registry is defined and use_docker_registry
 
@@ -108,32 +115,38 @@
         - scribe-js
         - supervisor
       tags: ["nodejs"]
+      when: inventory_hostname in groups[inventory_group_master] or inventory_hostname in groups[inventory_group_slave]
 
     # Configure NFS
     - role: ansible-nfs-client
       nfsmount: "{{ data_mount_point }}"
       nfspath: "{{ nfs_data_mount }}"
       nfsserver: "{{ nfsServerIp }}"
-      when: nfsServerIp is defined
+      when: nfsServerIp is defined and inventory_hostname != groups[inventory_group_service][0]
 
     # Create an users
     - role: ansible-welder-user
       group: "{{ welder_group }}"
       user_list: "{{ welder_user_list }}"
       dataDir: "{{ data_mount_point }}"
+      when: inventory_hostname in groups[inventory_group_master] or inventory_hostname in groups[inventory_group_slave]
 
     # Make sure we have usable JDKs on masters
     - role: ansible-java
       java_versions: [6, 7, 8]
+      when: inventory_hostname in groups[inventory_group_master] or inventory_hostname in groups[inventory_group_slave]
 
     - role: ansible-go
+      when: inventory_hostname in groups[inventory_group_master] or inventory_hostname in groups[inventory_group_slave]
 
-    - role: ../roles/ansible-maven
+    - role: ansible-maven
+      when: inventory_hostname in groups[inventory_group_master] or inventory_hostname in groups[inventory_group_slave]
 
     # Install zookeeper
     - role: ansible-zookeeper
       zookeeper_hosts: "{{ groups[inventory_group_master] }}"
       zookeeper_id: "{{ hostvars[inventory_hostname]['zoo_id'] }}"
+      when: inventory_hostname in groups[inventory_group_master]
 
     # Install High Availability Proxy
     - role: ansible-haProxy
@@ -143,9 +156,10 @@
     # Install Mesos
     - role: ansible-mesos
       zookeeper_hostnames: "{{ zookeeper_hosts_with_port  }}"
-      mesos_install_mode: "{{ mesos_mode }}"
+      mesos_install_mode: "{{ mesos_master_mode if inventory_hostname in groups[inventory_master_group] else 'slave' }}"
+      mesos_containerizers: "docker,mesos"
       mesos_cluster_name: "{{cluster_name}}"
-      mesos_hostname: "{{ hostvars[inventory_hostname]['private_ip_address'] }}"
+      when: inventory_hostname in groups[inventory_group_master] or inventory_hostname in groups[inventory_group_slave]
 
     # Install Marathon
     - role: ansible-marathon
@@ -162,21 +176,26 @@
       zookeeper_host_list: "{{ zookeeper_hosts_with_port }}"
       marathon_host: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
       mesos_dns_hosts: [ "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}" ]
-      is_mesos_dns_starter: true
+      is_mesos_dns_starter: "{{ true if inventory_hostname == groups[inventory_group_master][0] else false }}"
 
     - role: ansible-cassandra-marathon
       marathon_host: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
+      when: inventory_hostname == groups[inventory_group_master][0]
 
     - role: ansible-rabbitmq
+      when: inventory_hostname == groups[inventory_group_master][0]
 
     - role: ansible-redis
+      when: inventory_hostname == groups[inventory_group_master][0]
 
     - role: ansible-influxdb
+      when: inventory_hostname == groups[inventory_group_master][0]
 
     - role: ansible-grafana
+      when: inventory_hostname == groups[inventory_group_master][0]
 
     - role: ansible-sensu
-      sensu_mode: "master"
+      sensu_mode: "{{ 'master' if inventory_hostname == groups[inventory_group_master][0] else 'client' }}"
       sensu_master: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
       marathon_host: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
       mesos_master_list: "{{ zookeeper_hosts_no_port }}"
@@ -194,4 +213,4 @@
       when: "use_storm is defined and use_storm and inventory_hostname == groups[inventory_group_master][0]"
 
 - include: playbooks/welder_playbook.yml
-
+  when: inventory_hostname == groups[inventory_group_master][0]

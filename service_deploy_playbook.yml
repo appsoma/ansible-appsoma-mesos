@@ -47,6 +47,7 @@
 
     - name: Format data volume
       filesystem: fstype=ext4 dev="/dev/xvdf"
+
     - name: Mount data volume
       mount: name="{{ nfs_data_mount }}" src="/dev/xvdf" fstype=ext4 state=mounted
       when: inventory_hostname == groups[inventory_group_service][0]
