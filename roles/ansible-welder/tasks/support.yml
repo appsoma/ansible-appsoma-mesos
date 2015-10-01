@@ -36,7 +36,7 @@
      chdir: "{{ welder_support_dir }}/pump_java"
 
 - name: Compile and Start Java Kayak
-  shell: ". /etc/profile.d/zookeeper_host_list.sh; . /etc/profile.d/maven.sh; ./kayak_java.sh restart"
+  shell: ". /etc/profile.d/zookeeper_host_list.sh; . /etc/profile.d/maven.sh; ./kayak_java.sh start"
   args:
      chdir: "{{ welder_support_dir }}/kayak_java"
 

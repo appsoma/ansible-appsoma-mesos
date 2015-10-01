@@ -33,7 +33,7 @@ When using a cloud provider (for now, just Amazon EC2), you get dynamic access t
 
 ## Prerequisites
 
-Ansible will run from any host with network access to your cluster.  For a cloud provider, this requires internet access. 
+Ansible and Terraform will run from any host with network access to your cluster.  For a cloud provider, this requires internet access. 
 For an intranet, your host will have to have access to the LAN (local or VPN) and SSH access.
 
 Ansible can be installed on Ubuntu/Debian by adding the Ansible PPA repository:
@@ -48,6 +48,10 @@ Or on RH/Centos by using the [EPEL libary](http://fedoraproject.org/wiki/EPEL):
     sudo yum install ansible python-boto
 	
 Don't forget about Boto, the Amazon AWS client module for python.  The standard distro package should be sufficient.
+
+Terraform can be installed by following the directions [here](https://www.terraform.io/intro/getting-started/install.html)
+
+A convenience script (`install_ansible.sh`) is available in the repo.  This will install Ansible and Terraform on your system (using sudo)
 
 # Installation
 
@@ -69,7 +73,7 @@ To use HAProxy with SSL, set the flag in `required_vars.yml` and create a file c
 
 This script will create 1 NFS server with an EBS data volume and a new VPC, as well as the master and slave nodes.  Make sure your subscription has enough resources available
 To run with Amazon EC2, you'll have to collect an access credential (Access Key/Secret Key, or Access Key ID and Secret Access Key, either name might appear)
-You'll also need to register a [keypair on EC2](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html). 
+You'll also need to provide an RSA key pair.
 
 You'll also need to select an AWS region and availability zone to install the cluster in.
 
@@ -79,18 +83,17 @@ If you use Route53 to manage a public domain name, you can assign DNS entries to
     * Remember not to include the AWS keys in a git repo!
     * If you haven't already, copy `cluster_vars/required_vars.yml.template` and `cluster_vars/users.yml.template`
     * Set `cloud_provider: "ec2"` in `cluster_vars/{{ cluster_name }}/required_vars.yml`
-    * Be sure to change the `ec2_key_name`, `ec2_region`, and `ec2_zone` keys to match your information
-    * If you want to use Route53 DNS, make sure `use_route53: true` and `route53_zone` is set to your DNS zone.
+    * Be sure to change the `ec2_region` and `ec2_zone` keys to match your information
+    * If you want to use Route53 DNS, make sure `use_route53: true` and `route53_zone_id` is set to the ID of the hosted zone you will use on Route53.
     * Set the instance types, data volume size and type, and private lan subnets to your liking.  Remember these will cost you while running.
 
 Next, you'll have to set up the EC2 environment.  If you have an existing Boto config (`/etc/boto.cfg`, `~/.boto`, or `~/.aws/credentials`), you can skip this
 
     source setup_amazon_env.bash
     
-Now, test that you can access the EC2 dynamic inventory.  This should produce a list of some contents of your EC2 account.  
-Any errors messages here will prevent you from accessing EC2 and using this playbook:
+Now, test that you can access the Terraform dynamic inventory. 
 
-    inventory/ec2.py --list
+    inventory/terraform.py --list
 
 ### Running
 
@@ -99,19 +102,20 @@ This will remove the warnings (which require you to type `yes`) when you connect
  
 Now to run the playbook from scratch: 
 
-    ansible-playbook --private-key ~/mykey.pem -i inventory/ec2.py create_cluster_playbook.yml -e "cluster_name={{ cluster_name }}"
+    ansible-playbook --private-key ~/mykey.pem -i inventory/terraform.py manage_terraform_playbook.yml -e "cluster_name={{ cluster_name }}"
+    ansible-playbook --private-key ~/mykey.pem -i inventory/terraform.py deploy_cluster_playbook.yml -e "cluster_name={{ cluster_name }}"
 
-You can safely re-run this command multiple times, in the event of an Amazon communication outage, or an error in variables.
+You can safely re-run these commands multiple times, in the event of an Amazon communication outage, or an error in variables.
 
 If you edit `playbook_vars/users.yml`, you can update the entire cluster by running:
     
-    ansible-playbook --private-key ~/mykey.pem -i inventory/ec2.py sync_users.yml -e "cluster_name={{ cluster_name }}"
+    ansible-playbook --private-key ~/mykey.pem -i inventory/terraform.py sync_users.yml -e "cluster_name={{ cluster_name }}"
     
 This will add new users, and update existing users (and their passwords).  This fixed password management is the best solution short of a user directory system. (See [To do items](#to-do))
 
 A convenience script to hide some of the Ansible argument complexity and AWS setup is available in `update_cluster.bash`, just run with the name of your cluster, and the name of the playbook yml file you want to use as arguments:
     
-    update_cluster.bash {{ cluster_name }} create_cluster_playbook.yml
+    update_cluster.bash {{ cluster_name }} deploy_cluster_playbook.yml
     
 ### Troubleshooting
 * SSH errors
@@ -140,13 +144,13 @@ At least 3 nodes are required, one master, one service, and one slave.  You can 
 Your inventory file should look like this, with `mycluster` replaced with the cluster name.
 
     [mycluster_master]
-    192.168.100.1   public_ip_address=192.168.100.1 public_dns_name=master_0.mycluster.mydomain.com private_ip_address=10.10.0.1 private_dns_name=master_0.internal system_name=master_0 id=0 zoo_id=0
+    192.168.100.1   public_ip_address=192.168.100.1 public_dns_name=master_0.mycluster.mydomain.com private_ip_address=10.10.0.1 private_dns_name=master_0.internal system_name=master_0.internal short_name=master_0 type=master id=0 zoo_id=0
     
     [mycluster_service]
-    192.168.100.254	public_ip_address=192.168.100.254 public_dns_name=service_0.mycluster.mydomain.com private_ip_address=10.10.0.254 private_dns_name=service_0.internal system_name=service_0 id=0
+    192.168.100.254	public_ip_address=192.168.100.254 public_dns_name=service_0.mycluster.mydomain.com private_ip_address=10.10.0.254 private_dns_name=service_0.internal system_name=service_0.internal short_name=service_0 type=service id=0
     
     [mycluster_slave]
-    192.168.100.2   public_ip_address=192.168.100.2 public_dns_name=slave_0.mydomain.com private_ip_address=10.10.0.2 private_dns_name=slave_0.internal system_name=slave_0 id=0
+    192.168.100.2   public_ip_address=192.168.100.2 public_dns_name=slave_0.mydomain.com private_ip_address=10.10.0.2 private_dns_name=slave_0.internal system_name=slave_0 short_name=slave_0.internal type=slave_gp id=0
 
 ### Running
 
@@ -178,9 +182,9 @@ If you edit `cluster_vars/{{ cluster_name }}/users.yml`, you can update the enti
 
 You can ssh to your new cluster with user `ubuntu` and the private key you used for deployment.  If you use route53, nodes will be available at
 
-* `master_*.{{ route53_zone }}`
-* `slave_*.{{ route53_zone }}`
-* `service_*.{{ route53_zone }}`
+* `master_*.{{ service_discovery_dns_suffix }}`
+* `slave_*.{{ service_discovery_dns_suffix }}`
+* `service_*.{{ service_discovery_dns_suffix }}`
 
 Addtional SSH keys for user `ubuntu` can be set by setting `additional_ssh_keys` in cluster_vars/{{ cluster_name }}/required_vars.yml
 
@@ -200,7 +204,7 @@ The Welder users can be configured for ssh login by setting an authorized key in
 ## To Do
 
 * Additional tools
-* Supporting other clouds (GCE, OpenStack, Azure) via [Terraform](https://www.terraform.io/)
+* Supporting other clouds (GCE, OpenStack, etc.) via [Terraform](https://www.terraform.io/)
 * Better utilization of docker
 * Better cluster-wide user management (LDAP)
 * Better cluster-wide file support (HDFS)
