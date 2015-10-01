@@ -1,0 +1,25 @@
+variable "cluster_name" {
+  description = "Name of the cluster to be used for naming resources"
+  default = "{{ cluster_name }}"
+}
+
+variable "type_count" {
+  description = "Amazon instances of each type ('rack' attribute) to create"
+  default = {
+	service = {{ service_nodes.count }}
+	master = {{ masters.count }}
+{% for s_type in slave_types %}
+	{{ s_type.name }} = "{{ s_type.count }}"
+{% endfor %}
+  }
+}
+
+variable "master_public_ip" {}
+variable "master_public_dns" {}
+variable "service_public_ip" {}
+variable "service_public_dns" {}
+
+{% for s_type in slave_types %}
+variable "{{ s_type.name }}_public_ip" {}
+variable "{{ s_type.name }}_public_dns" {}
+{% endfor %}

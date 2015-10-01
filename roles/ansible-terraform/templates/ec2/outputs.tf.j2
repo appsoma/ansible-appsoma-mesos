@@ -1,0 +1,47 @@
+output "service_public_ip" {
+{% if service_nodes.count > 1 %}
+    value = "${join(",", aws_instance.service.*.public_ip)}"
+{% else %}
+    value = "${aws_instance.service.public_ip}"
+{% endif %}
+}
+
+output "service_public_dns" {
+{% if service_nodes.count > 1 %}
+    value = "${join(",", aws_instance.service.*.public_dns)}"
+{% else %}
+    value = "${aws_instance.service.public_dns}"
+{% endif %}
+}
+
+output "master_public_ip" {
+{% if service_nodes.count > 1 %}
+    value = "${join(",", aws_instance.master.*.public_ip)}"
+{% else %}
+    value = "${aws_instance.master.public_ip}"
+{% endif %}
+}
+output "master_public_dns" {
+{% if service_nodes.count > 1 %}
+    value = "${join(",", aws_instance.master.*.public_dns)}"
+{% else %}
+    value = "${aws_instance.master.public_dns}"
+{% endif %}
+}
+
+{% for s_type in slave_types %}
+output "{{ s_type.name }}_public_ip" {
+{% if s_type.count > 1 %}
+    value = "${join(",", aws_instance.{{ s_type.name }}.*.public_ip)}"
+{% else %}
+    value = "${aws_instance.{{ s_type.name }}.public_ip}"
+{% endif %}
+}
+output "{{ s_type.name }}_public_dns" {
+{% if s_type.count > 1 %}
+    value = "${join(",", aws_instance.{{ s_type.name }}.*.public_dns)}"
+{% else %}
+    value = "${aws_instance.{{ s_type.name }}.public_dns}"
+{% endif %}
+}
+{% endfor %}

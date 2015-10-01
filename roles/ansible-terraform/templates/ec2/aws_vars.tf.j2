@@ -1,3 +1,8 @@
+variable "cluster_name" {
+  description = "Name of the cluster to be used for naming resources"
+  default = "{{ cluster_name }}"
+}
+
 variable "aws_info" {
   description = "Amazon AWS/EC2/S3 keys and settings"
   default = {
@@ -44,8 +49,36 @@ variable "instance_volume_type" {
   }
 }
 
-provider "aws" {
-  access_key = "${var.aws_info.access_key}"
-  secret_key = "${var.aws_info.secret_key}"
-  region = "${var.aws_info.region}"
+variable "instance_root_disk_size_gb" {
+  description = "Size of volume for root disk on an instance"
+  default = {
+	service = {{ service_nodes.root_volume_size_gb }}
+	master = {{ masters.root_volume_size_gb }}
+{% for s_type in slave_types %}
+	{{ s_type.name }} = "{{ s_type.root_volume_size_gb }}"
+{% endfor %}
+  }
+}
+variable "boot_key" {
+  description = "Keypair to create on AWS to use for {{ cluster_name }}"
+  default = {
+    name = "terraform-{{ cluster_name }}"
+    pub_key = "{{ ec2_public_key }} terraform-{{ cluster_name }}"
+  }
+}
+
+variable "type_count" {
+  description = "Amazon instances of each type ('rack' attribute) to create"
+  default = {
+	service = {{ service_nodes.count }}
+	master = {{ masters.count }}
+{% for s_type in slave_types %}
+	{{ s_type.name }} = "{{ s_type.count }}"
+{% endfor %}
+  }
+}
+
+variable "data_volume_size_gb" {
+  description = "Size of NFS-mountable data volume created on service node"
+  default = {{ service_nodes.data_volume_size_gb }}
 }

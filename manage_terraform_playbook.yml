@@ -1,6 +1,7 @@
 ---
 - hosts: localhost
   connection: local
+  gather_facts: false
   vars_files:
     - "cluster_vars/common.yml"
     - "cluster_vars/{{ cluster_name }}/required_vars.yml"
@@ -8,6 +9,7 @@
   pre_tasks:
     - name: Include Amazon EC2 variables
       include_vars: "cluster_vars/{{ cluster_name }}/aws_secret_vars.yml"
+      no_log: yes
       when: cloud_provider == "ec2"
 
   roles:

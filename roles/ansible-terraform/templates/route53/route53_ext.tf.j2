@@ -1,0 +1,71 @@
+provider "aws" {
+   access_key = "{{ route53_access_key }}"
+   secret_key = "{{ route53_secret_key }}"
+   region = "{{ route53_region }}"
+}
+
+
+resource "aws_route53_record" "service-ext" {
+{% if service_nodes.count > 1 %}
+   zone_id = "{{ route53_zone_id }}"
+   name = "service_${count.index}.{{ service_discovery_dns_suffix }}"
+   type = "CNAME"
+   ttl = "30"
+   count = "${var.type_count.service}"
+   records = ["${element(split(",", var.service_public_dns), count.index)}"]
+{% else %}
+   zone_id = "{{ route53_zone_id }}"
+   name = "service_0.{{ service_discovery_dns_suffix }}"
+   type = "CNAME"
+   ttl = "30"
+   records = ["${var.service_public_dns}"]
+{% endif %}
+}
+
+resource "aws_route53_record" "wildcard-ext" {
+   zone_id = "{{ route53_zone_id }}"
+   name = "*.{{ service_discovery_dns_suffix }}"
+   type = "A"
+   ttl = "30"
+   records = ["${split(",", var.master_public_ip)}"]
+}
+
+resource "aws_route53_record" "master-ext" {
+{% if masters.count > 1 %}
+   zone_id = "{{ route53_zone_id }}"
+   name = "master_${count.index}.{{ service_discovery_dns_suffix }}"
+   type = "CNAME"
+   ttl = "30"
+   count = "${var.type_count.master}"
+   records = ["${element(split(",", var.master_public_dns), count.index)}"]
+{% else %}
+   zone_id = "{{ route53_zone_id }}"
+   name = "master_0.{{ service_discovery_dns_suffix }}"
+   type = "CNAME"
+   ttl = "30"
+   records = ["${var.master_public_dns}"]
+{% endif %}
+}
+
+{% for s_type in slave_types %}
+{% if s_type.count > 0 %}
+
+resource "aws_route53_record" "{{ s_type.name }}-ext" {
+
+{% if s_type.count > 1 %}
+   zone_id = "{{ route53_zone_id }}"
+   name = "{{ s_type.name }}_${count.index}.{{ service_discovery_dns_suffix }}"
+   type = "CNAME"
+   ttl = "30"
+   count = "${var.type_count.{{ s_type.name }}}"
+   records = ["${element(split(",", var.{{ s_type.name }}_public_dns), count.index)}"]
+{% else %}
+   zone_id = "{{ route53_zone_id }}"
+   name = "{{ s_type.name }}_0.{{ service_discovery_dns_suffix }}"
+   type = "CNAME"
+   ttl = "30"
+   records = ["${var.{{ s_type.name }}_public_dns}"]
+{% endif %}
+}
+{% endif %}
+{% endfor %}
