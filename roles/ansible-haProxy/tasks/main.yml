@@ -17,6 +17,8 @@
 
 - name: Install Python Kazoo client
   command: /usr/bin/pip install kazoo
+  register: pip_kazoo
+  changed_when: pip_kazoo.stdout.find('Requirement already satisfied') == 1
 
 - name: Get zookeeper CLI
   get_url:
@@ -32,12 +34,6 @@
 - name: Create SSL certificate
   copy: src="{{ haproxy_pem_file }}" dest=/opt/haproxy/haproxy.pem mode=600
   when: haproxy_use_ssl
-
-- name: Remove Old Cron
-  file: path=/etc/cron.d/gandalf state=absent
-
-- name: Remove old gandalf
-  file: path=/usr/local/bin/gandalf-dir/gandalf.py state=absent
 
 - name: Install Gandalf
   shell: "python /opt/haproxy/gandalf/gandalf.py --zookeeper {{ zookeeper_host_list }} install"

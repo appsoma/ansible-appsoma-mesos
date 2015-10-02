@@ -8,6 +8,12 @@
 - name: Add "mesos" domain search
   lineinfile: dest=/etc/resolvconf/resolv.conf.d/base line="search mesos"
 
+- name: Check for mesos in resolv.conf
+  shell: "grep mesos /etc/resolv.conf | wc -l"
+  register: resolv_conf
+
+  changed_when: resolv.conf.stdout != '1'
 - name: Refresh resolv.conf
   command: resolvconf -u
+  when: resolv_conf.changed
 

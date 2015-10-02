@@ -4,9 +4,15 @@
 - name: Install easy-rsa
   apt: pkg=easy-rsa state=present
 
+- name: Check IP forwarding
+  shell: "cat /proc/sys/net/ipv4/ip_forward"
+  register: ip_forward
+  changed_when: ip_forward.stdout == '0'
+
 - name: Allow IP forwarding
   #lineinfile: dest=/proc/sys/net/ipv4/ip_forward regexp='^1' line='1'
   shell: "echo 1 > /proc/sys/net/ipv4/ip_forward"
+  when: ip_forward.changed
 
 - name: Set IP forwarding in sysctl
   lineinfile: dest=/etc/sysctl.conf regexp='^net\.ipv4\.ip_forward=1' line='net.ipv4.ip_forward=1'

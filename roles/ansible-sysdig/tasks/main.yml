@@ -7,6 +7,7 @@
 - name: Get Linux kernel version
   shell: "uname -r"
   register: version
+  changed_when: false
 
 - name: Install Linux headers
   apt: pkg="linux-headers-{{version.stdout}}" state=present

@@ -37,11 +37,10 @@
 #
 # "copy" scripts to server instead of "script" command
 # to avoid "setlocale LC_CTYPE" error
-#
 
 - name: copy scripts to server
   sudo: True
-  copy: src="../files/{{ item }}"  dest="/tmp/"  mode="a+x"
+  copy: src="../files/{{ item }}"  dest="/tmp/"  mode="a+x" force=no
   with_items:
     - check-nodejs-version.sh
     - install-nodejs.sh

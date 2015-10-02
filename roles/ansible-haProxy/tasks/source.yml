@@ -33,5 +33,11 @@
 - name: Create config directory
   file: path=/etc/haproxy state=directory
 
+- name: Check for config file
+  file: path=/etc/haprnoxy/haproxy.cfg state=file
+  register: haproxy_cfg
+  failed_when: false
+
 - name: Create empty config
   file: path=/etc/haproxy/haproxy.cfg state=touch
+  when: haproxy_cfg.changed

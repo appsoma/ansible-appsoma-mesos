@@ -57,6 +57,14 @@
             {{ comma() }}{{ hostvars[item].private_ip_address }}
           {%- endfor %}
 
+    - name: Format data volume
+      filesystem: fstype=ext4 dev="/dev/xvdf"
+      when: inventory_hostname == groups[inventory_group_service][0]
+
+    - name: Mount data volume
+      mount: name="{{ nfs_data_mount }}" src="/dev/xvdf" fstype=ext4 state=mounted
+      when: inventory_hostname == groups[inventory_group_service][0]
+
     - name: Set Mesos Master mode
       set_fact: mesos_master_mode="{{ 'master-slave' if run_slave_on_master is defined and run_slave_on_master else 'master' }}"
 
@@ -152,11 +160,12 @@
     - role: ansible-haProxy
       zookeeper_host_list: "{{zookeeper_hosts_with_port}}"
       haproxy_pem_file: "cluster_vars/{{ cluster_name }}/haproxy.pem"
+      when: inventory_hostname in groups[inventory_group_master]
 
     # Install Mesos
     - role: ansible-mesos
       zookeeper_hostnames: "{{ zookeeper_hosts_with_port  }}"
-      mesos_install_mode: "{{ mesos_master_mode if inventory_hostname in groups[inventory_master_group] else 'slave' }}"
+      mesos_install_mode: "{{ mesos_master_mode if inventory_hostname in groups[inventory_group_master] else 'slave' }}"
       mesos_containerizers: "docker,mesos"
       mesos_cluster_name: "{{cluster_name}}"
       when: inventory_hostname in groups[inventory_group_master] or inventory_hostname in groups[inventory_group_slave]
@@ -213,4 +222,3 @@
       when: "use_storm is defined and use_storm and inventory_hostname == groups[inventory_group_master][0]"
 
 - include: playbooks/welder_playbook.yml
-  when: inventory_hostname == groups[inventory_group_master][0]
