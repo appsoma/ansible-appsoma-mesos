@@ -1,9 +1,14 @@
+- name: Service nodes on Amazon EC2
+  debug: msg="{{ groups[provider_group_prefix[provider] + inventory_group_service] }}"
+  when: groups[provider_group_prefix[provider] + inventory_group_service] is defined
 
-- name: Provider group
-  debug: msg="{{ provider_group_prefix[provider] }}"
+- name: Masters on Amazon EC2
+  debug: msg="{{ groups[provider_group_prefix[provider] + inventory_group_master] }}"
+  when: groups[provider_group_prefix[provider] + inventory_group_master] is defined
 
-- name: Group values from Amazon EC2
-  debug: msg="{{ groups[provider_group_prefix[provider] + inventory_group_service] }} "
+- name: Slaves on Amazon EC2
+  debug: msg="{{ groups[provider_group_prefix[provider] + inventory_group_slave] }}"
+  when: groups[provider_group_prefix[provider] + inventory_group_slave] is defined
 
 - name: Add service node variables to host list
   add_host:
@@ -17,8 +22,8 @@
     public_dns_name: "{{ hostvars[item].public.dns }}"
     private_ip_address: "{{ hostvars[item].private.ip }}"
     private_dns_name: "{{ hostvars[item].private.ip }}"
-  with_items: groups[provider_group_prefix[provider] + inventory_group_service]
-  when: hostvars[item].tags is defined and hostvars[item].tags.Name is defined and groups[provider_group_prefix[provider] + inventory_group_service] is defined
+  with_items: "{{ groups[provider_group_prefix[provider] + inventory_group_service] | default([]) }}"
+  when: groups[provider_group_prefix[provider] + inventory_group_service] is defined
 
 - name: Add master node variables to host list
   add_host:
@@ -33,8 +38,8 @@
     public_dns_name: "{{ hostvars[item].public.dns }}"
     private_ip_address: "{{ hostvars[item].private.ip}}"
     private_dns_name: "{{ hostvars[item].private.dns}}"
-  with_items: groups[provider_group_prefix[provider] + inventory_group_master]
-  when: hostvars[item].tags is defined and hostvars[item].tags.Name is defined and groups[provider_group_prefix[provider] + inventory_group_master] is defined
+  with_items: "{{ groups[provider_group_prefix[provider] + inventory_group_master] | default([]) }}"
+  when: groups[provider_group_prefix[provider] + inventory_group_master] is defined
 
 - name: Add slave node variables to host list
   add_host:
@@ -48,8 +53,6 @@
     public_dns_name: "{{ hostvars[item].public.dns }}"
     private_ip_address: "{{ hostvars[item].private.ip }}"
     private_dns_name: "{{ hostvars[item].private.ip }}"
-  with_items: groups[provider_group_prefix[provider] + inventory_group_slave]
-  when: hostvars[item].tags is defined and hostvars[item].tags.Name is defined and groups[provider_group_prefix[provider] + inventory_group_slave] is defined
-
-- name: Change values for Amazon EC2
-  debug: msg="{{ groups[inventory_group_service] }} ---- {{ groups[inventory_group_master] }} ---- {{ groups[inventory_group_slave] }} "
+  with_items: "{{ groups[provider_group_prefix[provider] + inventory_group_slave] | default([]) }}"
+  when: groups[provider_group_prefix[provider] + inventory_group_slave] is defined
+  when: groups[provider_group_prefix[provider] + inventory_group_slave] is defined

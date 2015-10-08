@@ -18,11 +18,17 @@ resource "aws_instance" "service" {
   }
   root_block_device {
     volume_type = "${var.instance_volume_type.service}"
+{% if service_nodes.root_volume_type is defined and  service_nodes.root_volume_type == 'io1' %}
+    iops = {{ service_nodes.root_volume_iops }}
+{% endif %}
     volume_size = "${var.instance_root_disk_size_gb.service}"
     delete_on_termination = true
   }
   ebs_block_device {
     volume_type = "${var.aws_data_volume_type}"
+{% if service_nodes.data_volume_type is defined and  service_nodes.data_volume_type == 'io1' %}
+    iops = {{ service_nodes.data_volume_iops }}
+{% endif %}
     volume_size = "${var.data_volume_size_gb}"
     delete_on_termination = true
     device_name = "/dev/xvdf"
@@ -39,6 +45,9 @@ resource "aws_instance" "master" {
   subnet_id = "${aws_subnet.subnet.id}"
   vpc_security_group_ids = ["${aws_security_group.master_sg.id}"]
   associate_public_ip_address = true
+{% if masters.root_volume_ebs_optimized is defined %}
+  ebs_optimized = {{ 'true' if masters.root_volume_ebs_optimized else 'false' }}
+{% endif %}
   tags {
     Name = "${var.cluster_name}_master_${count.index}"
     short_name =  "master_${count.index}"
@@ -50,9 +59,25 @@ resource "aws_instance" "master" {
   }
   root_block_device {
     volume_type = "${var.instance_volume_type.master}"
+{% if masters.root_volume_type is defined and masters.root_volume_type == 'io1' %}
+    iops = {{ masters.root_volume_iops }}
+{% endif %}
     volume_size = "${var.instance_root_disk_size_gb.master}"
     delete_on_termination = true
   }
+{% if masters.additional_volumes is defined %}
+{% for vol in masters.additional_volumes %}
+  ebs_block_device {
+    volume_type = "{{ vol.type }}"
+{% if vol.type == 'io1' %}
+    iops = {{ vol.iops }}
+{% endif %}
+    volume_size = "{{ vol.size_gb }}"
+    delete_on_termination = true
+    device_name = "{{ vol.device_name }}"
+  }
+{% endfor %}
+{% endif %}
   count = "${var.type_count.master}"
 }
 
@@ -74,11 +99,39 @@ resource "aws_instance" "{{ s_type.name }}" {
     cluster = "${var.cluster_name}"
     Class = "${var.cluster_name}_slave"
   }
+{% if s_type.root_volume_ebs_optimized is defined %}
+  ebs_optimized = {{ 'true' if s_type.root_volume_ebs_optimized else 'false' }}
+{% endif %}
   root_block_device {
     volume_type = "${var.instance_volume_type.{{ s_type.name }}}"
+{% if s_type.root_volume_type is defined and s_type.root_volume_type == 'io1' %}
+    iops = {{ s_type.root_volume_iops }}
+{% endif %}
     volume_size = "${var.instance_root_disk_size_gb.{{ s_type.name }}}"
     delete_on_termination = true
+
   }
+{% if s_type.additional_volumes is defined %}
+{% for vol in s_type.additional_volumes %}
+  ebs_block_device {
+    volume_type = "{{ vol.type }}"
+{% if vol.type == 'io1' %}
+    iops = {{ vol.iops }}
+{% endif %}
+    volume_size = "{{ vol.size_gb }}"
+    delete_on_termination = true
+    device_name = "{{ vol.device_name }}"
+  }
+{% endfor %}
+{% endif %}
+{% if s_type.instance_stores is defined and s_type.instance_stores|length > 0 %}
+{% for i in s_type.instance_stores %}
+  ephemeral_block_device {
+    device_name = "{{ i.device_name }}"
+    virtual_name = "{{ i.virtual_name }}"
+  }
+{% endfor %}
+{% endif %}
   count = "${var.type_count.{{s_type.name }}}"
 }
 

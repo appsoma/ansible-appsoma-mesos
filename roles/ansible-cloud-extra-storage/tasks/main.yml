@@ -1,0 +1,5 @@
+- include: ec2_instance_store.yml
+  when: provider == 'ec2' and instance_store_list is defined and instance_store_list|length > 0
+
+- include: ec2_ebs.yml
+  when: provider == 'ec2' and additional_volume_list is defined and additional_volume_list|length > 0

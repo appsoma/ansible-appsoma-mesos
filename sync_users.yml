@@ -1,4 +1,14 @@
 ---
+- hosts: localhost
+  connection: local
+  vars_files:
+    - "cluster_vars/common.yml"
+    - "cluster_vars/{{ cluster_name }}/required_vars.yml"
+    - "cluster_vars/{{ cluster_name }}/aws_secret_vars.yml"
+  roles:
+    - role: ../roles/ansible-cloud-inventory-parse
+      provider: "{{ cloud_provider }}"
+
 - hosts: [ "{{ inventory_group_service }}", "{{ inventory_group_master }}","{{ inventory_group_slave }}" ]
   remote_user: "{{ management_user }}"
   sudo: True

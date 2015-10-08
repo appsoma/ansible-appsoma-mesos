@@ -89,8 +89,6 @@
       marathon_host: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
       when: use_docker_registry is defined and use_docker_registry
 
-    - role: ansible-go
-
     # Create an Appsoma user as a member of the docker group (permission to run /usr/bin/docker)
     - role: ansible-welder-user
       dataDir: "{{ nfs_data_mount }}"

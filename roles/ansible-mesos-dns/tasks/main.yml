@@ -1,5 +1,5 @@
 - include: install.yml
-  when: is_mesos_dns_starter
+  when: is_mesos_dns_starter or is_mesos_dns_starter == "true"
 
 - name: Add Mesos-DNS as nameserver
   lineinfile: dest=/etc/resolvconf/resolv.conf.d/head line="nameserver {{ item }}"
@@ -11,8 +11,8 @@
 - name: Check for mesos in resolv.conf
   shell: "grep mesos /etc/resolv.conf | wc -l"
   register: resolv_conf
+  changed_when: resolv_conf.stdout != '1'
 
-  changed_when: resolv.conf.stdout != '1'
 - name: Refresh resolv.conf
   command: resolvconf -u
   when: resolv_conf.changed

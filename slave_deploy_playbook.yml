@@ -52,7 +52,23 @@
       with_items: additional_ssh_keys
       when: additional_ssh_keys is defined
 
+    - name: Find slave index
+      set_fact: slave_index="{{ item.0|int }}"
+      with_indexed_items: slave_types
+      when: item.1.name == hostvars[inventory_hostname].type
+
+    - name: Set instance store list
+      set_fact: instance_stores="{{slave_types[slave_index|int].instance_stores if slave_types[slave_index|int].instance_stores is defined else [] }}"
+
+    - name: Set additional volume list
+      set_fact: additional_volumes="{{slave_types[slave_index|int].additional_volumes if slave_types[slave_index|int].additional_volumes is defined else [] }}"
+
   roles:
+    - role: ansible-cloud-extra-storage
+      provider: "{{ cloud_provider }}"
+      instance_store_list: "{{ instance_stores }}"
+      additional_volume_list: "{{ additional_volumes }}"
+
     # Install NTP for time sync
     - role: ansible-ntp
 
@@ -95,14 +111,9 @@
     # Install Python
     - role: ansible-python
 
-    # Install NodeJs
-    - role: ansible-nvm-nodejs
-
     # Make sure we have usable JDKs on masters
     - role: ansible-java
-      java_versions: [6, 7, 8]
-
-    - role: ansible-go
+      java_versions: [7, 8]
 
     # Install mesos in slave mode
     - role: ansible-mesos
@@ -117,7 +128,6 @@
 
     - role: ansible-sensu
       sensu_master: "{{ hostvars[groups[inventory_group_master][0]]['private_ip_address'] }}"
-      mesos_master_list: "{{ zookeeper_hosts_no_port }}"
 
 - hosts: localhost
   gather_facts: no

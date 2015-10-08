@@ -30,8 +30,10 @@
   file: path={{nfsmount}} state=directory
   tags:
     - nfs
+  when: nfsmount is defined
 
 - name: configure /etc/fstab on clients
   mount: name={{nfsmount}} src={{nfsserver}}:{{nfspath}} fstype=nfs opts="{{ mount_options }}" state=mounted
   tags:
     - nfs
+  when: nfsmount is defined and nfsserver is defined and nfspath is defined

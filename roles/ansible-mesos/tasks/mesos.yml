@@ -28,7 +28,7 @@
   template: src=hostname.j2 dest=/etc/mesos-slave/hostname
   notify:
     - Restart mesos-slave
-  when: mesos_install_mode == "slave" or mesos_install_mode == "master-slave"
+  when: "mesos_install_mode == 'slave' or mesos_install_mode == 'master-slave' and (use_route53_slave_names is not defined or use_route53_slave_names)"
 
 - name: Set Mesos Work Dir (master)
   template: src=work_dir.j2 dest=/etc/mesos-master/work_dir

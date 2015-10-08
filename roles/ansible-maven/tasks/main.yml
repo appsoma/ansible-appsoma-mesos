@@ -1,5 +1,5 @@
 - name: Remove OS package if needed
-  apt: name=maven state=absent force=yes
+  apt: pkg=maven state=absent force=yes
 
 - name: Create Maven directory
   file: path=/opt/maven state=directory

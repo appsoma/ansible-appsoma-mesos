@@ -1,0 +1,11 @@
+- name: Format local disk volumes
+  filesystem: fstype=ext4 dev="{{ item.device_name }}" force=yes
+  with_items: additional_volume_list
+
+- name: Mount local disk volumes
+  mount: name="/local/{{ item.virtual_name }}" src="{{ item.device_name }}" fstype=ext4 state=mounted
+  with_items: additional_volume_list
+
+- name: Change permissions for local disk volumes
+  file: path="/local/{{ item.virtual_name }}" state=directory mode=0777 owner="{{ management_user }}"
+  with_items: additional_volume_list

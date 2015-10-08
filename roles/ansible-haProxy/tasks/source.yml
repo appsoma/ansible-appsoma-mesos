@@ -34,10 +34,10 @@
   file: path=/etc/haproxy state=directory
 
 - name: Check for config file
-  file: path=/etc/haprnoxy/haproxy.cfg state=file
+  file: path=/etc/haproxy/haproxy.cfg state=file owner=root mode=0644
   register: haproxy_cfg
   failed_when: false
 
 - name: Create empty config
-  file: path=/etc/haproxy/haproxy.cfg state=touch
-  when: haproxy_cfg.changed
+  file: path=/etc/haproxy/haproxy.cfg state=touch owner=root mode=0644
+  when: haproxy_cfg.state == 'absent'
