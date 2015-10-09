@@ -57,13 +57,34 @@
             {{ comma() }}{{ hostvars[item].private_ip_address }}
           {%- endfor %}
 
-    - name: Format data volume
-      filesystem: fstype=ext4 dev="/dev/xvdf"
-      when: inventory_hostname == groups[inventory_group_service][0]
+    - name: Find slave type index
+      set_fact: slave_index="{{ item.0|int }}"
+      with_indexed_items: slave_types
+      when: inventory_hostname in groups[inventory_group_slave] and item.1.name == hostvars[inventory_hostname].type
 
-    - name: Mount data volume
-      mount: name="{{ nfs_data_mount }}" src="/dev/xvdf" fstype=ext4 state=mounted
-      when: inventory_hostname == groups[inventory_group_service][0]
+    - name: Set Service instance store list
+      set_fact: instance_stores="{{ service_nodes.instance_stores if service_nodes.instance_stores is defined else [] }}"
+      when: inventory_hostname in groups[inventory_group_service]
+
+    - name: Set Master instance store list
+      set_fact: instance_stores="{{ masters.instance_stores if masters.instance_stores is defined else [] }}"
+      when: inventory_hostname in groups[inventory_group_master]
+
+    - name: Set Slave instance store list
+      set_fact: instance_stores="{{ slave_types[slave_index|int].instance_stores if slave_types[slave_index|int].instance_stores is defined else [] }}"
+      when: inventory_hostname in groups[inventory_group_slave]
+
+    - name: Set Service additional volume list
+      set_fact: additional_volumes="{{ service_nodes.additional_volumes if service_nodes.additional_volumes is defined else [] }}"
+      when: inventory_hostname in groups[inventory_group_service]
+
+    - name: Set Master additional volume list
+      set_fact: additional_volumes="{{ masters.additional_volumes if masters.additional_volumes is defined else [] }}"
+      when: inventory_hostname in groups[inventory_group_master]
+
+    - name: Set Slave additional volume list
+      set_fact: additional_volumes="{{ slave_types[slave_index|int].additional_volumes if slave_types[slave_index|int].additional_volumes is defined else [] }}"
+      when: inventory_hostname in groups[inventory_group_slave]
 
     - name: Set Mesos Master mode
       set_fact: mesos_master_mode="{{ 'master-slave' if run_slave_on_master is defined and run_slave_on_master else 'master' }}"
@@ -75,6 +96,12 @@
 
   roles:
 ####### System software config #######
+    # Extra storage on nodes (esp. service nodes)
+    - role: ansible-cloud-extra-storage
+      provider: "{{ cloud_provider }}"
+      instance_store_list: "{{ instance_stores }}"
+      additional_volume_list: "{{ additional_volumes }}"
+
     # Configure node as an NFS server
     - role: ansible-nfs-server
       nfs_exports:
@@ -144,6 +171,7 @@
     # Make sure we have JDKs
     - role: ansible-java
       java_versions: [7, 8]
+      add_jdk: "{{ inventory_hostname in groups[inventory_group_master] }}"
       when: inventory_hostname in groups[inventory_group_master] or inventory_hostname in groups[inventory_group_slave]
 
     - role: ansible-go
@@ -196,13 +224,9 @@
       zookeeper_host_list: "{{ zookeeper_hosts_with_port }}"
       marathon_host: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
       mesos_dns_hosts: [ "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}" ]
-      is_mesos_dns_starter: "{{ true if inventory_hostname == groups[inventory_group_master][0] else false }}"
+      is_mesos_dns_starter: "{{ true if inventory_hostname in groups[inventory_group_master] else false }}"
 
-    # Install High Availability Proxy
-    - role: ansible-haProxy
-      zookeeper_host_list: "{{zookeeper_hosts_with_port}}"
-      haproxy_pem_file: "cluster_vars/{{ cluster_name }}/haproxy.pem"
-      when: inventory_hostname in groups[inventory_group_master]
+####### Install cluster worker frameworks and tools #######
 
     # Install Appsoma Rhino
     - role: ../roles/ansible-rhino
@@ -210,21 +234,30 @@
       db_folder: "{{ data_mount_point }}/rhino_db"
       when: inventory_hostname == groups[inventory_group_master][0]
 
-####### Install cluster worker frameworks and tools #######
+    # Install Mesosphere Marathon
     - role: ansible-cassandra-marathon
       marathon_host: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
       when: inventory_hostname == groups[inventory_group_master][0]
 
-    - role: ../roles/ansible-kafka-mesos
-      zookeeper_hosts: "{{ zookeeper_hosts_with_port }}"
-      zookeeper_hosts_no_port_list: "{{ zookeeper_hosts_no_port.split(',') }}"
-      framework_host: "{{ hostvars[inventory_hostname]['private_dns_name'] }}"
-      when: "use_kafka is defined and use_kafka and inventory_hostname == groups[inventory_group_master][0]"
+    # Install High Availability Proxy
+    - role: ansible-haProxy
+      zookeeper_host_list: "{{zookeeper_hosts_with_port}}"
+      haproxy_pem_file: "cluster_vars/{{ cluster_name }}/haproxy.pem"
+      when: inventory_hostname in groups[inventory_group_master]
 
-    - role: ../roles/ansible-storm-mesos
-      zookeeper_hosts: "{{ zookeeper_hosts_with_port }}"
-      zookeeper_hosts_no_port_list: "{{ zookeeper_hosts_no_port.split(',') }}"
-      framework_host: "{{ hostvars[inventory_hostname]['private_dns_name'] }}"
-      when: "use_storm is defined and use_storm and inventory_hostname == groups[inventory_group_master][0]"
+    # Install Kafka Mesos framework
+#    - role: ../roles/ansible-kafka-mesos
+#      zookeeper_hosts: "{{ zookeeper_hosts_with_port }}"
+#      zookeeper_hosts_no_port_list: "{{ zookeeper_hosts_no_port.split(',') }}"
+#      framework_host: "{{ hostvars[inventory_hostname]['private_dns_name'] }}"
+#      when: "use_kafka is defined and use_kafka and inventory_hostname == groups[inventory_group_master][0]"
 
-- include: playbooks/welder_playbook.yml
+    # Install Storm Mesos framework
+#    - role: ../roles/ansible-storm-mesos
+#      zookeeper_hosts: "{{ zookeeper_hosts_with_port }}"
+#      zookeeper_hosts_no_port_list: "{{ zookeeper_hosts_no_port.split(',') }}"
+#      framework_host: "{{ hostvars[inventory_hostname]['private_dns_name'] }}"
+#      when: "use_storm is defined and use_storm and inventory_hostname == groups[inventory_group_master][0]"
+
+# Install welder
+#- include: playbooks/welder_playbook.yml

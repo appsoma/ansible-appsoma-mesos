@@ -1,5 +1,5 @@
 - include: install.yml
-  when: is_mesos_dns_starter or is_mesos_dns_starter == "true"
+  when: is_mesos_dns_starter
 
 - name: Add Mesos-DNS as nameserver
   lineinfile: dest=/etc/resolvconf/resolv.conf.d/head line="nameserver {{ item }}"

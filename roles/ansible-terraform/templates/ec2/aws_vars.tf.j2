@@ -33,11 +33,6 @@ variable "aws_instance_type" {
   }
 }
 
-variable "aws_data_volume_type" {
-  description = "Type of NFS-mountable data volume created on service node, standard is enough for NFS"
-  default = "{{ service_nodes.data_volume_type }}"
-}
-
 variable "instance_volume_type" {
   description = "Type of volume for root disk on an instance"
   default = {
@@ -76,9 +71,4 @@ variable "type_count" {
 	{{ s_type.name }} = "{{ s_type.count }}"
 {% endfor %}
   }
-}
-
-variable "data_volume_size_gb" {
-  description = "Size of NFS-mountable data volume created on service node"
-  default = {{ service_nodes.data_volume_size_gb }}
 }

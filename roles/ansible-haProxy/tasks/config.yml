@@ -1,77 +1,77 @@
 - name: Set backend template in zookeeper
-  command: zookeepercli --servers {{ zookeeper_host_list }} -c set "/gandalf/haproxy_backend.cfg" "{{ lookup('template', '../templates/haproxy_backend.cfg.j2') }}"
+  command: zookeepercli -verbose --servers {{ zookeeper_host_list }} -c set "/gandalf/haproxy_backend.cfg" "{{ lookup('template', '../templates/haproxy_backend.cfg.j2') }}"
   register: backend
   changed_when: backend.rc == 1
   failed_when: false
 
 - name: Create backend template in zookeeper
-  command: zookeepercli --servers {{ zookeeper_host_list }} -force=true -c creater "/gandalf/haproxy_backend.cfg" "{{ lookup('template', '../templates/haproxy_backend.cfg.j2') }}"
+  command: zookeepercli -verbose --servers {{ zookeeper_host_list }} -force=true -c creater "/gandalf/haproxy_backend.cfg" "{{ lookup('template', '../templates/haproxy_backend.cfg.j2') }}"
   when: backend.changed
 
 - name: Set frontends template in zookeeper
-  command: zookeepercli --servers {{ zookeeper_host_list }} -c set "/gandalf/haproxy_frontends.cfg" "{{ lookup('template', '../templates/haproxy_frontends.cfg.j2') }}"
+  command: zookeepercli -verbose --servers {{ zookeeper_host_list }} -c set "/gandalf/haproxy_frontends.cfg" "{{ lookup('template', '../templates/haproxy_frontends.cfg.j2') }}"
   register: frontend
   changed_when: frontend.rc == 1
   failed_when: false
 
 - name: Create frontends template in zookeeper
-  command: zookeepercli --servers {{ zookeeper_host_list }} -c creater "/gandalf/haproxy_frontends.cfg" "{{ lookup('template', '../templates/haproxy_frontends.cfg.j2') }}"
+  command: zookeepercli -verbose --servers {{ zookeeper_host_list }} -c creater "/gandalf/haproxy_frontends.cfg" "{{ lookup('template', '../templates/haproxy_frontends.cfg.j2') }}"
   when: frontend.changed
 
 - name: Set port template in zookeeper
-  command: zookeepercli --servers {{ zookeeper_host_list }} -c set "/gandalf/haproxy_port.cfg" "{{ lookup('template', '../templates/haproxy_port.cfg.j2') }}"
+  command: zookeepercli -verbose --servers {{ zookeeper_host_list }} -c set "/gandalf/haproxy_port.cfg" "{{ lookup('template', '../templates/haproxy_port.cfg.j2') }}"
   register: ports
   changed_when: ports.rc == 1
   failed_when: false
 
 - name: Create port template in zookeeper
-  command: zookeepercli --servers {{ zookeeper_host_list }} -c creater "/gandalf/haproxy_port.cfg" "{{ lookup('template', '../templates/haproxy_port.cfg.j2') }}"
+  command: zookeepercli -verbose --servers {{ zookeeper_host_list }} -c creater "/gandalf/haproxy_port.cfg" "{{ lookup('template', '../templates/haproxy_port.cfg.j2') }}"
   when: ports.changed
 
 - name: Set config template in zookeeper
-  command: zookeepercli --servers {{ zookeeper_host_list }} -c set "/gandalf/haproxy.cfg" "{{ lookup('template', '../templates/haproxy_template.cfg.j2') }}"
+  command: zookeepercli -verbose --servers {{ zookeeper_host_list }} -c set "/gandalf/haproxy.cfg" "{{ lookup('template', '../templates/haproxy_template.cfg.j2') }}"
   register: configs
   changed_when: configs.rc == 1
   failed_when: false
 
 - name: Create config template in zookeeper
-  command: zookeepercli --servers {{ zookeeper_host_list }} -c creater "/gandalf/haproxy.cfg" "{{ lookup('template', '../templates/haproxy_template.cfg.j2') }}"
+  command: zookeepercli -verbose --servers {{ zookeeper_host_list }} -c creater "/gandalf/haproxy.cfg" "{{ lookup('template', '../templates/haproxy_template.cfg.j2') }}"
   when: configs.changed
 
 - name: Set subnet dns setting
-  command: zookeepercli --servers {{ zookeeper_host_list }} -c set /gandalf/subnet_dns ".{{ service_discovery_dns_suffix }}"
+  command: zookeepercli -verbose --servers {{ zookeeper_host_list }} -c set /gandalf/subnet_dns ".{{ service_discovery_dns_suffix }}"
   register: subnet
   changed_when: subnet.rc == 1
   failed_when: false
 
 - name: Create subnet dns setting
-  command: zookeepercli --servers {{ zookeeper_host_list }} -c creater /gandalf/subnet_dns ".{{ service_discovery_dns_suffix }}"
+  command: zookeepercli -verbose --servers {{ zookeeper_host_list }} -c creater /gandalf/subnet_dns ".{{ service_discovery_dns_suffix }}"
   when: subnet.changed
 
 - name: Create services directory in zookeeper
-  command: zookeepercli --servers {{ zookeeper_host_list }} -c creater /gandalf/services ""
+  command: zookeepercli -verbose --servers {{ zookeeper_host_list }} -c creater /gandalf/services ""
   register: make_services
   changed_when: make_services.rc == 1
   failed_when: false
 
 - name: Create internals directory in zookeeper
-  command: zookeepercli --servers {{ zookeeper_host_list }} -c creater /internals ""
+  command: zookeepercli -verbose --servers {{ zookeeper_host_list }} -c creater /internals ""
   register: make_services
   changed_when: make_services.rc == 1
   failed_when: false
 
 - name: Create externals directory in zookeeper
-  command: zookeepercli --servers {{ zookeeper_host_list }} -c creater /externals ""
+  command: zookeepercli -verbose --servers {{ zookeeper_host_list }} -c creater /externals ""
   register: make_services
   changed_when: make_services.rc == 1
   failed_when: false
 
 - name: Set marathons configuration in zookeeper
-  command : zookeepercli --servers {{ zookeeper_host_list }} -c set /gandalf/marathons "{{ marathon_server }}"
+  command : zookeepercli -verbose --servers {{ zookeeper_host_list }} -c set /gandalf/marathons "{{ marathon_server }}"
   register: marathons
   changed_when: marathons.rc == 1
   failed_when: false
 
 - name: Create marathons configuration in zookeeper
-  command : zookeepercli --servers {{ zookeeper_host_list }} -c creater /gandalf/marathons "{{ marathon_server }}"
+  command : zookeepercli -verbose --servers {{ zookeeper_host_list }} -c creater /gandalf/marathons "{{ marathon_server }}"
   when: marathons.changed
