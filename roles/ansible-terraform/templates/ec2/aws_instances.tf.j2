@@ -24,15 +24,19 @@ resource "aws_instance" "service" {
     volume_size = "${var.instance_root_disk_size_gb.service}"
     delete_on_termination = true
   }
+{% if service_nodes.additional_volumes is defined %}
+{% for vol in service_nodes.additional_volumes %}
   ebs_block_device {
-    volume_type = "${var.aws_data_volume_type}"
-{% if service_nodes.data_volume_type is defined and  service_nodes.data_volume_type == 'io1' %}
-    iops = {{ service_nodes.data_volume_iops }}
+    volume_type = "{{ vol.type }}"
+{% if vol.type == 'io1' %}
+    iops = {{ vol.iops }}
 {% endif %}
-    volume_size = "${var.data_volume_size_gb}"
+    volume_size = "{{ vol.size_gb }}"
     delete_on_termination = true
-    device_name = "/dev/xvdf"
+    device_name = "{{ vol.device_name }}"
   }
+{% endfor %}
+{% endif %}
   count = "${var.type_count.service}"
 }
 
