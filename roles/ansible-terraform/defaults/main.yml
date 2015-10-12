@@ -1,1 +1,1 @@
-terraform_dir: "/home/mcv/terraform"
+terraform_dir: "./terraform" 
