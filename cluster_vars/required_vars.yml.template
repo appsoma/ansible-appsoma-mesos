@@ -36,14 +36,21 @@ haproxy_dns_services:
 external_welder_name: "welder.{{service_discovery_dns_suffix}}"
 external_welder_console_name: "welder_console.{{service_discovery_dns_suffix}}"
 
+# NFS Data options
+nfs_data_mount: "/data"
+data_mount_point: "/mnt/data"
+
 # Mesos Node definitions
 service_nodes:
   count: 1
   root_volume_size_gb: 16
   root_volume_type: "standard"
-  data_volume_type: "standard"
-  data_volume_size_gb: 100
   instance_type: "t2.micro"
+  additional_volumes:
+    - type: "gp2"
+      size_gb: 32
+      device_name: "/dev/xvdf"
+      mount_point: "{{ nfs_data_mount }}"
 
 masters:
   count: 1
@@ -69,15 +76,33 @@ slave_types:
     root_volume_size_gb: 16
     root_volume_type: "gp2"
     instance_type: "t2.large"
+    additional_volumes:
+      - type: "gp2"
+        size_gb: 32
+        device_name: "/dev/xvdf"
+        mount_point: "/mnt/vol0"
+      - type: "gp2"
+        size_gb: 32
+        device_name: "/dev/xvdg"
+        virtual_name: "/mnt/vol1"
+
+  - name: "slave_kafka"
+    count: 0
+    root_volume_size_gb: 8
+    root_volume_type: "gp2"
+    instance_type: "m3.xlarge"
+    instance_stores:
+      - device_name: "/dev/xvdf"
+        virtual_name: "ephemeral0"
+        mount_point: "/mnt/vol0"
+      - device_name: "/dev/xvdg"
+        virtual_name: "ephemeral1"
+        mount_point: "/mnt/vol1"
 
 # Network settings
 private_lan_net: "10.10.0.0/16"
 private_lan_subnet: "10.10.0.0/24"
 private_lan_dns: "10.10.0.2"
-
-# NFS Data options
-nfs_data_mount: "/data"
-data_mount_point: "/mnt/data"
 
 # Enable this script to burn a slave AMI.  Any AWS boot method may be used to add new slaves
 # with the AMI id created (named {{cluster_name}}_slave_image).  Just use the same subnet

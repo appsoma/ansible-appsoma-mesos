@@ -1,0 +1,2 @@
+add_jdk: false
+java_versions: [7,8]
