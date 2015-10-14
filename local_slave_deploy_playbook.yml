@@ -1,0 +1,105 @@
+---
+
+#
+# Required vars:
+# nfsServerIp, slave_type
+- hosts: localhost
+  connection: local
+  sudo: True
+  vars_files:
+    - "cluster_vars/common.yml"
+    - "cluster_vars/{{ cluster_name }}/required_vars.yml"
+  pre_tasks:
+    # Allow sudo with no terminal
+    - name: Remove require tty
+      lineinfile: regexp="tty" dest=/etc/sudoers/os_defaults state=absent
+      tags: ['system']
+
+    - name: Find NFS Server IP
+      set_fact: nfsServerIp={{ hostvars[groups[inventory_group_service][0]]['private_ip_address'] }}
+      when: groups[inventory_group_service] is defined
+
+    - name: Save zookeeper private IP list to bash profile
+      lineinfile: dest=/etc/profile.d/zookeeper_host_list.sh line="export ZK_HOST_LIST=master.mesos:2181" state=present create=yes
+
+    - name: Add ssh keys to management user
+      authorized_key: key="{{ item }}" state=present exclusive=no
+      with_items: additional_ssh_keys
+      when: additional_ssh_keys is defined
+
+    - name: Find slave index
+      set_fact: slave_index="{{ item.0|int }}"
+      with_indexed_items: slave_types
+      when: item.1.name == hostvars[inventory_hostname].type
+
+    - name: Set instance store list
+      set_fact: instance_stores="{{slave_types[slave_index|int].instance_stores if slave_types[slave_index|int].instance_stores is defined else [] }}"
+
+    - name: Set additional volume list
+      set_fact: additional_volumes="{{slave_types[slave_index|int].additional_volumes if slave_types[slave_index|int].additional_volumes is defined else [] }}"
+
+  roles:
+    - role: ansible-cloud-extra-storage
+      provider: "{{ cloud_provider }}"
+      instance_store_list: "{{ instance_stores }}"
+      additional_volume_list: "{{ additional_volumes }}"
+
+    # Install NTP for time sync
+    - role: ansible-ntp
+
+    # Install sysdig for troubleshooting
+    - role: ansible-sysdig
+
+    # Install CloudPassage Halo agent if available
+    - role: ansible-cphalo
+      halo_agent_key: "{{ cp_agent_key }}"
+      halo_agent_tag: "{{ cp_agent_tag }}"
+      when: use_halo is defined and use_halo
+
+    # Add UFW firewall if selected (should not be used with halo)
+    - role: ansible-ufw
+      extra_ports: "{{ slave_firewall_ports if slave_firewall_ports is defined else [] }}"
+      when: use_ufw is defined and use_ufw
+
+    # Install docker
+    - role: ansible-docker
+      when: use_docker_registry is not defined or not use_docker_registry
+
+    - role: ansible-docker
+      registry_host: "master.mesos"
+      marathon_host: "master.mesos"
+      when: use_docker_registry is defined and use_docker_registry
+
+    # Configure NFS
+    - role: ansible-nfs-client
+      nfsmount: "{{ data_mount_point }}"
+      nfspath: "{{ nfs_data_mount }}"
+      nfsserver: "{{ nfsServerIp }}"
+      when: nfsServerIp is defined
+
+    # Create users
+    - role: ansible-welder-user
+      group: "{{ welder_group }}"
+      user_list: "{{ welder_user_list }}"
+      dataDir: "{{ data_mount_point }}"
+
+    # Install Python
+    - role: ansible-python
+
+    # Make sure we have usable JDKs on masters
+    - role: ansible-java
+      java_versions: [7, 8]
+
+    # Install mesos in slave mode
+    - role: ansible-mesos
+      mesos_containerizers: "docker,mesos"
+      zookeeper_hostnames: "master.mesos"
+      mesos_install_mode: "slave"
+      mesos_cluster_name: "{{cluster_name}}"
+      mesos_hostname: "master.mesos"
+
+    - role: ansible-mesos-dns
+      mesos_dns_hosts: [ "master.mesos" ]
+
+    - role: ansible-sensu
+      sensu_master: "master.mesos"
