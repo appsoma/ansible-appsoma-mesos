@@ -30,7 +30,7 @@
     - name: Find slave index
       set_fact: slave_index="{{ item.0|int }}"
       with_indexed_items: slave_types
-      when: item.1.name == hostvars[inventory_hostname].type
+      when: item.1.name == slave_type
 
     - name: Set instance store list
       set_fact: instance_stores="{{slave_types[slave_index|int].instance_stores if slave_types[slave_index|int].instance_stores is defined else [] }}"

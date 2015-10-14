@@ -136,6 +136,30 @@ resource "aws_instance" "{{ s_type.name }}" {
   }
 {% endfor %}
 {% endif %}
+{% if local_slave_deploy is defined and local_slave_deploy %}
+  provisioner "remote-exec" {
+    inline= [
+      "mkdir -p /opt/deploy/ansible-appsoma-mesos"
+      "cd /opt/deploy; git clone https://github.com/appsoma/ansible-appsoma-mesos.git"
+      "cd /opt/deploy/ansible-appsoma-mesos; git checkout {{ deploy_version }}"
+      "cd /opt/deploy/ansible-appsoma-mesos; ./install_ansible_slave.sh local"
+      "mkdir -p /opt/deploy/ansible-appsoma-mesos/cluster_vars/{{ cluster_name }}
+    ]
+  }
+  provisioner "file" {
+    source="{{ ansible_dir }}/cluster_vars/{{ cluster_name }}/required_vars.yml"
+    destination=/opt/deploy/ansible-appsoma-mesos/cluster_vars/{{ cluster_name }}/required_vars.yml"
+  }
+  provisioner "file" {
+    source="{{ ansible_dir }}/cluster_vars/{{ cluster_name }}/users.yml"
+    destination=/opt/deploy/ansible-appsoma-mesos/cluster_vars/{{ cluster_name }}/users.yml"
+  }
+  provisioner "remote-exec" {
+    inline= [
+      "cd /opt/deploy/ansible-appsoma-mesos; ansible-playbook -i "
+    ]
+  }
+{% endif %}
   count = "${var.type_count.{{s_type.name }}}"
 }
 
