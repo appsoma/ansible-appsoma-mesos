@@ -138,26 +138,48 @@ resource "aws_instance" "{{ s_type.name }}" {
 {% endif %}
 {% if local_slave_deploy is defined and local_slave_deploy %}
   provisioner "remote-exec" {
-    inline= [
-      "mkdir -p /opt/deploy/ansible-appsoma-mesos"
-      "cd /opt/deploy; git clone https://github.com/appsoma/ansible-appsoma-mesos.git"
-      "cd /opt/deploy/ansible-appsoma-mesos; git checkout {{ deploy_version }}"
-      "cd /opt/deploy/ansible-appsoma-mesos; ./install_ansible_slave.sh local"
-      "mkdir -p /opt/deploy/ansible-appsoma-mesos/cluster_vars/{{ cluster_name }}
+    inline = [
+      "sudo mkdir -p /opt/deploy/ansible-appsoma-mesos",
+      "sudo chown -R ubuntu /opt/deploy",
+      "sudo apt-get install -y git",
+      "cd /opt/deploy; git clone https://github.com/appsoma/ansible-appsoma-mesos.git",
+      "cd /opt/deploy/ansible-appsoma-mesos; git checkout {{ deploy_version }}",
+      "cd /opt/deploy/ansible-appsoma-mesos; sudo ./install_ansible.sh local",
+      "mkdir -p /opt/deploy/ansible-appsoma-mesos/cluster_vars/{{ cluster_name }}"
     ]
+    connection {
+      type = "ssh"
+      user = "{{ management_user }}"
+      key_file = "{{ ansible_dir }}/cluster_vars/{{ cluster_name }}/{{ cluster_name }}_key.pem"
+    }
   }
   provisioner "file" {
-    source="{{ ansible_dir }}/cluster_vars/{{ cluster_name }}/required_vars.yml"
-    destination=/opt/deploy/ansible-appsoma-mesos/cluster_vars/{{ cluster_name }}/required_vars.yml"
+    source = "{{ ansible_dir }}/cluster_vars/{{ cluster_name }}/required_vars.yml"
+    destination = "/opt/deploy/ansible-appsoma-mesos/cluster_vars/{{ cluster_name }}/required_vars.yml"
+    connection {
+      type = "ssh"
+      user = "{{ management_user }}"
+      key_file = "{{ ansible_dir }}/cluster_vars/{{ cluster_name }}/{{ cluster_name }}_key.pem"
+    }
   }
   provisioner "file" {
-    source="{{ ansible_dir }}/cluster_vars/{{ cluster_name }}/users.yml"
-    destination=/opt/deploy/ansible-appsoma-mesos/cluster_vars/{{ cluster_name }}/users.yml"
+    source = "{{ ansible_dir }}/cluster_vars/{{ cluster_name }}/users.yml"
+    destination = "/opt/deploy/ansible-appsoma-mesos/cluster_vars/{{ cluster_name }}/users.yml"
+    connection {
+      type = "ssh"
+      user = "{{ management_user }}"
+      key_file = "{{ ansible_dir }}/cluster_vars/{{ cluster_name }}/{{ cluster_name }}_key.pem"
+    }
   }
   provisioner "remote-exec" {
-    inline= [
-      "cd /opt/deploy/ansible-appsoma-mesos; ansible-playbook -i "
+    inline = [
+      "cd /opt/deploy/ansible-appsoma-mesos; ansible-playbook local_slave_deploy_playbook.yml -e cluster_name='{{ cluster_name }}' -e nfs_server_ip='${aws_instance.service.private_ip}' -e slave_type='{{ s_type.name }}' -e short_name='{{ s_type.name }}_${count.index}' -e mesos_master_ip_list='${aws_instance.master.private_ip}'"
     ]
+    connection {
+      type = "ssh"
+      user = "{{ management_user }}"
+      key_file = "{{ ansible_dir }}/cluster_vars/{{ cluster_name }}/{{ cluster_name }}_key.pem"
+    }
   }
 {% endif %}
   count = "${var.type_count.{{s_type.name }}}"

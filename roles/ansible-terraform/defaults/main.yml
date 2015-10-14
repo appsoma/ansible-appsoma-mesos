@@ -1,1 +1,2 @@
-terraform_dir: "./terraform" 
+terraform_dir: "./terraform"
+deploy_version: "dev"

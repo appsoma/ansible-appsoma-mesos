@@ -105,5 +105,5 @@
 
     - role: ansible-sensu
       sensu_master: "master.mesos"
-      system_name: "{{ system_name }}"
+      system_name: "{{ short_name }}"
       ip_address: "{{ ansible_default_ipv4.address }}"
