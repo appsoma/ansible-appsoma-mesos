@@ -13,7 +13,7 @@
       tags: ['system']
 
     - name: Find NFS Server IP
-      set_fact: nfsServerIp={{ nfs_service_ip }}
+      set_fact: nfs_server_ip={{ nfs_service_ip }}
       when: groups[inventory_group_service] is defined
 
     # {{ zookeeper_hosts_with_port }}
@@ -52,8 +52,8 @@
     - role: ansible-nfs-client
       nfsmount: "{{ data_mount_point }}"
       nfspath: "{{ nfs_data_mount }}"
-      nfsserver: "{{ nfsServerIp }}"
-      when: nfsServerIp is defined
+      nfsserver: "{{ nfs_server_ip }}"
+      when: nfs_server_ip is defined
 
     # Install mesos in slave mode
     - role: ansible-mesos

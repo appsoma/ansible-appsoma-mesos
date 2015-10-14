@@ -35,7 +35,7 @@
       when: "(cloud_provider is defined and cloud_provider == 'ec2') or (use_docker_registry is defined and use_docker_registry)"
 
     - name: Find NFS Server IP
-      set_fact: nfsServerIp={{ hostvars[groups[inventory_group_service][0]]['private_ip_address'] }}
+      set_fact: nfs_server_ip={{ hostvars[groups[inventory_group_service][0]]['private_ip_address'] }}
       when: groups[inventory_group_service] is defined
 
     - name: Set zookeeper private IP list with port
@@ -113,8 +113,8 @@
     - role: ansible-nfs-client
       nfsmount: "{{ data_mount_point }}"
       nfspath: "{{ nfs_data_mount }}"
-      nfsserver: "{{ nfsServerIp }}"
-      when: nfsServerIp is defined and inventory_hostname != groups[inventory_group_service][0]
+      nfsserver: "{{ nfs_server_ip }}"
+      when: nfs_server_ip is defined and inventory_hostname != groups[inventory_group_service][0]
 
     # Install Docker
     - role: ansible-docker
@@ -212,6 +212,8 @@
       mesos_install_mode: "{{ mesos_master_mode if inventory_hostname in groups[inventory_group_master] else 'slave' }}"
       mesos_containerizers: "docker,mesos"
       mesos_cluster_name: "{{cluster_name}}"
+      mesos_node_type: "{{ hostvars[inventory_hostname].type }}"
+      mesos_host_name: "{{ hostvars[inventory_hostname].short_name }}.{{ cluster_name }}.internal"
       when: inventory_hostname in groups[inventory_group_master] or inventory_hostname in groups[inventory_group_slave]
 
     # Install Marathon

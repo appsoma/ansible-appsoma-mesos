@@ -2,13 +2,14 @@
 
 #
 # Required vars:
-# nfsServerIp, slave_type
+# nfs_server_ip, slave_type, mesos_hostname, mesos_master_ip
 - hosts: localhost
   connection: local
   sudo: True
   vars_files:
     - "cluster_vars/common.yml"
     - "cluster_vars/{{ cluster_name }}/required_vars.yml"
+    - "cluster_vars/{{ cluster_name }}/users.yml"
   pre_tasks:
     # Allow sudo with no terminal
     - name: Remove require tty
@@ -16,14 +17,14 @@
       tags: ['system']
 
     - name: Find NFS Server IP
-      set_fact: nfsServerIp={{ hostvars[groups[inventory_group_service][0]]['private_ip_address'] }}
+      set_fact: nfs_server_ip={{ hostvars[groups[inventory_group_service][0]]['private_ip_address'] }}
       when: groups[inventory_group_service] is defined
 
     - name: Save zookeeper private IP list to bash profile
       lineinfile: dest=/etc/profile.d/zookeeper_host_list.sh line="export ZK_HOST_LIST=master.mesos:2181" state=present create=yes
 
     - name: Add ssh keys to management user
-      authorized_key: key="{{ item }}" state=present exclusive=no
+      authorized_key: key="{{ item }}" state=present user="{{ management_user }}" exclusive=no
       with_items: additional_ssh_keys
       when: additional_ssh_keys is defined
 
@@ -74,8 +75,8 @@
     - role: ansible-nfs-client
       nfsmount: "{{ data_mount_point }}"
       nfspath: "{{ nfs_data_mount }}"
-      nfsserver: "{{ nfsServerIp }}"
-      when: nfsServerIp is defined
+      nfsserver: "{{ nfs_server_ip }}"
+      when: nfs_server_ip is defined
 
     # Create users
     - role: ansible-welder-user
@@ -95,11 +96,12 @@
       mesos_containerizers: "docker,mesos"
       zookeeper_hostnames: "master.mesos"
       mesos_install_mode: "slave"
+      mesos_node_type: "{{ slave_type }}"
       mesos_cluster_name: "{{cluster_name}}"
-      mesos_hostname: "master.mesos"
+      mesos_hostname: "{{ mesos_hostname }}"
 
     - role: ansible-mesos-dns
-      mesos_dns_hosts: [ "master.mesos" ]
+      mesos_dns_hosts: [ "{{ mesos_master_ip }}" ]
 
     - role: ansible-sensu
       sensu_master: "master.mesos"
