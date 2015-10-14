@@ -1,7 +1,7 @@
 {
   "checks": {
     "mesos_slave": {
-        "command": "/usr/local/bin/check-mesos.rb -s {{ hostvars[inventory_hostname].private_ip_address }} -m slave",
+        "command": "/usr/local/bin/check-mesos.rb -s {{ ip_address }} -m slave",
         "interval": {{ check_interval | int }},
         "subscribers": [
             "{{ cluster_name }}-slave"

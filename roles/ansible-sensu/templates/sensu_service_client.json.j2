@@ -1,7 +1,7 @@
 {
   "client": {
-    "name": "{{ hostvars[inventory_hostname]['system_name'] }}",
-    "address": "{{ hostvars[inventory_hostname]['private_ip_address']  }}",
+    "name": "{{ system_name }}",
+    "address": "{{ ip_address }}",
     "subscriptions": [
       "{{ cluster_name }}",
       "{{ cluster_name }}-service"

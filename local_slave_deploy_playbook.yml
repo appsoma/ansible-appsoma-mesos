@@ -2,7 +2,7 @@
 
 #
 # Required vars:
-# nfs_server_ip, slave_type, mesos_hostname, mesos_master_ip
+# nfs_server_ip, slave_type, short_name, mesos_master_ip_list
 - hosts: localhost
   connection: local
   sudo: True
@@ -98,10 +98,12 @@
       mesos_install_mode: "slave"
       mesos_node_type: "{{ slave_type }}"
       mesos_cluster_name: "{{cluster_name}}"
-      mesos_hostname: "{{ short_name }}"
+      mesos_hostname: "{{ short_name }}.{{ cluster_name }}.internal"
 
     - role: ansible-mesos-dns
-      mesos_dns_hosts: [ "{{ mesos_master_ip }}" ]
+      mesos_dns_hosts: [ "{{ mesos_master_ip_list }}" ]
 
     - role: ansible-sensu
       sensu_master: "master.mesos"
+      system_name: "{{ system_name }}"
+      ip_address: "{{ ansible_default_ipv4.address }}"

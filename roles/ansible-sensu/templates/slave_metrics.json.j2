@@ -2,7 +2,7 @@
   "checks": {
     "mesos_slave_metrics": {
         "type": "metric",
-        "command": "/usr/local/bin/metrics-mesos.rb -h {{ hostvars[inventory_hostname].private_ip_address }} -m slave",
+        "command": "/usr/local/bin/metrics-mesos.rb -h {{ ip_address }} -m slave",
         "subscribers": [
             "{{ cluster_name }}-slave"
         ],

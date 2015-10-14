@@ -1,14 +1,14 @@
 {
   "checks": {
     "mesos_master": {
-        "command": "/usr/local/bin/check-mesos.rb -s {{ hostvars[inventory_hostname].private_ip_address }} -m master",
+        "command": "/usr/local/bin/check-mesos.rb -s {{ ip_address }} -m master",
         "interval": {{ check_interval | int }},
         "subscribers": [
             "{{ cluster_name }}-master"
         ]
     },
     "marathon": {
-        "command": "/usr/local/bin/check-marathon.rb -s {{ marathon_host }}",
+        "command": "/usr/local/bin/check-marathon.rb -s {{ ip_address }}",
         "interval": {{ check_interval | int }},
         "subscribers": [
             "{{ cluster_name }}-master"

@@ -2,7 +2,7 @@
   "checks": {
     "mesos_master_metrics": {
         "type": "metric",
-        "command": "/usr/local/bin/metrics-mesos.rb -h {{ hostvars[inventory_hostname].private_ip_address }} -m master",
+        "command": "/usr/local/bin/metrics-mesos.rb -h {{ ip_address }} -m master",
         "subscribers": [
             "{{ cluster_name }}-master"
         ],
@@ -11,7 +11,7 @@
     },
     "marathon_metrics": {
         "type": "metric",
-        "command": "/usr/local/bin/metrics-marathon.rb -h {{ marathon_host }}",
+        "command": "/usr/local/bin/metrics-marathon.rb -h {{ ip_address }}",
         "subscribers": [
             "{{ cluster_name }}-master"
         ],
@@ -20,7 +20,7 @@
     },
     "haproxy_metrics": {
         "type": "metric",
-        "command": "/usr/local/bin/metrics-haproxy.rb -c {{ hostvars[inventory_hostname].private_ip_address }} -P 9090 -q haproxy?stats -u admin -p admin",
+        "command": "/usr/local/bin/metrics-haproxy.rb -c {{ ip_address }} -P 9090 -q haproxy?stats -u admin -p admin",
         "subscribers": [
             "{{ cluster_name }}-master"
         ],
