@@ -2,7 +2,8 @@
   when: is_mesos_dns_starter
 
 - name: Add Mesos-DNS as nameserver
-  lineinfile: dest=/etc/resolvconf/resolv.conf.d/head line="nameserver {{ item }}"
+  lineinfile: dest=/etc/resolvconf/resolv.conf.d/head line="nameserver {{ item }}" regexp="^nameserver "
+  register: add_ns
   with_items: mesos_dns_hosts
 
 - name: Add "mesos" domain search
@@ -15,5 +16,5 @@
 
 - name: Refresh resolv.conf
   command: resolvconf -u
-  when: resolv_conf.changed
+  when: resolv_conf.changed or add_ns.changed
 
