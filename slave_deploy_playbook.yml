@@ -128,6 +128,7 @@
       mesos_dns_hosts: [ "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}" ]
 
     - role: ansible-sensu
+      sensu_mode: "client"
       sensu_master: "{{ hostvars[groups[inventory_group_master][0]]['private_ip_address'] }}"
       system_name: "{{ hostvars[inventory_hostname].system_name }}"
       ip_address: "{{ hostvars[inventory_hostname].private_ip_address }}"

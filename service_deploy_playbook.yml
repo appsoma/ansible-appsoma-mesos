@@ -107,6 +107,7 @@
       mesos_dns_hosts: [ "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}" ]
 
     - role: ansible-sensu
+      sensu_mode: "client"
       sensu_master: "{{ hostvars[groups[inventory_group_master][0]]['private_ip_address'] }}"
       mesos_master_list: "{{ zookeeper_hosts_no_port }}"
       system_name: "{{ hostvars[inventory_hostname].system_name }}"

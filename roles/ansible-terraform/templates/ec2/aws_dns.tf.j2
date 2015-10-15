@@ -44,7 +44,7 @@ resource "aws_route53_record" "master" {
 {% for s_type in slave_types %}
 {% if s_type.count > 0 %}
 
-resource "aws_route53_record" "{{ s_type }}" {
+resource "aws_route53_record" "{{ s_type.name }}" {
 
 {% if s_type.count > 1 %}
    zone_id = "${aws_route53_zone.internal.id}"

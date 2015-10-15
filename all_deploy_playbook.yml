@@ -215,7 +215,7 @@
       mesos_containerizers: "docker,mesos"
       mesos_cluster_name: "{{cluster_name}}"
       mesos_node_type: "{{ hostvars[inventory_hostname].type }}"
-      mesos_host_name: "{{ hostvars[inventory_hostname].short_name }}.{{ cluster_name }}.internal"
+      mesos_hostname: "{{ hostvars[inventory_hostname].short_name }}.{{ cluster_name }}.internal"
       when: inventory_hostname in groups[inventory_group_master] or inventory_hostname in groups[inventory_group_slave]
 
     # Install Marathon

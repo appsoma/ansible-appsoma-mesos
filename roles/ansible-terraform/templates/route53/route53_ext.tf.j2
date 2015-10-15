@@ -27,7 +27,11 @@ resource "aws_route53_record" "wildcard-ext" {
    name = "*.{{ service_discovery_dns_suffix }}"
    type = "A"
    ttl = "10"
+{% if masters.count > 1 %}
    records = ["${split(",", var.master_public_ip)}"]
+{% else %}
+   records = ["${var.master_public_ip}"]
+{% endif %}
 }
 
 resource "aws_route53_record" "master-ext" {

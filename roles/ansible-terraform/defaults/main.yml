@@ -1,2 +1,3 @@
 terraform_dir: "./terraform"
 deploy_version: "dev"
+ansible_dir: "../"

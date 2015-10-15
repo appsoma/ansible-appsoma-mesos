@@ -104,6 +104,7 @@
       mesos_dns_hosts: [ "{{ mesos_master_ip_list }}" ]
 
     - role: ansible-sensu
+      sensu_mode: "client"
       sensu_master: "master.mesos"
       system_name: "{{ short_name }}"
       ip_address: "{{ ansible_default_ipv4.address }}"

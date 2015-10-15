@@ -4,7 +4,11 @@
     "address": "{{ ip_address }}",
     "subscriptions": [
       "{{ cluster_name }}",
+{% if "service" in system_name %}
+      "{{ cluster_name }}-service"
+{% else %}
       "{{ cluster_name }}-slave"
+{% endif %}
     ]
   }
 }
