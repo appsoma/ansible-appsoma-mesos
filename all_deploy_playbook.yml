@@ -130,7 +130,6 @@
       group: "{{ welder_group }}"
       user_list: "{{ welder_user_list }}"
       dataDir: "{{ data_mount_point }}"
-      when: inventory_hostname in groups[inventory_group_master] or inventory_hostname in groups[inventory_group_slave]
 
     # Install NTP for time sync
     - role: ansible-ntp
@@ -242,12 +241,6 @@
     - role: ansible-cassandra-marathon
       marathon_host: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
       when: inventory_hostname == groups[inventory_group_master][0]
-
-    # Install High Availability Proxy
-#    - role: ansible-haProxy
-#      zookeeper_host_list: "{{zookeeper_hosts_with_port}}"
-#      haproxy_pem_file: "cluster_vars/{{ cluster_name }}/haproxy.pem"
-#      when: inventory_hostname in groups[inventory_group_master]
 
     # Install Kafka Mesos framework
     - role: ../roles/ansible-kafka-mesos
