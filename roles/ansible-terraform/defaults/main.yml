@@ -1,3 +1,6 @@
 terraform_dir: "./terraform"
 deploy_version: "dev"
 ansible_dir: "../"
+
+
+use_s3_remote_terraform_state: false

@@ -33,6 +33,12 @@
     - "route53_ext.tf"
   when: use_route53 is defined and use_route53
 
+- name: Configure terraform for remote state
+  shell: 'terraform remote config -backend=s3 -backend-config="bucket={{ terraform_s3_state_bucket }}" -backend-config="key=clusters/{{ cluster_name }}.tfstate" -backend-config="region={{ ec2_region }}"'
+  args:
+    chdir: "{{ terraform_dir }}/{{ cluster_name }}"
+  when: use_s3_remote_terraform_state is defined and use_s3_remote_terraform_state
+
 - name: Run Terraform get
   command: terraform get
   args:

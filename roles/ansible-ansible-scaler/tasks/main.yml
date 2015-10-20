@@ -1,0 +1,35 @@
+- name: Install Ansible repo
+  apt_repository: repo="ppa:ansible/ansible"
+
+- name: Install Ansible and git
+  apt: name="{{ item }}" state=present
+  with_items:
+    - ansible
+    - git
+    - zip
+
+- name: Make working directory
+  file: path="{{ ansible_scaler_dir }}" owner="{{ management_user }}"
+
+- name: Fetch Ansible scripts
+  git:
+    dest: "{{ ansible_scaler_dir }}"
+    repo: https://github.com/appsoma/ansible-appsoma-mesos.git
+    version: "{{ ansible_scaler_version if ansible_scaler_version is defined else 'HEAD' }}"
+    update: yes
+    force: yes
+  sudo: yes
+  sudo_user: "{{ management_user }}"
+  register: git_pull
+
+- name: Copy Terraform executables
+  copy: src="{{ terraform_version }}/{{ item }}" dest="/usr/local/bin/{{ item }}" owner="{{ management_user }}" mode=0777
+  with_items: terraform_executables
+
+- name: Add Ansible variable files
+  copy: src="cluster_vars/{{ cluster_name }}/{{ item }}" dest="{{ ansible_scaler_dir }}/cluster_vars/{{ cluster_name }}/{{ item }}" owner="{{ management_user }}"
+  with_items:
+    - required_vars.yml
+    - "{{ cluster_name }}_key.pem"
+    - users.yml
+
