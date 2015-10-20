@@ -207,6 +207,10 @@
       system_name: "{{ hostvars[inventory_hostname].system_name }}"
       ip_address: "{{ hostvars[inventory_hostname].private_ip_address }}"
 
+    # Install the auto-scaler tools
+    - role: ansible-ansible-scaler
+      when: "use_ansible_scaler is defined and use_ansible_scaler"
+
     # Install Mesos
     - role: ansible-mesos
       zookeeper_hostnames: "{{ zookeeper_hosts_with_port  }}"

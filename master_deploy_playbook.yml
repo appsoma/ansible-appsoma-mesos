@@ -66,6 +66,7 @@
       when: additional_ssh_keys is defined
 
   roles:
+
     # Install NTP for time sync
     - role: ansible-ntp
 
@@ -169,6 +170,7 @@
     - role: ansible-cassandra-marathon
       marathon_host: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
 
+    # Install monitoring
     - role: ansible-rabbitmq
 
     - role: ansible-redis
@@ -184,17 +186,24 @@
       system_name: "{{ hostvars[inventory_hostname].system_name }}"
       ip_address: "{{ hostvars[inventory_hostname].private_ip_address }}"
 
-    - role: ../roles/ansible-kafka-mesos
+    # Install the Kafka framework
+    - role: ansible-kafka-mesos
       zookeeper_hosts: "{{ zookeeper_hosts_with_port }}"
       zookeeper_hosts_no_port_list: "{{ zookeeper_hosts_no_port.split(',') }}"
       framework_host: "{{ hostvars[inventory_hostname]['private_dns_name'] }}"
       when: "use_kafka is defined and use_kafka and inventory_hostname == groups[inventory_group_master][0]"
 
-    - role: ../roles/ansible-storm-mesos
+    # Install the Storm framework
+    - role: ansible-storm-mesos
       zookeeper_hosts: "{{ zookeeper_hosts_with_port }}"
       zookeeper_hosts_no_port_list: "{{ zookeeper_hosts_no_port.split(',') }}"
       framework_host: "{{ hostvars[inventory_hostname]['private_dns_name'] }}"
       when: "use_storm is defined and use_storm and inventory_hostname == groups[inventory_group_master][0]"
+
+    # Install the scaler from repo
+    - role: ansible-ansible-scaler
+      when: "use_ansible_scaler is defined and use_ansible_scaler"
+
 
 - include: playbooks/welder_playbook.yml
 
