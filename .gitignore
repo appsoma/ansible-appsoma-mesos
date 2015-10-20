@@ -2,3 +2,4 @@ ansible-appsoma-mesos.iws
 cluster_vars/*/*
 templates/*
 terraform/
+terraform_0.6.4/terraform

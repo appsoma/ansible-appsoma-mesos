@@ -1,3 +1,5 @@
+ansible_scaler_dir: "/opt/ansible-scaler"
+
 terraform_version: "0.6.4"
 terraform_cloud_provider:
   ec2: "terraform-provider-aws"
