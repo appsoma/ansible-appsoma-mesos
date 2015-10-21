@@ -89,7 +89,7 @@ resource "aws_instance" "master" {
 resource "aws_instance" "{{ s_type.name }}" {
 
   availability_zone = "${var.aws_info.zone}"
-  ami = "${lookup(var.aws_image, var.aws_info.region)}"
+  ami = "{{ slave_ami if slave_ami is defined else '${lookup(var.aws_image, var.aws_info.region)}' }}"
   instance_type = "${var.aws_instance_type.{{ s_type.name }}}"
   key_name = "${var.boot_key.name}"
   subnet_id = "${aws_subnet.subnet.id}"

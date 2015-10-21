@@ -18,8 +18,8 @@ done
 
 source setup_amazon_env.bash $CLUSTER_NAME
 if [ -z "$PLAN_ONLY" ] ; then
-    echo ansible-playbook -v --private-key cluster_vars/$1/${1}_key.pem -i inventory/terraform.py manage_terraform_playbook.yml -e "cluster_name=$1" -e "local_slave_deploy=$LOCAL_DEPLOY"
+    ansible-playbook -v --private-key cluster_vars/$CLUSTER_NAME/${CLUSTER_NAME}_key.pem -i inventory/terraform.py manage_terraform_playbook.yml -e "cluster_name=$CLUSTER_NAME" -e "local_slave_deploy=$LOCAL_DEPLOY"
 else
-    echo ansible-playbook -v --private-key cluster_vars/$1/${1}_key.pem -i inventory/terraform.py manage_terraform_playbook.yml -e "cluster_name=$1" -e "local_slave_deploy=$LOCAL_DEPLOY" -e "terraform_plan_only=true"
+    ansible-playbook -v --private-key cluster_vars/$CLUSTER_NAME/${CLUSTER_NAME}_key.pem -i inventory/terraform.py manage_terraform_playbook.yml -e "cluster_name=$CLUSTER_NAME" -e "local_slave_deploy=$LOCAL_DEPLOY" -e "terraform_plan_only=true"
 fi
 
