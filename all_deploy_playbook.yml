@@ -209,7 +209,7 @@
 
     # Install the auto-scaler tools
     - role: ansible-ansible-scaler
-      when: "use_ansible_scaler is defined and use_ansible_scaler"
+      when: "use_ansible_scaler is defined and use_ansible_scaler and inventory_hostname in groups[inventory_group_master]"
 
     # Install Mesos
     - role: ansible-mesos

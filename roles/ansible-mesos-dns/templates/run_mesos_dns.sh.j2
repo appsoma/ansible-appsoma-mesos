@@ -1,7 +1,9 @@
 #!/bin/bash
 if [ $1 = "start" ] ; then
-	curl -X POST -H "Content-Type: application/json" -d @{{ mesos_dns_dir}}/mesos_dns_marathon.json http://{{ marathon_host }}:8080/v2/apps
-
+#	curl -X POST -H "Content-Type: application/json" -d @{{ mesos_dns_dir}}/mesos_dns_marathon.json http://{{ marathon_host }}:8080/v2/apps
+    {{ mesos_dns_docker_cmd }}
 elif [ $1 = "stop" ] ; then
-	curl -X DELETE  -H "Content-Type: application/json" http://{{ marathon_host }}:8080/v2/apps/mesos-dns
+#	curl -X DELETE  -H "Content-Type: application/json" http://{{ marathon_host }}:8080/v2/apps/mesos-dns
+    docker stop mesos-dns
+    docker rm mesos-dns
 fi

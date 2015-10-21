@@ -10,14 +10,11 @@
 - name: Install Mesos-DNS start script
   template: src=run_mesos_dns.sh.j2 dest="{{ mesos_dns_dir }}/run_mesos_dns.sh" owner="{{ management_user }}" mode=700
 
-- name: Start Mesos-DNS
-  shell: "{{ mesos_dns_docker_cmd }}"
-  register: start_local_docker
-  changed_when: start_local_docker.stderr == "" or start_local_docker.stderr.find('already in use') == -1
-  failed_when: start_local_docker.stderr != "" and start_local_docker.stderr.find('already in use') == -1 and start_local_docker.stderr.find('Downloaded newer image') == -1
+- name: Start Mesos-DNS in Marathon
+  shell: "{{ mesos_dns_dir }}/run_mesos_dns.sh start"
+  register: start_mesos_dns
+  changed_when: start_mesos_dns.stderr == "" or start_mesos_dns.stderr.find('already in use') == -1
+  failed_when: start_mesos_dns.stderr != "" and start_mesos_dns.stderr.find('already in use') == -1 and start_mesos_dns.stderr.find('Downloaded newer image') == -1
 
 - name: Debug Mesos-DNS start
-  debug: var=start_local_docker
-
-#- name: Start Mesos-DNS in Marathon
-#  shell: "{{ mesos_dns_dir }}/run_mesos_dns.sh start"
+  debug: var=start_mesos_dns
