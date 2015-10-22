@@ -22,6 +22,7 @@
     public_dns_name: "{{ hostvars[item].public.dns }}"
     private_ip_address: "{{ hostvars[item].private.ip }}"
     private_dns_name: "{{ hostvars[item].private.ip }}"
+    instance_id: "{{ hostvars[item].id }}"
   with_items: "{{ groups[provider_group_prefix[provider] + inventory_group_service] | default([]) }}"
   when: groups[provider_group_prefix[provider] + inventory_group_service] is defined
 
@@ -38,6 +39,7 @@
     public_dns_name: "{{ hostvars[item].public.dns }}"
     private_ip_address: "{{ hostvars[item].private.ip}}"
     private_dns_name: "{{ hostvars[item].private.dns}}"
+    instance_id: "{{ hostvars[item].id }}"
   with_items: "{{ groups[provider_group_prefix[provider] + inventory_group_master] | default([]) }}"
   when: groups[provider_group_prefix[provider] + inventory_group_master] is defined
 
@@ -53,6 +55,7 @@
     public_dns_name: "{{ hostvars[item].public.dns }}"
     private_ip_address: "{{ hostvars[item].private.ip }}"
     private_dns_name: "{{ hostvars[item].private.ip }}"
+    instance_id: "{{ hostvars[item].id }}"
   with_items: "{{ groups[provider_group_prefix[provider] + inventory_group_slave] | default([]) }}"
   when: groups[provider_group_prefix[provider] + inventory_group_slave] is defined
   when: groups[provider_group_prefix[provider] + inventory_group_slave] is defined

@@ -36,16 +36,8 @@
       set_fact: nfs_server_ip={{ hostvars[groups[inventory_group_service][0]]['private_ip_address'] }}
       when: groups[inventory_group_service] is defined
 
-    - name:  Set zookeeper private IP list with ports
-      set_fact:
-        zookeeper_hosts_with_port: |
-          {% set comma = joiner(':' + zookeeper_client_port + ',') %}
-          {% for item in groups[inventory_group_master] -%}
-            {{ comma() }}{{ hostvars[item].private_ip_address }}:{{ zookeeper_client_port }}
-          {%- endfor %}
-
     - name: Save zookeeper private IP list to bash profile
-      lineinfile: dest=/etc/profile.d/zookeeper_host_list.sh line="export ZK_HOST_LIST={{ zookeeper_hosts_with_port }}" state=present create=yes
+      lineinfile: dest=/etc/profile.d/zookeeper_host_list.sh line="export ZK_HOST_LIST=master.mesos:2181" state=present create=yes
 
     - name: Add ssh keys to management user
       authorized_key: key="{{ item }}" state=present user=ubuntu exclusive=no
@@ -115,17 +107,17 @@
     - role: ansible-java
       java_versions: [7, 8]
 
+    - role: ansible-mesos-dns
+      mesos_dns_hosts: [ "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}" ]
+
     # Install mesos in slave mode
     - role: ansible-mesos
       mesos_containerizers: "docker,mesos"
-      zookeeper_hostnames: "{{ zookeeper_hosts_with_port }}"
+      zookeeper_hostnames: "master.mesos:2181"
       mesos_install_mode: "slave"
       mesos_cluster_name: "{{cluster_name}}"
       mesos_node_type: "{{ hostvars[inventory_hostname].type }}"
       mesos_hostname: "{{ hostvars[inventory_hostname].short_name }}.{{ cluster_name }}.internal"
-
-    - role: ansible-mesos-dns
-      mesos_dns_hosts: [ "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}" ]
 
     - role: ansible-sensu
       sensu_mode: "client"

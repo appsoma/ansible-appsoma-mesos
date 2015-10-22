@@ -68,5 +68,25 @@
     - role: ansible-mesos
       mesos_containerizers: "docker,mesos"
       mesos_install_mode: "slave"
+      mesos_node_type: "generic"
 
     - role: ansible-sensu
+      sensu_mode: "client"
+      ip_address: "{{ hostvars[inventory_hostname].private_ip_address }}"
+
+  post_tasks:
+    - name: Stop sensu
+      service: name=sensu state=stopped
+
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - "cluster_vars/common.yml"
+    - "cluster_vars/{{ cluster_name }}/required_vars.yml"
+    - "cluster_vars/{{ cluster_name }}/aws_secret_vars.yml"
+  roles:
+    # Burn an image from the completed slaves
+    - role: ec2Burn
+      source_instance_id: "{{hostvars[groups[inventory_group_slave][0]].instance_id }}"
+      node_class: "{{ cluster_name }}_slave"
+      when: create_slave_image and cloud_provider == "ec2"
