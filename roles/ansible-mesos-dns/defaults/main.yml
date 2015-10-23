@@ -1,3 +1,4 @@
 is_mesos_dns_starter: false
 mesos_dns_dir: "{{ data_mount_point }}/mesos_dns"
-mesos_dns_docker_cmd: "docker run -d --name mesos-dns --restart=always -p 53:53/udp -p 5001:5001 -v {{ mesos_dns_dir }}/config.json:/config.json mesosphere/mesos-dns /mesos-dns -v 2 -config=config.json"
+
+mesos_dns_docker_cmd: docker run -d --name mesos-dns --restart=always --net=host -e MESOS_ZK="zk://{{ zookeeper_host_list }}/mesos" -e MESOS_DNS_EXTERNAL_SERVERS={{ private_lan_dns }} -e MESOS_DNS_HTTP_PORT=5001 -e MESOS_DNS_HTTP_ENABLED=true -e MESOS_DNS_REFRSH=5 -e LOCAL_IP={{ hostvars[inventory_hostname].private_ip_address }} tobilg/mesos-dns
