@@ -24,6 +24,9 @@
     - Restart mesos-master
   when: "mesos_install_mode == 'master' and cloud_provider == 'ec2' and (use_route53_slave_names is defined and use_route53_slave_names)"
 
+- name: Remove previous hostname info
+  file: path=/etc/mesos-slave/hostname state=absent
+
 - name: Set Mesos Hostname (slave)
   template: src=hostname.j2 dest=/etc/mesos-slave/hostname
   notify:
