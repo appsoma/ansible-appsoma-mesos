@@ -143,7 +143,8 @@ resource "aws_instance" "{{ s_type }}" {
       "sudo apt-get install -y git",
       "cd /opt/deploy; git clone https://github.com/appsoma/ansible-appsoma-mesos.git",
       "cd /opt/deploy/ansible-appsoma-mesos; git checkout {{ deploy_version }}",
-      "cd /opt/deploy/ansible-appsoma-mesos; sudo ./install_ansible.sh local",
+      "chmod 700 /opt/deploy/ansible-appsoma-mesos/install_ansible.bash",
+      "cd /opt/deploy/ansible-appsoma-mesos; sudo ./install_ansible.bash local",
       "mkdir -p /opt/deploy/ansible-appsoma-mesos/cluster_vars/{{ cluster_name }}"
     ]
     connection {
