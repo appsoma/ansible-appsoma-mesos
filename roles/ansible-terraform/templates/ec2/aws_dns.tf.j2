@@ -40,25 +40,25 @@ resource "aws_route53_record" "master" {
 {% endif %}
 
 
-{% if use_route53_slave_names is not defined or use_route53_slave_names %}
+{% if use_route53_slave_names is not defined and use_route53_slave_names %}
 {% for s_type in slave_types %}
-{% if s_type.count > 0 %}
+{% if slave_types[s_type].count > 0 %}
 
-resource "aws_route53_record" "{{ s_type.name }}" {
+resource "aws_route53_record" "{{ s_type }}" {
 
-{% if s_type.count > 1 %}
+{% if slave_types[s_type].count > 1 %}
    zone_id = "${aws_route53_zone.internal.id}"
-   name = "{{ s_type.name }}_${count.index}.{{ cluster_name }}.internal"
+   name = "{{ s_type }}_${count.index}.{{ cluster_name }}.internal"
    type = "CNAME"
    ttl = "10"
-   count = "${var.type_count.{{ s_type.name}}}"
-   records = ["${element(aws_instance.{{ s_type.name }}.*.private_dns, count.index)}"]
+   count = "${var.type_count.{{ slave_types[s_type].ocunt }}}"
+   records = ["${element(aws_instance.{{ s_type }}.*.private_dns, count.index)}"]
 {% else %}
    zone_id = "${aws_route53_zone.internal.id}"
-   name = "{{ s_type.name }}_0.{{ cluster_name }}.internal"
+   name = "{{ s_type }}_0.{{ cluster_name }}.internal"
    type = "CNAME"
    ttl = "10"
-   records = ["${aws_instance.{{ s_type.name }}.private_dns}"]
+   records = ["${aws_instance.{{ s_type }}.private_dns}"]
 {% endif %}
 }
 

@@ -54,23 +54,23 @@ resource "aws_route53_record" "master-ext" {
 
 {% if use_route53_slave_names is not defined or use_route53_slave_names %}
 {% for s_type in slave_types %}
-{% if s_type.count > 0 %}
+{% if slave_types[s_type].count > 0 %}
 
-resource "aws_route53_record" "{{ s_type.name }}-ext" {
+resource "aws_route53_record" "{{ s_type }}-ext" {
 
-{% if s_type.count > 1 %}
+{% if slave_types[s_type].count > 1 %}
    zone_id = "{{ route53_zone_id }}"
-   name = "{{ s_type.name }}_${count.index}.{{ service_discovery_dns_suffix }}"
+   name = "{{ s_type }}_${count.index}.{{ service_discovery_dns_suffix }}"
    type = "CNAME"
    ttl = "10"
-   count = "${var.type_count.{{ s_type.name }}}"
-   records = ["${element(split(",", var.{{ s_type.name }}_public_dns), count.index)}"]
+   count = "${var.type_count.{{ s_type }}}"
+   records = ["${element(split(",", var.{{ s_type }}_public_dns), count.index)}"]
 {% else %}
    zone_id = "{{ route53_zone_id }}"
-   name = "{{ s_type.name }}_0.{{ service_discovery_dns_suffix }}"
+   name = "{{ s_type }}_0.{{ service_discovery_dns_suffix }}"
    type = "CNAME"
    ttl = "10"
-   records = ["${var.{{ s_type.name }}_public_dns}"]
+   records = ["${var.{{ s_type }}_public_dns}"]
 {% endif %}
 }
 {% endif %}

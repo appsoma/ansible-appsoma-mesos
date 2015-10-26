@@ -28,7 +28,7 @@ variable "aws_instance_type" {
 	service = "{{ service_nodes.instance_type }}"
 	master = "{{ masters.instance_type }}"
 {% for s_type in slave_types %}
-	{{ s_type.name }} = "{{ s_type.instance_type }}"
+	{{ s_type }} = "{{ slave_types[s_type].instance_type }}"
 {% endfor %}
   }
 }
@@ -39,7 +39,7 @@ variable "instance_volume_type" {
 	service = "{{ service_nodes.root_volume_type }}"
 	master = "{{ masters.root_volume_type }}"
 {% for s_type in slave_types %}
-	{{ s_type.name }} = "{{ s_type.root_volume_type }}"
+	{{ s_type }} = "{{ slave_types[s_type].root_volume_type }}"
 {% endfor %}
   }
 }
@@ -50,7 +50,7 @@ variable "instance_root_disk_size_gb" {
 	service = {{ service_nodes.root_volume_size_gb }}
 	master = {{ masters.root_volume_size_gb }}
 {% for s_type in slave_types %}
-	{{ s_type.name }} = "{{ s_type.root_volume_size_gb }}"
+	{{ s_type }} = {{ slave_types[s_type].root_volume_size_gb }}
 {% endfor %}
   }
 }
@@ -63,12 +63,12 @@ variable "boot_key" {
 }
 
 variable "type_count" {
-  description = "Amazon instances of each type ('rack' attribute) to create"
+  description = "Amazon instances of each type ('node_type' attribute) to create"
   default = {
 	service = {{ service_nodes.count }}
 	master = {{ masters.count }}
 {% for s_type in slave_types %}
-	{{ s_type.name }} = "{{ s_type.count }}"
+	{{ s_type }} = {{ slave_types[s_type].count }}
 {% endfor %}
   }
 }

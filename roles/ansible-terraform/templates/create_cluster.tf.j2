@@ -12,8 +12,8 @@ module "route53" {
   service_public_ip = "${module.ec2.service_public_ip}"
   service_public_dns = "${module.ec2.service_public_dns}"
 {% for s_type in slave_types %}
-  {{ s_type.name }}_public_ip = "${module.ec2.{{ s_type.name }}_public_ip}"
-  {{ s_type.name }}_public_dns = "${module.ec2.{{ s_type.name }}_public_dns}"
+  {{ s_type }}_public_ip = "${module.ec2.{{ s_type }}_public_ip}"
+  {{ s_type }}_public_dns = "${module.ec2.{{ s_type }}_public_dns}"
 {% endfor %}
 }
 {% endif %}

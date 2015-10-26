@@ -30,18 +30,18 @@ output "master_public_dns" {
 }
 
 {% for s_type in slave_types %}
-output "{{ s_type.name }}_public_ip" {
-{% if s_type.count > 1 %}
-    value = "${join(",", aws_instance.{{ s_type.name }}.*.public_ip)}"
+output "{{ s_type }}_public_ip" {
+{% if slave_types[s_type].count > 1 %}
+    value = "${join(",", aws_instance.{{ s_type }}.*.public_ip)}"
 {% else %}
-    value = "${aws_instance.{{ s_type.name }}.public_ip}"
+    value = "${aws_instance.{{ s_type }}.public_ip}"
 {% endif %}
 }
-output "{{ s_type.name }}_public_dns" {
-{% if s_type.count > 1 %}
-    value = "${join(",", aws_instance.{{ s_type.name }}.*.public_dns)}"
+output "{{ s_type }}_public_dns" {
+{% if slave_types[s_type].count > 1 %}
+    value = "${join(",", aws_instance.{{ s_type }}.*.public_dns)}"
 {% else %}
-    value = "${aws_instance.{{ s_type.name }}.public_dns}"
+    value = "${aws_instance.{{ s_type }}.public_dns}"
 {% endif %}
 }
 {% endfor %}

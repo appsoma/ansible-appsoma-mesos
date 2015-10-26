@@ -9,7 +9,7 @@ variable "type_count" {
 	service = {{ service_nodes.count }}
 	master = {{ masters.count }}
 {% for s_type in slave_types %}
-	{{ s_type.name }} = "{{ s_type.count }}"
+	{{ s_type }} = "{{ slave_types[s_type].count }}"
 {% endfor %}
   }
 }
@@ -20,6 +20,6 @@ variable "service_public_ip" {}
 variable "service_public_dns" {}
 
 {% for s_type in slave_types %}
-variable "{{ s_type.name }}_public_ip" {}
-variable "{{ s_type.name }}_public_dns" {}
+variable "{{ s_type }}_public_ip" {}
+variable "{{ s_type }}_public_dns" {}
 {% endfor %}

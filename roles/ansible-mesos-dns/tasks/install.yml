@@ -15,6 +15,3 @@
   register: start_mesos_dns
   changed_when: start_mesos_dns.stderr == "" or start_mesos_dns.stderr.find('already in use') == -1
   failed_when: start_mesos_dns.stderr != "" and start_mesos_dns.stderr.find('already in use') == -1 and start_mesos_dns.stderr.find('Downloaded newer image') == -1
-
-- name: Debug Mesos-DNS start
-  debug: var=start_mesos_dns

@@ -22,7 +22,7 @@
     - "outputs.tf"
   when: cloud_provider == 'ec2'
 
-- name: Creaet Route53 Terraform module directory
+- name: Create Route53 Terraform module directory
   file: path="{{ terraform_dir }}/{{ cluster_name }}/route53" state=directory
   when: use_route53 is defined and use_route53
 

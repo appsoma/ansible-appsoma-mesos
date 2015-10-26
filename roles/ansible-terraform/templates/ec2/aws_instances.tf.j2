@@ -86,37 +86,36 @@ resource "aws_instance" "master" {
 }
 
 {% for s_type in slave_types %}
-resource "aws_instance" "{{ s_type.name }}" {
-
+resource "aws_instance" "{{ s_type }}" {
   availability_zone = "${var.aws_info.zone}"
   ami = "{{ slave_ami if slave_ami is defined else '${lookup(var.aws_image, var.aws_info.region)}' }}"
-  instance_type = "${var.aws_instance_type.{{ s_type.name }}}"
+  instance_type = "${var.aws_instance_type.{{ s_type }}}"
   key_name = "${var.boot_key.name}"
   subnet_id = "${aws_subnet.subnet.id}"
   vpc_security_group_ids = ["${aws_security_group.slave_sg.id}"]
   associate_public_ip_address = true
   tags {
-    Name = "${var.cluster_name}_{{ s_type.name }}_${count.index}"
-    short_name =  "{{ s_type.name }}_${count.index}"
-    type = "{{ s_type.name }}"
+    Name = "${var.cluster_name}_{{ s_type }}_${count.index}"
+    short_name =  "{{ s_type }}_${count.index}"
+    type = "{{ s_type }}"
     id = "${count.index}"
     cluster = "${var.cluster_name}"
     Class = "${var.cluster_name}_slave"
   }
-{% if s_type.root_volume_ebs_optimized is defined %}
-  ebs_optimized = {{ 'true' if s_type.root_volume_ebs_optimized else 'false' }}
+{% if slave_types[s_type].root_volume_ebs_optimized is defined %}
+  ebs_optimized = {{ 'true' if slave_types[s_type].root_volume_ebs_optimized else 'false' }}
 {% endif %}
   root_block_device {
-    volume_type = "${var.instance_volume_type.{{ s_type.name }}}"
-{% if s_type.root_volume_type is defined and s_type.root_volume_type == 'io1' %}
-    iops = {{ s_type.root_volume_iops }}
+    volume_type = "${var.instance_volume_type.{{ s_type }}}"
+{% if slave_types[s_type].root_volume_type is defined and slave_types[s_type].root_volume_type == 'io1' %}
+    iops = {{ slave_types[s_type].root_volume_iops }}
 {% endif %}
-    volume_size = "${var.instance_root_disk_size_gb.{{ s_type.name }}}"
+    volume_size = "${var.instance_root_disk_size_gb.{{ s_type }}}"
     delete_on_termination = true
 
   }
-{% if s_type.additional_volumes is defined %}
-{% for vol in s_type.additional_volumes %}
+{% if slave_types[s_type].additional_volumes is defined %}
+{% for vol in slave_types[s_type].additional_volumes %}
   ebs_block_device {
     volume_type = "{{ vol.type }}"
 {% if vol.type == 'io1' %}
@@ -128,15 +127,15 @@ resource "aws_instance" "{{ s_type.name }}" {
   }
 {% endfor %}
 {% endif %}
-{% if s_type.instance_stores is defined and s_type.instance_stores|length > 0 %}
-{% for i in s_type.instance_stores %}
+{% if slave_types[s_type].instance_stores is defined and slave_types[s_type].instance_stores|length > 0 %}
+{% for i in slave_types[s_type].instance_stores %}
   ephemeral_block_device {
     device_name = "{{ i.device_name }}"
     virtual_name = "{{ i.virtual_name }}"
   }
 {% endfor %}
 {% endif %}
-{% if local_slave_deploy is defined and local_slave_deploy %}
+{% if local_slave_deploy is defined and local_slave_deploy == "true" %}
   provisioner "remote-exec" {
     inline = [
       "sudo mkdir -p /opt/deploy/ansible-appsoma-mesos",
@@ -173,7 +172,7 @@ resource "aws_instance" "{{ s_type.name }}" {
   }
   provisioner "remote-exec" {
     inline = [
-      "cd /opt/deploy/ansible-appsoma-mesos; ansible-playbook local_slave_deploy_playbook.yml -e cluster_name='{{ cluster_name }}' -e system_name='${var.cluster_name}_{{ s_type.name }}_${count.index}' -e nfs_server_ip='${aws_instance.service.private_ip}' -e slave_type='{{ s_type.name }}' -e short_name='{{ s_type.name }}_${count.index}' -e mesos_master_ip_list='${aws_instance.master.private_ip}'"
+      "cd /opt/deploy/ansible-appsoma-mesos; ansible-playbook local_slave_deploy_playbook.yml -e cluster_name='{{ cluster_name }}' -e system_name='${var.cluster_name}_{{ s_type }}_${count.index}' -e nfs_server_ip='${aws_instance.service.private_ip}' -e slave_type='{{ s_type }}' -e short_name='{{ s_type }}_${count.index}' -e mesos_master_ip_list='${aws_instance.master.private_ip}'"
     ]
     connection {
       type = "ssh"
@@ -182,7 +181,7 @@ resource "aws_instance" "{{ s_type.name }}" {
     }
   }
 {% endif %}
-  count = "${var.type_count.{{s_type.name }}}"
+  count = "${var.type_count.{{ s_type }}}"
 }
 
 {% endfor %}

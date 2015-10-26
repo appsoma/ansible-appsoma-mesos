@@ -184,7 +184,7 @@
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" default="false" assert-keyword="true" jdk-15="true" project-jdk-name="Python 2.7.9 (C:\Python27\python.exe)" project-jdk-type="Python SDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
-  <component name="PublishConfigData" serverName="welder_dev_master_0">
+  <component name="PublishConfigData" autoUpload="Always" serverName="local dev">
     <serverData>
       <paths name="ansible-manager">
         <serverdata>
@@ -193,7 +193,18 @@
           </mappings>
         </serverdata>
       </paths>
+      <paths name="local dev">
+        <serverdata>
+          <mappings>
+            <mapping deploy="ansible-appsoma-mesos" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath path="/ansible-appsoma-mesos/terraform" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
     </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
   <component name="VcsDirectoryMappings">

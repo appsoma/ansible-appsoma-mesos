@@ -28,16 +28,11 @@
       with_items: additional_ssh_keys
       when: additional_ssh_keys is defined
 
-    - name: Find slave index
-      set_fact: slave_index="{{ item.0|int }}"
-      with_indexed_items: slave_types
-      when: item.1.name == slave_type
-
     - name: Set instance store list
-      set_fact: instance_stores="{{slave_types[slave_index|int].instance_stores if slave_types[slave_index|int].instance_stores is defined else [] }}"
+      set_fact: instance_stores="{{slave_types[slave_type].instance_stores if slave_types[slave_type].instance_stores is defined else [] }}"
 
     - name: Set additional volume list
-      set_fact: additional_volumes="{{slave_types[slave_index|int].additional_volumes if slave_types[slave_index|int].additional_volumes is defined else [] }}"
+      set_fact: additional_volumes="{{slave_types[slave_type].additional_volumes if slave_types[slave_type].additional_volumes is defined else [] }}"
 
   roles:
     - role: ansible-cloud-extra-storage

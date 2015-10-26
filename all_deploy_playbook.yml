@@ -57,11 +57,6 @@
             {{ comma() }}{{ hostvars[item].private_ip_address }}
           {%- endfor %}
 
-    - name: Find slave type index
-      set_fact: slave_index="{{ item.0|int }}"
-      with_indexed_items: slave_types
-      when: inventory_group_slave in groups and inventory_hostname in groups[inventory_group_slave] and item.1.name == hostvars[inventory_hostname].type
-
     - name: Set Service instance store list
       set_fact: instance_stores="{{ service_nodes.instance_stores if service_nodes.instance_stores is defined else [] }}"
       when: inventory_hostname in groups[inventory_group_service]
@@ -71,7 +66,7 @@
       when: inventory_hostname in groups[inventory_group_master]
 
     - name: Set Slave instance store list
-      set_fact: instance_stores="{{ slave_types[slave_index|int].instance_stores if slave_types[slave_index|int].instance_stores is defined else [] }}"
+      set_fact: instance_stores="{{ slave_types[hostvars[inventory_hostname].type].instance_stores if slave_types[hostvars[inventory_hostname].type].instance_stores is defined else [] }}"
       when: inventory_group_slave in groups and inventory_hostname in groups[inventory_group_slave]
 
     - name: Set Service additional volume list
@@ -83,7 +78,7 @@
       when: inventory_hostname in groups[inventory_group_master]
 
     - name: Set Slave additional volume list
-      set_fact: additional_volumes="{{ slave_types[slave_index|int].additional_volumes if slave_types[slave_index|int].additional_volumes is defined else [] }}"
+      set_fact: additional_volumes="{{ slave_types[hostvars[inventory_hostname].type].additional_volumes if slave_types[hostvars[inventory_hostname].type].additional_volumes is defined else [] }}"
       when: inventory_group_slave in groups and inventory_hostname in groups[inventory_group_slave]
 
     - name: Set Mesos Master mode
