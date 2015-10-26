@@ -13,5 +13,7 @@ sudo cp -P terraform_0.6.4/terraform-provider-aws /usr/local/bin
 sudo cp -P terraform_0.6.4/terraform-provider-google /usr/local/bin
 sudo cp -P terraform_0.6.4/terraform-provider-openstack /usr/local/bin
 sudo cp -P terraform_0.6.4/terraform-provisioner-local-exec /usr/local/bin
+sudo cp -P terraform_0.6.4/terraform-provisioner-file /usr/local/bin
+sudo cp -P terraform_0.6.4/terraform-provisioner-remote-exec /usr/local/bin
 fi
 fi
