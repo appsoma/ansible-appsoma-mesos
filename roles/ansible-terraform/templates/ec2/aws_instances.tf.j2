@@ -139,7 +139,7 @@ resource "aws_instance" "{{ s_type }}" {
   provisioner "remote-exec" {
     inline = [
       "sudo mkdir -p {{ scaler_dir }}",
-      "sudo chown -R ubuntu /opt/deploy",
+      "sudo chown -R ubuntu {{ scaler_dir }}",
       "sudo apt-get install -y git",
       "cd {{ scaler_dir }}; git clone https://github.com/appsoma/ansible-appsoma-mesos.git .",
       "cd {{ scaler_dir }}; git checkout {{ deploy_version }}",
