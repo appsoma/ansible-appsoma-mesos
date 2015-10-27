@@ -25,6 +25,7 @@
 - name: Copy Terraform executables
   copy: src="terraform_{{ terraform_version }}/{{ item }}" dest="/usr/local/bin/{{ item }}" owner="{{ management_user }}" mode=0777
   with_items: terraform_executables
+  when: is_scaler_host
 
 - name: Make Ansible cluster variable dir
   file: path="{{ ansible_scaler_dir }}/cluster_vars/{{ cluster_name }}" state=directory owner="{{ management_user }}"
@@ -40,4 +41,5 @@
     - required_vars.yml
     - "{{ cluster_name }}_key.pem"
     - users.yml
+  when: is_scaler_host
 

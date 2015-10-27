@@ -1,4 +1,6 @@
 ansible_scaler_dir: "/opt/ansible-scaler"
+is_scaler_host: true
+
 
 terraform_version: "0.6.4"
 terraform_cloud_provider:

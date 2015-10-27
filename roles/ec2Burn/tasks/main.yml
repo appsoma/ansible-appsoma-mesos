@@ -1,14 +1,14 @@
 
 
-- name: "Create Slave AMI for cluster {{cluster_name}}"
+- name: "Create Slave AMI"
   ec2_ami:
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
     region: "{{ ec2_region }}"
-    instance_id: "{{source_instance_id}}"
+    instance_id: "{{ source_instance_id }}"
     wait: yes
     state: present
-    name: "{{cluster_name}}_slave_image"
+    name: "{{ ec2_region }}_slave_image"
   register: ec2AmiCreate
   ignore_errors: True
 
@@ -30,6 +30,5 @@
   ec2_tag:  region="{{ ec2_region }}" resource="{{ ami_id }}" aws_access_key="{{ aws_access_key }}" aws_secret_key="{{ aws_secret_key }}"
   args:
     tags:
-      Name: "{{cluster_name}}_slave_image"
-      cluster: "{{cluster_name}}"
+      Name: "{{ ec2_region }}_slave_image"
       class: "{{ node_class }}"

@@ -33,11 +33,6 @@
       lineinfile: regexp="tty" dest=/etc/sudoers/os_defaults state=absent
       tags: ['system']
 
-    - name: Add ssh keys to management user
-      authorized_key: key="{{ item }}" state=present user=ubuntu exclusive=no
-      with_items: additional_ssh_keys
-      when: additional_ssh_keys is defined
-
   roles:
     # Install NTP for time sync
     - role: ansible-ntp
@@ -74,9 +69,15 @@
       sensu_mode: "client"
       ip_address: "{{ hostvars[inventory_hostname].private_ip_address }}"
 
+    - role: ansible-ansible-scaler
+      is_scaler_host: false
+
   post_tasks:
     - name: Stop sensu
-      service: name=sensu state=stopped
+      service: name=sensu-client state=stopped enabled=false
+
+    - name: Stop mesos-slave
+      service: name=mesos-slave state=stopped enabled=false
 
 - hosts: localhost
   gather_facts: no
@@ -87,6 +88,6 @@
   roles:
     # Burn an image from the completed slaves
     - role: ec2Burn
-      source_instance_id: "{{hostvars[groups[inventory_group_slave][0]].instance_id }}"
-      node_class: "{{ cluster_name }}_slave"
-      when: create_slave_image and cloud_provider == "ec2"
+      source_instance_id: "{{ hostvars[groups[inventory_group_slave][0]].instance_id }}"
+      node_class: "slave"
+      when: cloud_provider == "ec2"

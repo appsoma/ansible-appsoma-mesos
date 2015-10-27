@@ -40,7 +40,7 @@ resource "aws_route53_record" "master" {
 {% endif %}
 
 
-{% if use_route53_slave_names is not defined and use_route53_slave_names %}
+{% if use_route53_slave_names is defined and use_route53_slave_names %}
 {% for s_type in slave_types %}
 {% if slave_types[s_type].count > 0 %}
 

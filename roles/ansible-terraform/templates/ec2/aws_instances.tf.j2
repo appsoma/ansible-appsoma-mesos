@@ -138,14 +138,14 @@ resource "aws_instance" "{{ s_type }}" {
 {% if local_slave_deploy is defined and local_slave_deploy == "true" %}
   provisioner "remote-exec" {
     inline = [
-      "sudo mkdir -p /opt/deploy/ansible-appsoma-mesos",
+      "sudo mkdir -p {{ scaler_dir }}",
       "sudo chown -R ubuntu /opt/deploy",
       "sudo apt-get install -y git",
-      "cd /opt/deploy; git clone https://github.com/appsoma/ansible-appsoma-mesos.git",
-      "cd /opt/deploy/ansible-appsoma-mesos; git checkout {{ deploy_version }}",
-      "chmod 700 /opt/deploy/ansible-appsoma-mesos/install_ansible.bash",
-      "cd /opt/deploy/ansible-appsoma-mesos; sudo ./install_ansible.bash local",
-      "mkdir -p /opt/deploy/ansible-appsoma-mesos/cluster_vars/{{ cluster_name }}"
+      "cd {{ scaler_dir }}; git clone https://github.com/appsoma/ansible-appsoma-mesos.git .",
+      "cd {{ scaler_dir }}; git checkout {{ deploy_version }}",
+      "chmod 700 {{ scaler_dir }}/install_ansible.bash",
+      "cd {{ scaler_dir }}; sudo ./install_ansible.bash local",
+      "mkdir -p {{ scaler_dir }}/cluster_vars/{{ cluster_name }}"
     ]
     connection {
       type = "ssh"
@@ -155,7 +155,7 @@ resource "aws_instance" "{{ s_type }}" {
   }
   provisioner "file" {
     source = "{{ ansible_dir }}/cluster_vars/{{ cluster_name }}/required_vars.yml"
-    destination = "/opt/deploy/ansible-appsoma-mesos/cluster_vars/{{ cluster_name }}/required_vars.yml"
+    destination = "{{ scaler_dir }}/cluster_vars/{{ cluster_name }}/required_vars.yml"
     connection {
       type = "ssh"
       user = "{{ management_user }}"
@@ -164,7 +164,7 @@ resource "aws_instance" "{{ s_type }}" {
   }
   provisioner "file" {
     source = "{{ ansible_dir }}/cluster_vars/{{ cluster_name }}/users.yml"
-    destination = "/opt/deploy/ansible-appsoma-mesos/cluster_vars/{{ cluster_name }}/users.yml"
+    destination = "{{ scaler_dir }}/cluster_vars/{{ cluster_name }}/users.yml"
     connection {
       type = "ssh"
       user = "{{ management_user }}"
@@ -173,7 +173,7 @@ resource "aws_instance" "{{ s_type }}" {
   }
   provisioner "remote-exec" {
     inline = [
-      "cd /opt/deploy/ansible-appsoma-mesos; ansible-playbook local_slave_deploy_playbook.yml -e cluster_name='{{ cluster_name }}' -e system_name='${var.cluster_name}_{{ s_type }}_${count.index}' -e nfs_server_ip='${aws_instance.service.private_ip}' -e slave_type='{{ s_type }}' -e short_name='{{ s_type }}_${count.index}' -e mesos_master_ip_list='${aws_instance.master.private_ip}'"
+      "cd {{ scaler_dir }}; ansible-playbook local_slave_deploy_playbook.yml -e cluster_name='{{ cluster_name }}' -e system_name='${var.cluster_name}_{{ s_type }}_${count.index}' -e nfs_server_ip='${aws_instance.service.private_ip}' -e slave_type='{{ s_type }}' -e short_name='{{ s_type }}_${count.index}' -e mesos_master_ip_list='${aws_instance.master.private_ip}'"
     ]
     connection {
       type = "ssh"
