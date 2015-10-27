@@ -21,7 +21,10 @@
       when: groups[inventory_group_service] is defined
 
     - name: Save zookeeper private IP list to bash profile
-      lineinfile: dest=/etc/profile.d/zookeeper_host_list.sh line="export ZK_HOST_LIST=master.mesos:2181" state=present create=yes
+      lineinfile: dest=/etc/profile.d/appsoma_env.sh line="export ZK_HOST_LIST=master.mesos:2181" state=present create=yes
+
+    - name: Save cluster name to bash profile
+      lineinfile: dest=/etc/profile.d/appsoma_env.sh line="export CLUSTER_NAME={{ cluster_name }}" state=present create=yes
 
     - name: Add ssh keys to management user
       authorized_key: key="{{ item }}" state=present user="{{ management_user }}" exclusive=no

@@ -47,7 +47,10 @@
           {%- endfor %}
 
     - name: Save zookeeper private IP list to bash profile
-      lineinfile: dest=/etc/profile.d/zookeeper_host_list.sh line="export ZK_HOST_LIST={{ zookeeper_hosts_with_port }}" state=present create=yes
+      lineinfile: dest=/etc/profile.d/appsoma_env.sh line="export ZK_HOST_LIST={{ zookeeper_hosts_with_port }}" state=present create=yes
+
+    - name: Save cluster name to bash profile
+      lineinfile: dest=/etc/profile.d/appsoma_env.sh line="export CLUSTER_NAME={{ cluster_name }}" state=present create=yes
 
     - name:  Set zookeeper private IP list
       set_fact:

@@ -12,7 +12,7 @@
 
 # To make changes as other users, be sure to "chmod -R g+w {{ project_folder }}/demo_project"
 
-- name: Create project folder
+- name: Create Demo project folder
   file: path="{{ project_folder }}/demo_project" state=directory owner="demo" group="{{ welder_group['name'] }}" mode=2775
 
 - name: Clone Demo Project source
@@ -25,6 +25,23 @@
     track_submodules: yes
   sudo: yes
   sudo_user: "demo"
+  register: git_pull
+  failed_when: false
+  failed_when: "(git_pull.failed and git.pull.msg is defined and git_pull.msg.find('modifications exist') == -1)"
+
+- name: Create Monitor project folder
+  file: path="{{ project_folder }}/monitor_project" state=directory owner="{{ management_user }}" group="{{ welder_group['name'] }}" mode=2775
+
+- name: Clone Monitor Project source
+  git:
+    dest: "{{ project_folder }}/monitor_project"
+    repo: https://github.com/appsoma/monitor_project.git
+    version: "{{ monitor_project_version if monitor_project_version is defined else 'HEAD' }}"
+    accept_hostkey: true
+    update: yes
+    track_submodules: yes
+  sudo: yes
+  sudo_user: "{{ management_user }}"
   register: git_pull
   failed_when: false
   failed_when: "(git_pull.failed and git.pull.msg is defined and git_pull.msg.find('modifications exist') == -1)"

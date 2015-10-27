@@ -1,7 +1,7 @@
 - include: system.yml
   when: not use_containers
 
-- include: demo_project.yml
+- include: projects.yml
 
 - include: support.yml
 
