@@ -51,7 +51,7 @@ resource "aws_route53_record" "{{ s_type }}" {
    name = "{{ s_type }}_${count.index}.{{ cluster_name }}.internal"
    type = "CNAME"
    ttl = "10"
-   count = "${var.type_count.{{ slave_types[s_type].ocunt }}}"
+   count = "${var.type_count.{{ slave_types[s_type].count }}}"
    records = ["${element(aws_instance.{{ s_type }}.*.private_dns, count.index)}"]
 {% else %}
    zone_id = "${aws_route53_zone.internal.id}"
