@@ -5,9 +5,9 @@
   service: name=welder-widgets state=restarted enabled=yes
 
 - name: Stop wsyak
-  shell: ". /etc/profile.d/zookeeper_host_list.sh; {{ welder_support_dir }}/wsyak/wsyak.sh stop"
+  shell: ". /etc/profile.d/appsoma_env.sh; {{ welder_support_dir }}/wsyak/wsyak.sh stop"
   when: yak_mode == 'wsyak'
 
 - name: Start wsyak
-  shell: ". /etc/profile.d/zookeeper_host_list.sh; {{ welder_support_dir }}/wsyak/wsyak.sh start"
+  shell: ". /etc/profile.d/appsoma_env.sh; {{ welder_support_dir }}/wsyak/wsyak.sh start"
   when: yak_mode == 'wsyak'
