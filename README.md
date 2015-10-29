@@ -66,7 +66,6 @@ The only absolute customization you must do is the `cluster_name` variable.  Thi
 
 To use HAProxy with SSL, set the flag in `required_vars.yml` and create a file called `cluster_vars/{{ cluster_name }}/haproxy.pem`
 
-
 ## How To install on EC2 
 
 ### What you'll need
@@ -116,7 +115,23 @@ This will add new users, and update existing users (and their passwords).  This 
 A convenience script to hide some of the Ansible argument complexity and AWS setup is available in `update_cluster.bash`, just run with the name of your cluster, and the name of the playbook yml file you want to use as arguments:
     
     update_cluster.bash {{ cluster_name }} deploy_cluster_playbook.yml
+
+ 
+### Scaling
+
+The cluster can be installed and scaled with the `manage_terraform_playbook.yml` playbook.  And a convenience wrapper is also provided
     
+    scale_cluster.bash {{ cluster_name }} [--plan_only|--apply_separate] [--local_deploy] [--attributes]
+    
+* The `--plan_only` and `--apply_separate` options allow for testing and clearer console output, respectively.
+* The `--local_deploy` option sets up newly booted slaves in the config to be auto-configured on boot.  This only works if the service and master nodes have been properly deployed (do not use this option on initial deploys).'
+* The `--attributes` option takes a string with mesos-slave [attributes](http://mesos.apache.org/documentation/attributes-resources/) which are added to slave nodes being deployed by this run of the scale_cluster script with `--local_deploy`
+    * Note:  This option doesn't work on non-local_deploy runs.  To deploy extra attributes with the master_deploy or slave_deploy playbooks, set `extra_slave_attributes` variable with `-e` or in the `required_vars.yml` for your cluster.
+
+Dynamic scaling can be achieved by changing the `cluster_vars/{{ cluster_name }}/required_vars.yml` file or 
+adding a `-e slave_types.{{ slave_type }}.count=X` option to the playbook.
+Appsoma Welder has a built-in scaling tool as part of the [support projects](https://github.com/appsoma/welder_support).
+
 ### Troubleshooting
 * SSH errors
     * Make sure your SSH key has the correct permissions (`0600`).  Set `StrictHostKeyChecking no` in `/etc/ssh/ssh_config`
@@ -207,5 +222,5 @@ The Welder users can be configured for ssh login by setting an authorized key in
 * Supporting other clouds (GCE, OpenStack, etc.) via [Terraform](https://www.terraform.io/)
 * Better utilization of docker
 * Better cluster-wide user management (LDAP)
-* Better cluster-wide file support (HDFS)
+* Better cluster-wide file support.
 
