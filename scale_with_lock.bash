@@ -24,6 +24,6 @@ echo "LOCKING"
 exlock_now || exit 1
 echo "LOCKED"
 
-./scale_cluster.bash $1 --apply_separate --local_deploy
+./scale_cluster.bash $@
 exit $?
 
