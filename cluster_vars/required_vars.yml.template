@@ -41,6 +41,10 @@ nfs_data_mount: "/data"
 data_mount_point: "/mnt/data"
 
 # Mesos Node definitions
+
+# Service nodes serve up NFS to the cluster.  They require some sort of external mount to safely store all NFS data
+# This example uses a standard SSD on EBS for EC2.
+# In the NFS state, only one service node is usable
 service_nodes:
   count: 1
   root_volume_size_gb: 16
@@ -48,30 +52,50 @@ service_nodes:
   instance_type: "t2.micro"
   additional_volumes:
     - type: "gp2"
-      size_gb: 32
+      size_gb: 100
       device_name: "/dev/xvdf"
       mount_point: "{{ nfs_data_mount }}"
 
+# Masters perform a lot of cluster management like hosting of frameworks and monitoring. They require medium amounts of
+# memory, CPU, and disk space.
+# Generally 1 master is enough to run a small cluster, but 2-3 masters will provide high-availability
+# This config has not been well tested with multiple masters.
 masters:
   count: 1
-  root_volume_size_gb: 32
+  root_volume_size_gb: 64
   root_volume_type: "standard"
   instance_type: "t2.medium"
 
+
+# Define each kind of slave you may use in a cluster in this structure.
+# If a type has a count of 0, no resources will be used by that type, and no money will be spent.
+# A slave type can be dynamically scaled from 0-N nodes.
 slave_types:
-  - name: "slave_small"
+
+  # Suitable only for testing
+  slave_tiny:
     count: 0
-    root_volume_size_gb: 16
+    root_volume_size_gb: 8
     root_volume_type: "standard"
     instance_type: "t2.micro"
 
-  - name: "slave_gp"
-    count: 1
+  # Use this for small, low overhead services
+  slave_small:
+    count: 0
+    root_volume_size_gb: 16
+    root_volume_type: "standard"
+    instance_type: "t2.small"
+
+  # Reasonable for testing and some long-running services
+  slave_gp:
+    count: 0
     root_volume_size_gb: 16
     root_volume_type: "standard"
     instance_type: "t2.medium"
 
-  - name: "slave_db"
+  # This could host a decent scalable database like Cassandra
+  # Note the additional SSD EBS volumes for local storage.
+  slave_db:
     count: 0
     root_volume_size_gb: 16
     root_volume_type: "gp2"
@@ -86,7 +110,9 @@ slave_types:
         device_name: "/dev/xvdg"
         virtual_name: "/mnt/vol1"
 
-  - name: "slave_kafka"
+  # Using a larger instance with local SSD disks offers high speed and dependable resources and networking for services
+  # like Kafka
+  slave_kafka:
     count: 0
     root_volume_size_gb: 8
     root_volume_type: "gp2"
@@ -104,11 +130,21 @@ private_lan_net: "10.10.0.0/16"
 private_lan_subnet: "10.10.0.0/24"
 private_lan_dns: "10.10.0.2"
 
-# Enable this script to burn a slave AMI.  Any AWS boot method may be used to add new slaves
-# with the AMI id created (named {{cluster_name}}_slave_image).  Just use the same subnet
-# and the security group {{ cluster_name }}-all-sg
-# Currently for test only
-create_slave_image: false
+
+# Local System scaler settings
+#local_slave_deploy: true
+#slave_ami: ""
+use_s3_remote_terraform_state: true
+terraform_s3_state_bucket: "appsoma-ansible-terraform-states"
+
+use_ansible_scaler: true
+deploy_version: "v0.2.2"
+ansible_scaler_version: "{{ deploy_version }}"
+
+# Network settings
+private_lan_net: "10.10.0.0/16"
+private_lan_subnet: "10.10.0.0/24"
+private_lan_dns: "10.10.0.2"
 
 run_slave_on_master: true  # Allows jobs like frameworks to use Master resources
 
@@ -122,8 +158,8 @@ use_openvpn: true # Create an OpenVPN server on the service node
 use_kafka: true
 
 additional_ssh_keys:
-  - "<ssh key 1>"
-  - "<ssh key 2>"
+#  - "<ssh key 1>"
+#  - "<ssh key 2>"
 
 use_docker_registry: false
 s3_docker_registry_store: "<S3 bucket name >"
