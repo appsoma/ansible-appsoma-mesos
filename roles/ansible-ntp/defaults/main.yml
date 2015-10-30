@@ -1,3 +1,4 @@
 ---
 ntp_enabled: true
 ntp_timezone: UTC
+package_install: true

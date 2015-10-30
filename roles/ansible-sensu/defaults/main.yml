@@ -1,3 +1,5 @@
+package_install: true
+
 all_plugins:
   - sensu-plugins-cpu-checks
   - sensu-plugins-memory-checks

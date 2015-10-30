@@ -1,11 +1,14 @@
 - name: Get CloudPassage repo key
   apt_key: url="{{ cphalo_key_url }}" state=present
+  when: package_install
 
 - name: Add CloudPassage repo
   apt_repository: repo="deb {{ cphalo_repo_url }} debian main" state=present update_cache=yes
+  when: package_install
 
 - name: Install cphalo
   apt: pkg=cphalo state=present
+  when: package_install
 
 - name: Test if cphalo already has a id
   file: path=/opt/cloudpassage/data/id state=file

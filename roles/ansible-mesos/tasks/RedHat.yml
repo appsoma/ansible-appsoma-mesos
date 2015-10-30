@@ -1,9 +1,11 @@
 ---
 - name: Add mesosphere repo
   yum: name=http://repos.mesosphere.io/el/6/noarch/RPMS/mesosphere-el-repo-6-2.noarch.rpm state=present
+  when: package_install
 
 - name: Downloading and enable the EPEL repository definitions.
   yum: name=http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm state=present
+  when: package_install
 
 - name: Install os packages
   yum: name={{item}} state=present
@@ -14,3 +16,5 @@
     - libselinux-python 
     - python-setuptools
     - mesos-{{mesos_version}}
+  when: package_install
+
