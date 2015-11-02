@@ -11,6 +11,13 @@
     - "cluster_vars/{{ cluster_name }}/required_vars.yml"
     - "cluster_vars/{{ cluster_name }}/users.yml"
   pre_tasks:
+
+    - name: Check for package install
+      set_fact: install_packages="{{ true if slave_ami is not defined else false }}"
+
+    - name: Debug package install
+      debug: var=install_packages
+
     # Allow sudo with no terminal
     - name: Remove require tty
       lineinfile: regexp="tty" dest=/etc/sudoers/os_defaults state=absent
