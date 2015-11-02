@@ -12,6 +12,8 @@
     - "cluster_vars/{{ cluster_name }}/users.yml"
   pre_tasks:
     # Allow sudo with no terminal
+    - debug: msg="PACKAGE INSTALL {{ slave_ami is not defined }}"
+
     - name: Remove require tty
       lineinfile: regexp="tty" dest=/etc/sudoers/os_defaults state=absent
       tags: ['system']
@@ -45,13 +47,13 @@
 
     # Install NTP for time sync
     - role: ansible-ntp
-      package_install: "{{ slave_ami is defined }}"
+      package_install: "{{ slave_ami is not defined }}"
 
     # Install CloudPassage Halo agent if available
     - role: ansible-cphalo
       halo_agent_key: "{{ cp_agent_key }}"
       halo_agent_tag: "{{ cp_agent_tag }}"
-      package_install: "{{ slave_ami is defined }}"
+      package_install: "{{ slave_ami is not defined }}"
       when: use_halo is defined and use_halo
 
     # Add UFW firewall if selected (should not be used with halo)
@@ -61,13 +63,13 @@
 
     # Install docker
     - role: ansible-docker
-      package_install: "{{ slave_ami is defined }}"
+      package_install: "{{ slave_ami is not defined }}"
       when: use_docker_registry is not defined or not use_docker_registry
 
     - role: ansible-docker
       registry_host: "master.mesos"
       marathon_host: "master.mesos"
-      package_install: "{{ slave_ami is defined }}"
+      package_install: "{{ slave_ami is not defined }}"
       when: use_docker_registry is defined and use_docker_registry
 
     # Configure NFS
@@ -75,7 +77,7 @@
       nfsmount: "{{ data_mount_point }}"
       nfspath: "{{ nfs_data_mount }}"
       nfsserver: "{{ nfs_server_ip }}"
-      package_install: "{{ slave_ami is defined }}"
+      package_install: "{{ slave_ami is not defined }}"
       when: nfs_server_ip is defined
 
     # Create users
@@ -95,11 +97,11 @@
       mesos_node_type: "{{ slave_type }}"
       mesos_cluster_name: "{{ cluster_name }}"
       mesos_hostname: "{{ short_name }}.{{ cluster_name }}.internal"
-      package_install: "{{ slave_ami is defined }}"
+      package_install: "{{ slave_ami is not defined }}"
 
     - role: ansible-sensu
       sensu_mode: "client"
       sensu_master: "master.mesos"
       system_name: "{{ system_name }}"
       ip_address: "{{ ansible_default_ipv4.address }}"
-      package_install: "{{ slave_ami is defined }}"
+      package_install: "{{ slave_ami is not defined }}"
