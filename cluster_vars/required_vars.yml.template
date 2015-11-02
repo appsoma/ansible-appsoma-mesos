@@ -138,7 +138,7 @@ use_s3_remote_terraform_state: true
 terraform_s3_state_bucket: "appsoma-ansible-terraform-states"
 
 use_ansible_scaler: true
-deploy_version: "v0.2.2"
+deploy_version: "HEAD"
 ansible_scaler_version: "{{ deploy_version }}"
 
 # Network settings
