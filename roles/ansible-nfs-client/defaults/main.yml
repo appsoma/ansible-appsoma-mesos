@@ -1,3 +1,4 @@
+package_install: true
 use_sync: true
 use_caching: false
 mount_options: "rw,hard,intr{{',sync' if use_sync else ''}}{{',actimeo=1' if not use_caching else ''}}"

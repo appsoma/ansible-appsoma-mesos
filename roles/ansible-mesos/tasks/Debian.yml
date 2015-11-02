@@ -1,9 +1,11 @@
 ---
 - name: Add apt-key
   apt_key: id=E56151BF keyserver=keyserver.ubuntu.com state=present
+  when: package_install
 
 - name: Add mesosphere repo
   apt_repository: repo='deb http://repos.mesosphere.io/{{ansible_distribution|lower}} {{ansible_distribution_release|lower}} main' state=present update_cache=yes
+  when: package_install
 
 - name: Install Debian OS packages
   apt: pkg={{item}} state=present
@@ -14,11 +16,12 @@
     - python-setuptools
     - python-dev
     - mesos={{mesos_version}}-1.0.{{ansible_distribution|lower}}{{ansible_distribution_version.split('.')|join('')}}
+  when: package_install
 
 # == Remove zookeeper daemon which shouldn't be running on slaves
 - name: Remove zookeeperd from slaves
   apt: pkg=zookeeperd state=absent
-  when: mesos_install_mode == "slave"
+  when: mesos_install_mode == "slave" and package_install
 
 - name: Fix rsyslog service
   file: path=/etc/init.d/rsyslog state=absent

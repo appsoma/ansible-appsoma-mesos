@@ -11,12 +11,23 @@
 - name: Install InfluxDB deb file
   apt: deb="/tmp/influxdb_{{ influxdb_version }}_amd64.deb"
   when: check_deb.changed
+  register: install
+
+- name: Create InfluxDB data dir
+  file: path={{ influxdb_data_dir }} state=directory owner=influxdb group=influxdb
+  register: create_dir
 
 - name: Install InfluxDB config file
   template: src=influxdb.conf.j2 dest=/etc/opt/influxdb/influxdb.conf
+  register: config
+
+- name: Restart InfluxDB
+  service: name=influxdb state=restarted enabled=yes
+  when: "not install.changed and (create_dir.changed or config.changed)"
 
 - name: Start InfluxDB
   service: name=influxdb state=started enabled=yes
+  when: install.changed
 
 - name: Check if InfluxDB database exists
   command: /opt/influxdb/influx -execute "show databases;"

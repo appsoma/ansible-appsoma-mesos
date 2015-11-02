@@ -1,4 +1,5 @@
 ---
+package_install: true
 mesos_install_mode: "master" # {master|slave|master-slave}
 mesos_version: "0.22.1"
 

@@ -1,11 +1,14 @@
 - name: Install Sensu core repo key
   apt_key: url=http://repos.sensuapp.org/apt/pubkey.gpg state=present
+  when: package_install
 
 - name: Add Sensu core repo
   apt_repository: repo="deb http://repos.sensuapp.org/apt sensu main" state=present
+  when: package_install
 
 - name: Install Sensu core
   apt: pkg=sensu state=present
+  when: package_install
 
 - name: Install Ruby
   apt: pkg="{{ item }}" state=present
@@ -13,12 +16,14 @@
     - build-essential
     - ruby
     - ruby-dev
+  when: package_install
 
 - name: Install Sensu plugin gem
   command: gem install --conservative sensu-plugin
   register: gem_plugin
   changed_when: gem_plugin.stdout != ""
   notify: Restart Sensu Client
+  when: package_install
 
 - name: Install Sensu plugins for all nodes
   command: gem install --conservative "{{ item }}"
@@ -26,6 +31,7 @@
   changed_when: all_gem_plugins.stdout != ""
   with_items: all_plugins
   notify: Restart Sensu Client
+  when: package_install
 
 - name: Install Sensu plugins for Mesos
   command: gem install --conservative "{{ item }}"
@@ -34,13 +40,14 @@
   with_items: mesos_plugins
   when: inventory_group_master in group_names or inventory_group_slave in group_names
   notify: Restart Sensu Client
+  when: package_install
 
 - name: Install Sensu plugins for master nodes
   command: gem install --conservative "{{ item }}"
   register: master_gem_plugins
   changed_when: master_gem_plugins.stdout != ""
   with_items: master_plugins
-  when: inventory_group_master in group_names
+  when: inventory_group_master in group_names and package_install
   notify: Restart Sensu Client
 
 - name: Install Sensu config

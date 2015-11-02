@@ -6,14 +6,15 @@ sudo apt-get install -y ansible unzip
 
 if [ -z "$1" ]; then
 if [ "$1" != "local" ]; then
-wget https://dl.bintray.com/mitchellh/terraform/terraform_0.6.4_linux_amd64.zip -O terraform_0.6.4.zip
-unzip terraform_0.6.4.zip -d terraform_0.6.4
-sudo cp -P terraform_0.6.4/terraform /usr/local/bin
-sudo cp -P terraform_0.6.4/terraform-provider-aws /usr/local/bin
-sudo cp -P terraform_0.6.4/terraform-provider-google /usr/local/bin
-sudo cp -P terraform_0.6.4/terraform-provider-openstack /usr/local/bin
-sudo cp -P terraform_0.6.4/terraform-provisioner-local-exec /usr/local/bin
-sudo cp -P terraform_0.6.4/terraform-provisioner-file /usr/local/bin
-sudo cp -P terraform_0.6.4/terraform-provisioner-remote-exec /usr/local/bin
+TF_VERSION=0.6.6
+wget https://dl.bintray.com/mitchellh/terraform/terraform_$TF_VERSION_linux_amd64.zip -O terraform_$TF_VERSION.zip
+unzip terraform_$TF_VERSION.zip -d terraform_$TF_VERSION
+sudo cp -P terraform_$TF_VERSION/terraform /usr/local/bin
+sudo cp -P terraform_$TF_VERSION/terraform-provider-aws /usr/local/bin
+sudo cp -P terraform_$TF_VERSION/terraform-provider-google /usr/local/bin
+sudo cp -P terraform_$TF_VERSION/terraform-provider-openstack /usr/local/bin
+sudo cp -P terraform_$TF_VERSION/terraform-provisioner-local-exec /usr/local/bin
+sudo cp -P terraform_$TF_VERSION/terraform-provisioner-file /usr/local/bin
+sudo cp -P terraform_$TF_VERSION/terraform-provisioner-remote-exec /usr/local/bin
 fi
 fi

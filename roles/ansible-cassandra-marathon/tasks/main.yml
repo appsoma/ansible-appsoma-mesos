@@ -9,3 +9,6 @@
 
 - name: Copy Cassandra Marathon start script
   template: src=start_cassandra.sh.j2 dest="{{ cassandra_marathon_dir }}/start_cassandra.sh" owner="{{ management_user }}" mode=700
+
+- name: Install cqlsh via PIP
+  command: pip install cqlsh

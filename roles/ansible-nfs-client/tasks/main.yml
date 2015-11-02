@@ -1,12 +1,12 @@
 - name: install nfs client
   apt: pkg=nfs-common state=present
-  when: ansible_os_family == "Debian"
+  when: ansible_os_family == "Debian" and package_install
   tags:
     - nfs
 
 - name: install nfs client
   yum: pkg=nfs-utils state=present
-  when: ansible_os_family == "RedHat"
+  when: ansible_os_family == "RedHat" and package_install
   tags:
     - nfs
 
