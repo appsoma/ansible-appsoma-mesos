@@ -9,6 +9,9 @@
     state: link
     force: yes
 
+- name: Should this install packages
+  debug: var=package_install
+
 - name: Install NTP (RedHat).
   yum: name=ntp state=installed
   when: ansible_os_family == 'RedHat' and package_install
