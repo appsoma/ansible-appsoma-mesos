@@ -146,7 +146,7 @@ resource "aws_instance" "{{ s_type }}" {
       "cd {{ scaler_dir }}; git clone https://github.com/appsoma/ansible-appsoma-mesos.git .",
       "cd {{ scaler_dir }}; git fetch",
       "cd {{ scaler_dir }}; git checkout {{ deploy_version }}",
-      "cd {{ scalder_dir }}; git pull",
+      "cd {{ scaler_dir }}; git pull",
 {% if slave_ami is not defined %}
       "chmod 700 {{ scaler_dir }}/install_ansible.bash",
       "cd {{ scaler_dir }}; sudo ./install_ansible.bash local",
