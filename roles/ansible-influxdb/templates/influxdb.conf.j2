@@ -16,7 +16,7 @@ reporting-disabled = false
 ###
 
 [meta]
-  dir = "/var/opt/influxdb/meta"
+  dir = "{{ influxdb_data_dir }}/meta"
   hostname = "localhost"
   bind-address = ":8088"
   retention-autocreate = true
@@ -32,7 +32,7 @@ reporting-disabled = false
 ###
 
 [data]
-  dir = "/var/opt/influxdb/data"
+  dir = "{{ influxdb_data_dir }}/data"
 
 ###
 ### [cluster]
@@ -161,14 +161,9 @@ reporting-disabled = false
 
 [hinted-handoff]
   enabled = true
-  dir = "/var/opt/influxdb/hh"
+  dir = "{{ influxdb_data_dir }}/hh"
   max-size = 1073741824
   max-age = "168h"
   retry-rate-limit = 0
   retry-interval = "1s"
 
-[input_plugins.collectd]
-  enabled = true
-  port = 8096
-  database = "{{ cluster_name }}"
-  typesdb = "/usr/share/collectd/types.db"

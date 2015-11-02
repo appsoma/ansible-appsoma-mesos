@@ -140,9 +140,16 @@ resource "aws_instance" "{{ s_type }}" {
     inline = [
       "sudo mkdir -p {{ scaler_dir }}",
       "sudo chown -R ubuntu {{ scaler_dir }}",
+{% if slave_ami is not defined %}
+      "sudo apt-get install -y git",
+{% endif %}
       "cd {{ scaler_dir }}; git clone https://github.com/appsoma/ansible-appsoma-mesos.git .",
       "cd {{ scaler_dir }}; git fetch",
       "cd {{ scaler_dir }}; git checkout {{ deploy_version }}",
+{% if slave_ami is not defined %}
+      "chmod 700 {{ scaler_dir }}/install_ansible.bash",
+      "cd {{ scaler_dir }}; sudo ./install_ansible.bash local",
+{% endif %}
       "mkdir -p {{ scaler_dir }}/cluster_vars/{{ cluster_name }}"
     ]
     connection {
