@@ -11,11 +11,11 @@
 
 - name: Install NTP (RedHat).
   yum: name=ntp state=installed
-  when: ansible_os_family == 'RedHat' and package_install
+  when: ansible_os_family == 'RedHat' and package_install != 'False'
 
 - name: Install NTP (Debian).
   apt: pkg=ntp state=installed
-  when: ansible_os_family == 'Debian' and package_install
+  when: ansible_os_family == 'Debian' and package_install != 'False'
 
 - name: Ensure NTP is running and enabled at system start.
   service:

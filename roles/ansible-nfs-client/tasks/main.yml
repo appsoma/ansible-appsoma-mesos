@@ -1,14 +1,10 @@
 - name: install nfs client
   apt: pkg=nfs-common state=present
-  when: ansible_os_family == "Debian" and package_install
-  tags:
-    - nfs
+  when: ansible_os_family == "Debian" and package_install != 'False'
 
 - name: install nfs client
   yum: pkg=nfs-utils state=present
-  when: ansible_os_family == "RedHat" and package_install
-  tags:
-    - nfs
+  when: ansible_os_family == "RedHat" and package_install != 'False'
 
 - name: Ensure rpcbind is running (CentOS)
   service: name=rpcbind state=started enabled=yes
@@ -28,12 +24,8 @@
 
 - name: Ensure {{nfsmount}} directory exists
   file: path={{nfsmount}} state=directory
-  tags:
-    - nfs
   when: nfsmount is defined
 
 - name: configure /etc/fstab on clients
   mount: name={{nfsmount}} src={{nfsserver}}:{{nfspath}} fstype=nfs opts="{{ mount_options }}" state=mounted
-  tags:
-    - nfs
   when: nfsmount is defined and nfsserver is defined and nfspath is defined
