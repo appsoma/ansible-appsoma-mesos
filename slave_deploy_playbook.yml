@@ -123,16 +123,3 @@
       sensu_master: "{{ hostvars[groups[inventory_group_master][0]]['private_ip_address'] }}"
       system_name: "{{ hostvars[inventory_hostname].system_name }}"
       ip_address: "{{ hostvars[inventory_hostname].private_ip_address }}"
-
-- hosts: localhost
-  gather_facts: no
-  vars_files:
-    - "cluster_vars/common.yml"
-    - "cluster_vars/{{ cluster_name }}/required_vars.yml"
-    - "cluster_vars/{{ cluster_name }}/aws_secret_vars.yml"
-  roles:
-    # Burn an image from the completed slaves
-    - role: ec2Burn
-      source_instance_id: "{{hostvars[groups[inventory_group_slave][0]]['ec2_id']}}"
-      node_class: "{{ slave_class_name }}"
-      when: create_slave_image
