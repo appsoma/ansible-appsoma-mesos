@@ -8,6 +8,8 @@ apt_cache_timeout: 3600
 client_port: 2181
 init_limit: 5
 sync_limit: 2
+snapshot_purge_limit=3
+snapshot_purge_interval_hrs=1
 tick_time: 2000
 zoo_id: 1
 data_dir: /var/lib/zookeeper
