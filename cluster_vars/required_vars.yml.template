@@ -93,6 +93,13 @@ slave_types:
     root_volume_type: "standard"
     instance_type: "t2.medium"
 
+  # Slave type which will be booted by the kascaler utility
+  slave_kascaler:
+    count: 0
+    root_volume_size_gb: 16
+    root_volume_type: "standard"
+    instance_type: "t2.medium"
+
   # This could host a decent scalable database like Cassandra
   # Note the additional SSD EBS volumes for local storage.
   slave_db:
