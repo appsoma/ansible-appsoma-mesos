@@ -85,7 +85,6 @@
 
 - name: Install Checks
   template: src="all_checks.json.j2" dest="/etc/sensu/conf.d/all_checks.json"
-  when: sensu_mode == "master"
   notify:
     - Restart Sensu Server
     - Restart Sensu API
@@ -93,7 +92,7 @@
 
 - name: Install Slave Checks
   template: src="slave_checks.json.j2" dest="/etc/sensu/conf.d/slave_checks.json"
-  when: sensu_mode == "master"
+  when: sensu_mode == "client-slave"
   notify:
     - Restart Sensu Server
     - Restart Sensu API
@@ -109,7 +108,6 @@
 
 - name: Install Metrics
   template: src="all_metrics.json.j2" dest="/etc/sensu/conf.d/all_metrics.json"
-  when: sensu_mode == "master"
   notify:
     - Restart Sensu Server
     - Restart Sensu API
@@ -117,7 +115,7 @@
 
 - name: Install Slave Metrics
   template: src="slave_metrics.json.j2" dest="/etc/sensu/conf.d/slave_metrics.json"
-  when: sensu_mode == "master"
+  when: sensu_mode == "client-slave"
   notify:
     - Restart Sensu Server
     - Restart Sensu API
