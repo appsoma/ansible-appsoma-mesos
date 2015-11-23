@@ -1,4 +1,6 @@
 package_install: true
+create_halo_id: true
+start_halo_daemon: true
 
 cphalo_repo_url: http://packages.cloudpassage.com/debian
 cphalo_key_url: http://packages.cloudpassage.com/cloudpassage.packages.key
