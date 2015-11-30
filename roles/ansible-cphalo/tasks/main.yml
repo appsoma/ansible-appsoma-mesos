@@ -16,12 +16,13 @@
   failed_when: false
   changed_when: cphalo_id.state == 'absent'
 
-- name: Start cphalod for the first time
+- name: Configure cphalod to create an ID
   shell: "sudo /opt/cloudpassage/bin/configure --agent-key={{ halo_agent_key }} --tag={{ halo_agent_tag }}"
-  when: cphalo_id.state == 'absent'
+  when: "create_halo_id and cphalo_id is defined and cphalo_id.state == 'absent'"
 
 - name: Start cphalod
   shell: "/etc/init.d/cphalod start"
   register: cphalo_start
   failed_when: cphalo_start.stdout != '' and cphalo_start.stdout.find('cphalo is running') == -1 and cphalo_start.stdout.find('Starting CloudPassage Halo Agent cphalo') == -1
   changed_when: cphalo_start.stdout.find('cphalo is running') == -1 or cphalo_start.stdout.find('...done') == 1
+  when: "start_halo_daemon"

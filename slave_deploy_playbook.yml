@@ -119,7 +119,7 @@
       mesos_hostname: "{{ hostvars[inventory_hostname].short_name }}.{{ cluster_name }}.internal"
 
     - role: ansible-sensu
-      sensu_mode: "client"
+      sensu_mode: "client-slave"
       sensu_master: "{{ hostvars[groups[inventory_group_master][0]]['private_ip_address'] }}"
       system_name: "{{ hostvars[inventory_hostname].system_name }}"
       ip_address: "{{ hostvars[inventory_hostname].private_ip_address }}"

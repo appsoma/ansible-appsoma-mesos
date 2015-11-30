@@ -44,6 +44,8 @@
     - role: ansible-cphalo
       halo_agent_key: "{{ cp_agent_key }}"
       halo_agent_tag: "{{ cp_agent_tag }}"
+      create_halo_id: false
+      start_halo_daemon: false
       when: use_halo is defined and use_halo
 
     # Install docker
@@ -66,7 +68,7 @@
       mesos_node_type: "generic"
 
     - role: ansible-sensu
-      sensu_mode: "client"
+      sensu_mode: "client-slave"
       ip_address: "{{ hostvars[inventory_hostname].private_ip_address }}"
 
     - role: ansible-ansible-scaler

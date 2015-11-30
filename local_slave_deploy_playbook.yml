@@ -105,7 +105,7 @@
       package_install: "{{ install_packages }}"
 
     - role: ansible-sensu
-      sensu_mode: "client"
+      sensu_mode: "client-slave"
       sensu_master: "master.mesos"
       system_name: "{{ system_name }}"
       ip_address: "{{ ansible_default_ipv4.address }}"
