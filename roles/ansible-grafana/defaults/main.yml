@@ -3,4 +3,4 @@ influx_db_url: "{{ 'https' if haproxy_use_ssl else 'http' }}://influx.{{ service
 mesos_url: "{{ 'https' if haproxy_use_ssl else 'http' }}://mesos.{{ service_discovery_dns_suffix }}"
 marathon_url: "{{ 'https' if haproxy_use_ssl else 'http' }}://marathon.{{ service_discovery_dns_suffix }}"
 uchiwa_url: "{{ 'https' if haproxy_use_ssl else 'http' }}://status.{{ service_discovery_dns_suffix }}"
-mesos_version: "0.22.1"
+mesos_version: "0.23.0"
