@@ -32,10 +32,10 @@ done
 source setup_amazon_env.bash $CLUSTER_NAME
 
 echo "WILL RUN COMMAND:"
-echo ansible-playbook -v --private-key cluster_vars/$CLUSTER_NAME/${CLUSTER_NAME}_key.pem manage_terraform_playbook.yml \
+echo ansible-playbook -i inventory/terraform.py -v --private-key cluster_vars/$CLUSTER_NAME/${CLUSTER_NAME}_key.pem manage_terraform_playbook.yml \
 -e cluster_name=$CLUSTER_NAME $PLAN_ONLY $LOCAL_DEPLOY $ATTRIBUTES
 /usr/bin/time -f "wall time to run playbook:%e" \
-ansible-playbook -v --private-key cluster_vars/$CLUSTER_NAME/${CLUSTER_NAME}_key.pem manage_terraform_playbook.yml \
+ansible-playbook -i inventory/terraform.py -v --private-key cluster_vars/$CLUSTER_NAME/${CLUSTER_NAME}_key.pem manage_terraform_playbook.yml \
 -e cluster_name=$CLUSTER_NAME $PLAN_ONLY $LOCAL_DEPLOY $ATTRIBUTES
 
 if [ $? -ne 0 ] ; then
