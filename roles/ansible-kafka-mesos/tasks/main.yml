@@ -18,7 +18,7 @@
   sudo_user: "{{ kafka_user }}"
   register: git_pull
 
-- name: Build kafka-mesos
+#- name: Build kafka-mesos
   shell: "./gradlew jar"
   args:
      chdir: /opt/kafka
@@ -32,11 +32,12 @@
 - name: Set Configuration
   template: src=kafka-mesos.properties.j2 dest=/opt/kafka/kafka-mesos.properties
 
-- name: Set init script
+#- name: Set init script
   template: src=init_kafka-mesos.conf.j2 dest=/etc/init/kafka-mesos.conf
 
 - name: Create broker creation script
   template: src=add_broker.sh.j2 dest=/opt/kafka/add_broker.sh mode=755
+
 
 - name: Start kafka-mesos
   service: name=kafka-mesos state=started

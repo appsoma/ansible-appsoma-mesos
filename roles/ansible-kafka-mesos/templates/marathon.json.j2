@@ -1,0 +1,17 @@
+{
+	"container": {
+		"type": "DOCKER",
+		"docker": {
+			"network": "HOST",
+			"image": "appsoma/kafka-mesos"
+		}
+	},
+	"id": "kafka-mesos-framework",
+	"cpus": 0.2,
+	"mem": 512,
+	"ports": [7000],
+	"cmd": "./kafka-mesos.sh scheduler --master=master.mesos:5050 --zk=master.mesos:2181 --api=http://master.mesos:7000 --storage=zk:/kafka-mesos",
+	"instances": 1,
+	"constraints": [["node_type", "LIKE", "master"]]
+}
+
