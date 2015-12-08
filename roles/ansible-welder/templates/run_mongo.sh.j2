@@ -19,22 +19,13 @@ cat >/tmp/mongo-marathon.json <<EOL
 	"mem": 512.0,
 	"instances": 1,
 	"constraints": [
-		[ "kascaling_group", "UNLIKE", "true" ]
+		[ "kascaling_group", "unlike", "true" ]
 	],
-	"ports": [9999],
 	"container": {
 		"type": "DOCKER",
 		"docker": {
 			"image": "mongo:3",
-			"network": "BRIDGE",
-			"portMappings": [
-				{
-					"containerPort": 21017,
-					"hostPort": 9999,
-					"servicePort": 9999,
-					"protocol": "tcp"
-				}
-			]
+			"network": "HOST"
 		},
 		"volumes": [
 			{

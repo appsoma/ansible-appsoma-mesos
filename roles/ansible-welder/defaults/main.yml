@@ -18,7 +18,7 @@ ext_welder_url: "{{ 'https' if welder_use_tls is defined and welder_use_tls else
 
 db_folder: "{{ data_mount_point }}/welder_db"
 db_host: "mongo.marathon.mesos"
-db_port: 9999
+db_port: 27017
 
 marathon_host: "master.mesos"
 scheduler_ip: "master.mesos"

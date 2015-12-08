@@ -19,20 +19,3 @@
 
 - name: Add management user to Welder user group
   user: name="{{ management_user }}" groups="{{ welder_group['name'] }}" append=yes
-
-- name: Add User's data dir
-  file:
-    name: "{{ dataDir }}/{{ item.username }}"
-    owner: "{{ item.username }}"
-    group: "{{ group['name'] }}"
-    state: directory
-  no_log: true
-  with_items: user_list
-
-- name: Add ~/data link
-  file:
-    src: "{{ dataDir }}/{{ item.username }}"
-    dest: "/home/{{ item.username }}/data"
-    state: link
-  no_log: true
-  with_items: user_list
