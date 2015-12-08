@@ -1,9 +1,42 @@
-#!/bin/bash
-if [ $1 = "start" ] ; then
-#	curl -X POST -H "Content-Type: application/json" -d @{{ mesos_dns_dir}}/mesos_dns_marathon.json http://{{ marathon_host }}:8080/v2/apps
-    {{ mesos_dns_docker_cmd }}
-elif [ $1 = "stop" ] ; then
-#	curl -X DELETE  -H "Content-Type: application/json" http://{{ marathon_host }}:8080/v2/apps/mesos-dns
-    docker stop mesos-dns
-    docker rm mesos-dns
+#!/usr/bin/env bash
+
+if [ "$1" != "start" ] && [ "$1" != "restart" ] && [ "$1" != "stop" ]; then
+	echo "Options are start, stop, restart"
+	exit 1
 fi
+
+if [ "$1" == "stop" ] || [ "$1" == "restart" ]; then
+	curl -H "Content-Type:application/json" -X DELETE http://{{ marathon_host }}:8080/v2/apps/mesos-dns
+fi
+
+if [ "$1" == "start" ] || [ "$1" == "restart" ]; then
+
+cat >/tmp/mesos-dns-marathon.json <<EOL
+{
+	"id": "/mesos-dns",
+	"env": {
+		"MESOS_ZK": "zk://{{ zookeeper_host_list }}/mesos",
+		"MESOS_DNS_EXTERNAL_SERVERS": "{{ private_lan_dns }}",
+		"MESOS_DNS_HTTP_PORT": "5001",
+		"MESOS_DNS_HTTP_ENABLED": "true",
+		"MESOS_DNS_REFRESH": "5",
+		"LOCAL_IP": "0.0.0.0"
+	},
+	"container": {
+		"type": "DOCKER",
+		"docker": {
+			"network": "HOST",
+			"image": "appsoma/mesos-dns"
+		}
+	},
+	"constraints": [[ "node_type", "LIKE", "master" ]],
+	"cpus": 0.1,
+	"mem": 256,
+	"instances": 1
+}
+EOL
+
+curl -H "Content-Type:application/json" -X POST --data @/tmp/mesos-dns-marathon.json http://{{ marathon_host }}:8080/v2/apps
+
+fi
+echo

@@ -167,7 +167,7 @@
     - role: ansible-mesos-dns
       zookeeper_host_list: "{{ zookeeper_hosts_with_port }}"
       marathon_host: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
-      mesos_dns_hosts: [ "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}" ]
+      mesos_dns_hosts: "{{ zookeeper_hosts_no_port }}"
       is_mesos_dns_starter: true
 
     - role: ansible-cassandra-marathon
