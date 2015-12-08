@@ -1,5 +1,3 @@
-- include: mongo.yml
-
 - name: Install PAM dev libraries (Debian/Ubuntu)
   apt: pkg=libpam0g-dev state=present
   when: ansible_os_family == "Debian"
@@ -7,24 +5,6 @@
 - name: Install PAM dev libraries (RedHat/Centos)
   yum: pkg=pam-devel state-present
   when: ansible_os_family == "RedHat"
-
-- name: Create Welder dir
-  file: path="{{ welder_dir }}" state=directory owner="{{ management_user }}" group="{{ management_user }}"
-
-- name: Create Welder etc dir
-  file: path="{{ welder_etc_dir }}" state=directory
-
-- name: Create Welder log dir
-  file: path="{{ welder_log_dir }}" state=directory
-
-- name: Create project folder
-  file: path="{{ project_folder }}" state=directory owner="{{ welder_user }}" group="{{ welder_group['name'] }}" mode=2775
-
-- name: Create upload folder
-  file: path="{{ upload_folder }}" state=directory  owner="{{ welder_user }}" group="{{ welder_group['name'] }}" mode=2775
-
-- name: Create service log folder
-  file: path="{{ upload_folder }}" state=directory  owner="{{ welder_user }}" group="{{ welder_group['name'] }}" mode=2775
 
 - name: Clone Welder source
   git:

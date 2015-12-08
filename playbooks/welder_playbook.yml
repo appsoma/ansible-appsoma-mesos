@@ -39,10 +39,6 @@
 
   roles:
     - role: ../roles/ansible-welder
-      int_ip: "{{ hostvars[inventory_hostname]['private_ip_address'] }}"
       ext_ip: "{{ hostvars[inventory_hostname]['public_ip_address'] }}"
-      scheduler_ip: "{{ hostvars[inventory_hostname]['private_ip_address'] }}"
-      marathon_host: "{{ hostvars[inventory_hostname]['private_ip_address'] }}"
-      zookeeper_hosts: "{{ zookeeper_hosts_with_port }}"
       scheduler: "rhino"
       when: inventory_hostname == groups[inventory_group_master][0]

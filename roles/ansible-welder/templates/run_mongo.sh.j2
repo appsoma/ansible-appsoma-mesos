@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+if [ "$1" != "start" ] && [ "$1" != "restart" ] && [ "$1" != "stop" ]; then
+	echo "Options are start, stop, restart"
+	exit 1
+fi
+
+if [ "$1" == "stop" ] || [ "$1" == "restart" ]; then
+	curl -H "Content-Type:application/json" -X DELETE http://master.mesos:8080/v2/apps/mongo
+fi
+
+if [ "$1" == "start" ] || [ "$1" == "restart" ]; then
+
+cat >/tmp/mongo-marathon.json <<EOL
+{
+	"id": "/mongo",
+ 	"cmd": "mongod --smallfiles",
+	"cpus": 0.25,
+	"mem": 512.0,
+	"instances": 1,
+	"constraints": [
+		[ "kascaling_group", "UNLIKE", "true" ]
+	],
+	"ports": [9999],
+	"container": {
+		"type": "DOCKER",
+		"docker": {
+			"image": "mongo:3",
+			"network": "BRIDGE",
+			"portMappings": [
+				{
+					"containerPort": 21017,
+					"hostPort": 9999,
+					"servicePort": 9999,
+					"protocol": "tcp"
+				}
+			]
+		},
+		"volumes": [
+			{
+				"hostPath": "{{ db_folder }}",
+				"containerPath": "/data/db",
+				"mode": "RW"
+			}
+		]
+	}
+}
+EOL
+
+curl -H "Content-Type:application/json" -X POST --data @/tmp/mongo-marathon.json http://master.mesos:8080/v2/apps
+
+fi
+echo

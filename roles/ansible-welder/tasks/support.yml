@@ -23,7 +23,7 @@
   changed_when: npmwsyak.stdout != ''
   notify: Stop wsyak
   notify: Start wsyak
-  when: yak_mode == 'wsyak'
+  when: yak_mode is defined and yak_mode == 'wsyak'
 
 - name: Compile Java Message Pump
   shell: ". /etc/profile.d/maven.sh; mvn compile"

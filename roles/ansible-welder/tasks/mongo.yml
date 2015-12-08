@@ -1,27 +1,11 @@
-- name: Add Mongo specific key
-  apt_key: keyserver="{{mongo_repo_keyserver}}" id="{{mongo_repo_key}}" state=present
-
-- name: Add Mongo repo
-  apt_repository: repo="deb {{mongo_repo}} {{ansible_distribution_release}}/mongodb-org/3.0 multiverse" update_cache=yes state=present
-
-- name: Install MongoDB
-  apt: pkg=mongodb-org state=present
-  register: mongo_install
-
 - name: Create DB directory
-  file: path="{{db_folder}}" state=directory owner=mongodb group=mongodb
-  register: mongo_create
+  file: path="{{db_folder}}" state=directory owner="{{ management_user }}"
 
-- name: Configure MongoDB
-  template: src=mongodb.conf.j2 dest=/etc/mongod.conf owner=root group=root mode=0644
-  register: mongo_config
+- name: Create Mongo marathon run script
+  template: src="run_mongo.sh.j2" dest="{{ welder_dir }}/run_mongo.sh" mode=755
 
-- name: Remove /etc/init.d registration for MongoDB
-  file: path=/etc/init.d/mongodb state=absent
-
-- name: Restart MongoDB
-  service: name=mongod state=restarted enabled=yes
-  when: mongo_install.changed or mongo_create.changed or mongo_config.changed
+- name: Run Mongo in marathon
+  shell: "{{ welder_dir }}/run_mongo.sh start"
 
 
 

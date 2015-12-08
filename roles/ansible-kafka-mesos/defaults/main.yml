@@ -1,1 +1,2 @@
+kafka_dir: "/opt/kafka"
 kafka_mesos_version: "v0.9.2.0"

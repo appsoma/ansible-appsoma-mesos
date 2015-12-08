@@ -1,5 +1,29 @@
+- include: mongo.yml
+  when: welder_db_type == "mongo"
+
+- name: Create Welder dir
+  file: path="{{ welder_dir }}" state=directory owner="{{ management_user }}" group="{{ management_user }}"
+
+- name: Create Welder etc dir
+  file: path="{{ welder_etc_dir }}" state=directory
+
+- name: Create Welder log dir
+  file: path="{{ welder_log_dir }}" state=directory
+
+- name: Create project folder
+  file: path="{{ project_folder }}" state=directory owner="{{ welder_user }}" group="{{ welder_group['name'] }}" mode=2775
+
+- name: Create upload folder
+  file: path="{{ upload_folder }}" state=directory  owner="{{ welder_user }}" group="{{ welder_group['name'] }}" mode=2775
+
+- name: Create service log folder
+  file: path="{{ upload_folder }}" state=directory  owner="{{ welder_user }}" group="{{ welder_group['name'] }}" mode=2775
+
+- include: container.yml
+  when: use_container
+
 - include: system.yml
-  when: not use_containers
+  when: not use_container
 
 - include: projects.yml
 

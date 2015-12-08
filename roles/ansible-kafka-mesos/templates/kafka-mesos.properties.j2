@@ -1,9 +1,9 @@
 storage=zk:/kafka-mesos
 clusterStorage=zk:/kafka-mesos
 
-master=zk://{{ zookeeper_hosts }}/mesos
-zk={{ zookeeper_hosts }}
-api=http://{{ framework_host }}:7000
+master=zk://master.mesos:2181/mesos
+zk=master.mesos:2181
+api=http://master.mesos:7000
 
 num.network.threads=4
 num.io.threads=8

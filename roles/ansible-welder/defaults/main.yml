@@ -5,20 +5,24 @@ welder_etc_dir: "{{ appsoma_etc_dir }}/welder"
 welder_log_dir: "{{ appsoma_log_dir }}"
 welder_data_dir: "{{ data_mount_point }}/welder"
 welder_support_dir: "{{ welder_data_dir }}/support"
+welder_db_type: "mongo"
 
 welder_use_tls: false
-use_containers: false
+use_container: true
 
 external_welder_name: "{{ ext_ip }}:{{ welder_port }}"
 external_welder_console_name: "{{ ext_ip }}"
-int_welder_url: "{{ 'https' if welder_use_tls is defined and welder_use_tls else 'http' }}://{{ int_ip }}:{{welder_port }}"
+int_welder_url: "{{ 'https' if welder_use_tls is defined and welder_use_tls else 'http' }}://master.mesos:{{welder_port }}"
 ext_welder_url: "{{ 'https' if welder_use_tls is defined and welder_use_tls else 'http' }}://{{ external_welder_name }}"
 
-db_folder: "{{ data_mount_point }}/welder_db"
-db_host: "localhost"
-db_port: 27017
 
-marathon_host: "{{ hostvars[inventory_hostname]['private_ip_address'] }}"
+db_folder: "{{ data_mount_point }}/welder_db"
+db_host: "mongo.marathon.mesos"
+db_port: 9999
+
+marathon_host: "master.mesos"
+scheduler_ip: "master.mesos"
+zookeeper_hosts: "master.mesos:2181"
 marathon_url: "http://{{ marathon_host }}:8080"
 
 project_folder: "{{ welder_data_dir }}/projects"
@@ -31,7 +35,5 @@ rhino_url: "http://{{ scheduler_ip }}:8899/"
 use_https: False
 key_path: "{{ welder_dir }}/certificate.key"
 cert_path: "{{ welder_dir }}/certificate.crt"
-
-yak_mode: "wsyak"
 
 

@@ -14,10 +14,10 @@ stop on runlevel [06]
 
 script
   ENABLE_KAFKA="yes"
-  DIR=/opt/kafka
+  DIR={{ kafka_dir }}
   DAEMON_OPTS="scheduler $DIR/kafka-mesos.properties"
   DAEMON=$DIR/kafka-mesos.sh
-  DAEMON_USER={{ kafka_user }}
+  DAEMON_USER={{ management_user }}
 
   export MESOS_NATIVE_JAVA_LIBRARY=/usr/local/lib/libmesos.so
 
