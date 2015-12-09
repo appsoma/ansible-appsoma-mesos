@@ -19,7 +19,7 @@ cat >/tmp/mongo-marathon.json <<EOL
 	"mem": 512.0,
 	"instances": 1,
 	"constraints": [
-		[ "kascaling_group", "unlike", "true" ]
+		[ "kascaling_group", "UNLIKE", "true" ]
 	],
 	"container": {
 		"type": "DOCKER",
