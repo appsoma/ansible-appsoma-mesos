@@ -16,7 +16,7 @@ curl -include -XPOST http://master.mesos:8080/v2/artifacts --form file=@{{ kafka
 cat >/tmp/kafka-marathon.json <<EOL
 {
 	"id": "/kafka-framework",
- 	"cmd": "./kafka-mesos scheduler \$MESOS_SANDBOX/kafka-mesos.properties",
+ 	"cmd": "./kafka-mesos.sh scheduler \$MESOS_SANDBOX/kafka-mesos.properties",
 	"cpus": 0.2,
 	"mem": 512.0,
 	"instances": 1,
@@ -32,7 +32,7 @@ cat >/tmp/kafka-marathon.json <<EOL
           			{
             			"containerPort": 7000,
             			"hostPort": 0,
-            			"servicePort": 7000
+            			"servicePort": 7000,
             			"protocol": "tcp"
             		}
             ]

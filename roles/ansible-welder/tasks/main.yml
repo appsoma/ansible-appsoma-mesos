@@ -1,8 +1,8 @@
-- include: mongo.yml
-  when: welder_db_type == "mongo"
-
 - name: Create Welder dir
   file: path="{{ welder_dir }}" state=directory owner="{{ management_user }}" group="{{ management_user }}"
+
+- include: mongo.yml
+  when: welder_db_type == "mongo"
 
 - name: Create Welder etc dir
   file: path="{{ welder_etc_dir }}" state=directory
