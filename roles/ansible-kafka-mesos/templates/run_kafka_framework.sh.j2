@@ -27,15 +27,7 @@ cat >/tmp/kafka-marathon.json <<EOL
 		"type": "DOCKER",
 		"docker": {
 			"image": "appsoma/kafka-mesos:latest",
-			"network": "BRIDGE",
-			"portMappings": [
-          			{
-            			"containerPort": 7000,
-            			"hostPort": 0,
-            			"servicePort": 7000,
-            			"protocol": "tcp"
-            		}
-            ]
+			"network": "HOST"
 		}
 	},
 	"uris": [
