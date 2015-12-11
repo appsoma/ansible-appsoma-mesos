@@ -5,7 +5,7 @@
 #
 
 # use "nvm ls-remote" to see all available versions 
-nodejs_version: "v0.12.4"
+nodejs_version: "v0.12.8"
 
 
 #
