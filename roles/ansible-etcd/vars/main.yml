@@ -1,1 +1,0 @@
-cluster_group: "tag_cluster_{{ cluster_name }}"
