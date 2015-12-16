@@ -1,0 +1,14 @@
+node_type: 'slave'
+node_name: "{{ inventory_hostname }}"
+
+appsoma_log_dir: "/var/log/appsoma"
+mesos_log_dir: "/tmp/mesos/logs"
+mesos_work_dir: "/tmp/mesos"
+
+use_elasticsearch: false
+elasticsearch_host: localhost
+elasticsearch_port: 9200
+logstash_host: "elk.marathon.mesos"
+logstash_port: 5044
+
+index_value: "{{ cluster_name }}-filebeat"

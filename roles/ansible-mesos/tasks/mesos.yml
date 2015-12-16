@@ -98,6 +98,7 @@
 - name: Remove "latest" slave link to prevent re-use failures
   file: path="{{ mesos_work_dir }}/meta/slaves/latest" state=absent
   when: mesos_install_mode == "slave" or mesos_install_mode == "master-slave"
+  failed_when: false
 
 - name: Start and enable mesos-slave
   service: name=mesos-slave state=started

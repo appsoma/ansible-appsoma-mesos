@@ -1,49 +1,48 @@
 #!/usr/bin/env bash
 
 if [ "$1" != "start" ] && [ "$1" != "restart" ] && [ "$1" != "stop" ]; then
-	echo "Options are start, stop, restart"
-	exit 1
+ 	echo "Options are start, stop, restart"
+   	exit 1
 fi
 
 if [ "$1" == "stop" ] || [ "$1" == "restart" ]; then
-	curl -H "Content-Type:application/json" -X DELETE http://master.mesos:8080/v2/apps/kafka-framework
+  	curl -H "Content-Type:application/json" -X DELETE http://master.mesos:8080/v2/apps/kafka-framework
 fi
 
 if [ "$1" == "start" ] || [ "$1" == "restart" ]; then
 
-curl -include -XPOST http://master.mesos:8080/v2/artifacts --form file=@{{ kafka_dir }}/kafka-mesos.properties
+	curl -include -XPOST http://master.mesos:8080/v2/artifacts --form file=@{{ kafka_dir }}/kafka-mesos.properties
 
-cat >/tmp/kafka-marathon.json <<EOL
+	cat >/tmp/kafka-marathon.json <<EOL
 {
-	"id": "/kafka-framework",
- 	"cmd": "./kafka-mesos.sh scheduler \$MESOS_SANDBOX/kafka-mesos.properties",
-	"cpus": 0.2,
-	"mem": 512.0,
-	"instances": 1,
-	"constraints": [
-		[ "node_type", "LIKE", "master" ]
-	],
-	"container": {
-		"type": "DOCKER",
-		"docker": {
-			"image": "appsoma/kafka-mesos:latest",
-			"network": "BRIDGE",
-			"portMappings": [
-          			{
-            			"containerPort": 7000,
-            			"hostPort": 7000,
-            			"protocol": "tcp"
-            		}
-            ]
-		}
-	},
-	"uris": [
-		"http://master.mesos:8080/v2/artifacts/kafka-mesos.properties"
-	]
+	"id": "/kafka",
+  	"cmd": "./kafka-mesos.sh scheduler \$MESOS_SANDBOX/kafka-mesos.properties",
+   	"cpus": 0.2,
+   	"mem": 512.0,
+   	"instances": 1,
+   	"constraints": [
+   		[ "node_type", "LIKE", "master" ]
+   	],
+   	"container": {
+   		"type": "DOCKER",
+   		"docker": {
+   			"image": "appsoma/kafka-mesos:latest",
+   			"network": "BRIDGE",
+   			"portMappings": [
+      			{
+           			"containerPort": 7000,
+           			"hostPort": 7000,
+           			"protocol": "tcp"
+           		}
+			]
+    	}
+    },
+    "uris": [
+    	"http://master.mesos:8080/v2/artifacts/kafka-mesos.properties"
+    ]
 }
 EOL
 
-curl -H "Content-Type:application/json" -X POST --data @/tmp/kafka-marathon.json http://master.mesos:8080/v2/apps
-
+	curl -H "Content-Type:application/json" -X POST --data @/tmp/kafka-marathon.json http://master.mesos:8080/v2/apps
 fi
 echo

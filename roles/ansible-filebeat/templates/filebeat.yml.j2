@@ -1,0 +1,107 @@
+################### Filebeat Configuration Example #########################
+
+############################# Filebeat ######################################
+filebeat:
+  # List of prospectors to fetch data.
+  prospectors:
+    - paths:
+        - "/var/log/syslog"
+      input_type: log
+      fields:
+        source: "syslog"
+        server: "{{ node_name }}"
+    - paths:
+        - "/var/log/*.log"
+      input_type: log
+      fields:
+        source: "system"
+        server: "{{ node_name }}"
+    - paths:
+        - "/var/log/dmesg"
+      input_type: log
+      fields:
+        source: "dmesg"
+        server: "{{ node_name }}"
+
+{% if node_type == 'master' %}
+    - paths:
+        - {{ appsoma_log_dir }}/*.log
+      input_type: log
+      fields:
+        source: "appsoma"
+        server: "{{ node_name }}"
+
+{% endif %}
+    - paths:
+        - {{ mesos_log_dir }}/*.INFO
+        - {{ mesos_log_dir }}/*.WARNING
+        - {{ mesos_log_dir }}/*.ERRROR
+      input_type: log
+      fields:
+        source: "mesos"
+        server: "{{ node_name }}j"
+
+    - paths:
+        - {{ mesos_work_dir }}/slaves/*/frameworks/*/executors/*/runs/*/stdout
+        - {{ mesos_work_dir }}/slaves/*/frameworks/*/executors/*/runs/*/stderr
+      input_type: log
+      fields:
+        source: "job"
+        server: "{{ node_name }}"
+
+  spool_size: 1024
+  idle_timeout: 5s
+
+  # Name of the registry file. Per default it is put in the current working
+  # directory. In case the working directory is changed after when running
+  # filebeat again, indexing starts from the beginning again.
+  registry_file: /var/lib/filebeat/registry
+
+
+###############################################################################
+############################# Libbeat Config ##################################
+# Base config file used by all other beats for using libbeat features
+
+############################# Output ##########################################
+output:
+
+{% if use_elasticsearch %}
+  ### Elasticsearch as output
+  elasticsearch:
+    hosts: ["{{ elasticsearch_host }}:{{ elasticsearch_port }}"]
+    # Optional protocol and basic auth credentials. These are deprecated.
+    #protocol: "https"
+    #username: "admin"
+    #password: "s3cr3t"
+    index: "{{ index_value }}"
+{% else %}
+  ### Logstash as output
+  logstash:
+    # The Logstash hosts
+    hosts: ["{{ logstash_host }}:{{ logstash_port }}"]
+    index: {{ index_value }}
+{% endif %}
+
+############################# Shipper #########################################
+
+shipper:
+  name: {{ node_name }}
+  tags: ["{{ node_type }}", "{{ node_name }}"]
+
+
+
+
+############################# Logging #########################################
+logging:
+  to_syslog: true
+  to_files: true
+
+  # To enable logging to files, to_files option has to be set to true
+  files:
+    path: /var/log/mybeat
+    name: mybeat
+    rotateeverybytes: 10485760 # = 10MB
+  #selectors: [ ]
+  #level: error
+
+
