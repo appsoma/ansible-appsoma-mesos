@@ -11,7 +11,7 @@ fi
 
 if [ "$1" == "start" ] || [ "$1" == "restart" ]; then
 
-cat >/tmp/elk_run.json <<EOL
+   cat >/tmp/elk_run.json <<EOL
 {
 	"id": "/elk",
 	"cpus": 0.2,
@@ -23,14 +23,21 @@ cat >/tmp/elk_run.json <<EOL
 	"container": {
 		"type": "DOCKER",
 		"docker": {
-			"image": "appsoma/elk:latest",
-			"network": "HOST",
-		}
+			"image": "appsoma/elk:v0.1",
+			"network": "HOST"
+		},
+		"volumes": [
+			{
+				"hostPath": "{{ elasticsearch_data_dir }}",
+				"containerPath": "/var/lib/elasticsearch",
+				"mode": "RW"
+			}
+		]
 	}
 }
 EOL
 
-curl -H "Content-Type:application/json" -X POST --data @/tmp/elk_run.json http://master.mesos:8080/v2/apps
+   curl -H "Content-Type:application/json" -X POST --data @/tmp/elk_run.json http://master.mesos:8080/v2/apps
 
 fi
 echo

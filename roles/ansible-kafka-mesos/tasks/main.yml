@@ -34,7 +34,7 @@
   sudo_user: "{{ management_user }}"
 
 - name: Create broker creation script
-  template: src="add_broker.sh.j2" dest="{{ kafka_dir }}/add_broker.sh" mode=755
+  template: src="add_broker.sh.j2" dest="{{ kafka_dir }}/add_broker.sh" mode=0755
   sudo: yes
   sudo_user: "{{ management_user }}"
 
@@ -44,7 +44,7 @@
   sudo_user: "{{ management_user }}"
 
 - name: Copy framework startup script
-  template: src="run_kafka_framework.sh.j2" dest="{{ kafka_dir }}/run_kafka_framework.sh" mode=755
+  template: src="run_kafka_framework.sh.j2" dest="{{ kafka_dir }}/run_kafka_framework.sh" mode=0755
   sudo: yes
   sudo_user: "{{ management_user }}"
 

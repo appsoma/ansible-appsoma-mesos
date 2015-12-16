@@ -4,7 +4,7 @@
   register: haproxy_dir
 
 - name: Setup HAProxy script
-  copy: src=haproxy_dns_cfg dest="{{ haproxy_script_location }}/haproxy_dns_cfg" mode=755
+  copy: src=haproxy_dns_cfg dest="{{ haproxy_script_location }}/haproxy_dns_cfg" mode=0755
   when: haproxy_dir.stat.exists
   notify:
     - Restart Marathon

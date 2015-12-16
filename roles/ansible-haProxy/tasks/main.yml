@@ -32,7 +32,7 @@
 - include: config.yml
 
 - name: Create SSL certificate
-  copy: src="{{ haproxy_pem_file }}" dest=/opt/haproxy/haproxy.pem mode=600
+  copy: src="{{ haproxy_pem_file }}" dest=/opt/haproxy/haproxy.pem mode=0600
   when: haproxy_use_ssl
 
 - name: Install Gandalf

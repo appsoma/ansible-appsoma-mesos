@@ -1,0 +1,11 @@
+- name: Make ELK Server dir
+  file: path="{{ elk_dir }}" state=directory owner="{{ management_user }}"
+
+- name: Make Elasticsearch data dir
+  file: path="{{ elasticsearch_data_dir }}" state=directory owner="{{ management_user }}"
+
+- name: Install ELK Server marathon script
+  template: src=run_elk.sh.j2 dest="{{ elk_dir }}/run_elk.sh" owner="{{ management_user }}" mode=0755
+
+- name: Start ELK Server in Marathon
+  shell: "{{ elk_dir }}/run_elk.sh start"

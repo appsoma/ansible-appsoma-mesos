@@ -1,0 +1,2 @@
+elk_dir: "/opt/elk"
+elasticsearch_data_dir: "{{ data_mount_point }}/elasticsearch"

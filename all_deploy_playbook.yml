@@ -185,6 +185,10 @@
       when: inventory_hostname in groups[inventory_group_master]
 
     # Monitoring tools
+    - role: ansible-elk
+      run_once: true
+      when: inventory_hostname in groups[inventory_group_master]
+
     - role: ansible-rabbitmq
       when: inventory_hostname == groups[inventory_group_master][0]
 

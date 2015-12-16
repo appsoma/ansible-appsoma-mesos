@@ -2,7 +2,7 @@
   file: path="{{db_folder}}" state=directory owner="{{ management_user }}"
 
 - name: Create Mongo marathon run script
-  template: src="run_mongo.sh.j2" dest="/tmp/run_mongo.sh" mode=755
+  template: src="run_mongo.sh.j2" dest="/tmp/run_mongo.sh" mode=0755
 
 - name: Run Mongo in marathon
   shell: "/tmp/run_mongo.sh start"

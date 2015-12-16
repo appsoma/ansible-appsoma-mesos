@@ -8,7 +8,7 @@
   template: src=cm-worker.json.j2 dest="{{ cassandra_marathon_dir }}/cm-worker.json" owner="{{ management_user }}"
 
 - name: Copy Cassandra Marathon start script
-  template: src=start_cassandra.sh.j2 dest="{{ cassandra_marathon_dir }}/start_cassandra.sh" owner="{{ management_user }}" mode=700
+  template: src=start_cassandra.sh.j2 dest="{{ cassandra_marathon_dir }}/start_cassandra.sh" owner="{{ management_user }}" mode=0755
 
 - name: Install cqlsh via PIP
   command: pip install cqlsh

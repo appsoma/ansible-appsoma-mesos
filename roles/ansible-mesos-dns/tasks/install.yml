@@ -2,7 +2,7 @@
   file: path="{{ mesos_dns_dir }}" state=directory owner="{{ management_user }}"
 
 - name: Install Mesos-DNS marathon script
-  template: src=run_mesos_dns.sh.j2 dest="{{ mesos_dns_dir }}/run_mesos_dns.sh" owner="{{ management_user }}" mode=755
+  template: src=run_mesos_dns.sh.j2 dest="{{ mesos_dns_dir }}/run_mesos_dns.sh" owner="{{ management_user }}" mode=0755
 
 - name: Start Mesos-DNS in Marathon
   shell: "{{ mesos_dns_dir }}/run_mesos_dns.sh start"
