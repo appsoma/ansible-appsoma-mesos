@@ -1,0 +1,11 @@
+- name: Download filebeat
+  get_url: url="https://download.elastic.co/beats/filebeat/filebeat_1.0.0_amd64.deb" dest="/tmp/filebeat_1.0.0_amd64.deb"
+
+- name: Install filebeat from URL
+  apt: deb=/tmp/filebeat_1.0.0_amd64.deb state=present
+
+- name: Install filebeat config
+  template: src=filebeat.yml.j2 dest=/etc/filebeat/filebeat.yml mode=0644
+
+- name: Start filebeat service
+  service: name=filebeat state=started

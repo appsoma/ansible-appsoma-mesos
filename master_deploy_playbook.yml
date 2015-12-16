@@ -175,6 +175,7 @@
 
     # Install monitoring
     - role: ansible-elk
+      when: false
 
     - role: ansible-rabbitmq
 
@@ -190,6 +191,14 @@
       mesos_master_list: "{{ zookeeper_hosts_no_port }}"
       system_name: "{{ hostvars[inventory_hostname].system_name }}"
       ip_address: "{{ hostvars[inventory_hostname].private_ip_address }}"
+
+    - role: ansible-filebeat
+      mesos_log_dir: "{{ mesos_work_dir }}/mesos_log"
+      mesos_dir: "{{ mesos_work_dir }} "
+      appsoma_dir: "{{ appsoma_log_dir }}"
+      node_type: "{{ hostvars[inventory_hostname].type }}"
+      node_name: "{{ hostvars[inventory_hostname].short_name }}"
+      when: false
 
     # Install the Kafka framework
     - role: ansible-kafka-mesos

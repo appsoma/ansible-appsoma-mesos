@@ -25,7 +25,7 @@ filebeat:
 
 {% if node_type == 'master' %}
     - paths:
-        - {{ appsoma_log_dir }}/*.log
+        - {{ appsoma_dir }}/*.log
       input_type: log
       fields:
         source: "appsoma"
@@ -42,8 +42,8 @@ filebeat:
         server: "{{ node_name }}j"
 
     - paths:
-        - {{ mesos_work_dir }}/slaves/*/frameworks/*/executors/*/runs/*/stdout
-        - {{ mesos_work_dir }}/slaves/*/frameworks/*/executors/*/runs/*/stderr
+        - {{ mesos_dir }}/slaves/*/frameworks/*/executors/*/runs/*/stdout
+        - {{ mesos_dir }}/slaves/*/frameworks/*/executors/*/runs/*/stderr
       input_type: log
       fields:
         source: "job"
