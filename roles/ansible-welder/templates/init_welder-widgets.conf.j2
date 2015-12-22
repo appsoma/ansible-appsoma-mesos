@@ -13,8 +13,8 @@ stop on runlevel [06]
 
 script
   ENABLE_WELDER="yes"
-  DIR={{ welder_dir }}/widgets
-  DAEMON={{ welder_dir }}/widgets/auto_build
+  DIR={{ welder_src_dir }}/widgets
+  DAEMON={{ welder_src_dir }}/widgets/auto_build
 
   if [ "x$ENABLE_WELDER" = "xyes" ]
   then

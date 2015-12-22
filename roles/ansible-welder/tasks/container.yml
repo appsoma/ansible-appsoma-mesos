@@ -1,6 +1,6 @@
 - name: Clone Welder source
   git:
-    dest: "{{ welder_dir }}"
+    dest: "{{ welder_src_dir }}"
     repo: https://github.com/appsoma/welder.git
     version: "{{ welder_version if welder_version is defined else 'HEAD' }}"
     update: yes
@@ -10,13 +10,12 @@
   register: git_pull
 
 - name: Fetch Welder configuration template
-  fetch: src="{{ welder_dir }}/config.json.template" dest="../templates/{{ cluster_name }}.welder.config.json.j2" flat=yes
+  fetch: src="{{ welder_src_dir }}/config.json.template" dest="../templates/{{ cluster_name }}.welder.config.json.j2" flat=yes
 
 - name: Create Welder Configuration
-  template: src="../templates/{{ cluster_name }}.welder.config.json.j2" dest="{{ welder_dir}}/welder_config.json"
-
+  template: src="../templates/{{ cluster_name }}.welder.config.json.j2" dest="{{ welder_src_dir}}/welder_config.json"
 
 - name: Run Welder in marathon
   shell: "./welder_marathon.sh start"
   args:
-    chdir: "{{ welder_dir }}"
+    chdir: "{{ welder_src_dir }}"

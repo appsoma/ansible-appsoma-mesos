@@ -65,3 +65,4 @@
 - name: Set service configuration in zookeeper
   command:  curl -X POST localhost:2288/apps -d "url={{ item['url'] }}" -d "app_name={{ item['app_name'] }}" -d "service_port={{ item['service_port'] }}" -d "servers={{ hostvars[groups[inventory_group_master][0]]['private_ip_address'] }}:{{ item['port'] }}"
   with_items: haproxy_dns_services
+

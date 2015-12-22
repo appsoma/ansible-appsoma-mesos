@@ -1,4 +1,4 @@
-ansible_scaler_dir: "/opt/ansible-scaler"
+ansible_scaler_dir: "{{ data_mount_point }}/ansible-scaler"
 is_scaler_host: true
 
 

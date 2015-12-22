@@ -15,14 +15,14 @@ output "service_public_dns" {
 }
 
 output "master_public_ip" {
-{% if service_nodes.count > 1 %}
+{% if masters.count > 1 %}
     value = "${join(",", aws_instance.master.*.public_ip)}"
 {% else %}
     value = "${aws_instance.master.public_ip}"
 {% endif %}
 }
 output "master_public_dns" {
-{% if service_nodes.count > 1 %}
+{% if masters.count > 1 %}
     value = "${join(",", aws_instance.master.*.public_dns)}"
 {% else %}
     value = "${aws_instance.master.public_dns}"

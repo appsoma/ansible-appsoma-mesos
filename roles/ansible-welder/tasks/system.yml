@@ -8,7 +8,7 @@
 
 - name: Clone Welder source
   git:
-    dest: "{{ welder_dir }}"
+    dest: "{{ welder_src_dir }}"
     repo: https://github.com/appsoma/welder.git
     version: "{{ welder_version if welder_version is defined else 'HEAD' }}"
     update: yes
@@ -31,7 +31,7 @@
   when: welder_use_tls
 
 - name: Fetch Welder configuration template
-  fetch: src="{{ welder_dir }}/config.json.template" dest="../templates/{{ cluster_name }}.welder.config.json.j2" flat=yes
+  fetch: src="{{ welder_src_dir }}/config.json.template" dest="../templates/{{ cluster_name }}.welder.config.json.j2" flat=yes
 
 - name: Create Welder Configuration
   template: src="../templates/{{ cluster_name }}.welder.config.json.j2" dest="{{ welder_etc_dir}}/config.json"
@@ -46,7 +46,7 @@
   notify: Restart Welder Widgets
 
 - name: Run NPM for widgets
-  shell: "cd {{  welder_dir }}/widgets; npm install;"
+  shell: "cd {{  welder_src_dir }}/widgets; npm install;"
   sudo: yes
   sudo_user: "{{ welder_user }}"
   register: npmwidgets
@@ -55,14 +55,14 @@
   notify: Restart Welder
 
 - name: Browserify widgets
-  shell: "cd {{  welder_dir }}/widgets; ./build"
+  shell: "cd {{  welder_src_dir }}/widgets; ./build"
   sudo: yes
   sudo_user: "{{ welder_user }}"
   register: browserifywidgets
   failed_when: browserifywidgets.stderr.find('ERROR') != -1
 
 - name: Run NPM for welder
-  shell: "cd {{  welder_dir }}; npm install"
+  shell: "cd {{  welder_src_dir }}; npm install"
   sudo: yes
   sudo_user: "{{ welder_user }}"
   register: npmwelder

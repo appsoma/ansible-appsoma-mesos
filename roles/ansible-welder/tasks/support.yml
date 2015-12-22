@@ -11,8 +11,6 @@
     force: yes
   sudo: yes
   sudo_user: "{{ management_user }}"
-  notify: Stop wsyak
-  notify: Start wsyak
 
 - name: Run NPM for wsyak
   shell: "cd {{ welder_support_dir }}/wsyak; npm install;"
@@ -40,9 +38,20 @@
   sudo_user: "{{ management_user }}"
 
 - name: Compile and Start Java Kayak
-  shell: ". /etc/profile.d/appsoma_env.sh; . /etc/profile.d/maven.sh; ./kayak_java.sh start"
+  shell: "./kayak_java.sh start"
   args:
      chdir: "{{ welder_support_dir }}/kayak_java"
   sudo: yes
   sudo_user: "{{ management_user }}"
+  when: use_container
+
+- name: Compile Java Kayak
+  shell: ". /etc/profile.d/appsoma_env.sh; . /etc/profile.d/maven.sh; ./kayak_java_build.sh start"
+  args:
+     chdir: "{{ welder_support_dir }}/kayak_java"
+  sudo: yes
+  sudo_user: "{{ management_user }}"
+  when: not use_container
+
+
 

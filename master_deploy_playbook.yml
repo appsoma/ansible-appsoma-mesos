@@ -156,7 +156,6 @@
     # Install Marathon
     - role: ansible-marathon
       zookeeper_hostnames: "{{ zookeeper_hosts_with_port  }}"
-      when: inventory_hostname == groups[inventory_group_master][0]
 
     # Install Appsoma Rhino
     - role: ../roles/ansible-rhino
@@ -178,15 +177,19 @@
       when: false
 
     - role: ansible-rabbitmq
+      when: inventory_hostname == groups[inventory_group_master][0]
 
     - role: ansible-redis
+      when: inventory_hostname == groups[inventory_group_master][0]
 
     - role: ansible-influxdb
+      when: inventory_hostname == groups[inventory_group_master][0]
 
     - role: ansible-grafana
+      when: inventory_hostname == groups[inventory_group_master][0]
 
     - role: ansible-sensu
-      sensu_mode: "master"
+      sensu_mode: "{{ 'master' if inventory_hostname == groups[inventory_group_master][0] else 'client-master' }}"
       sensu_master: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
       mesos_master_list: "{{ zookeeper_hosts_no_port }}"
       system_name: "{{ hostvars[inventory_hostname].system_name }}"
@@ -202,8 +205,7 @@
 
     # Install the Kafka framework
     - role: ansible-kafka-mesos
-      run_once: true
-      when: "use_kafka is defined and use_kafka and inventory_hostname in groups[inventory_group_master]"
+      when: "use_kafka is defined and use_kafka and inventory_hostname == groups[inventory_group_master][0]"
 
     # Install the Storm framework
     - role: ansible-storm-mesos
@@ -214,7 +216,7 @@
 
     # Install the scaler from repo
     - role: ansible-ansible-scaler
-      when: "use_ansible_scaler is defined and use_ansible_scaler"
+      when: "use_ansible_scaler is defined and use_ansible_scaler and inventory_hostname == groups[inventory_group_master][0]"
 
 
 - include: playbooks/welder_playbook.yml

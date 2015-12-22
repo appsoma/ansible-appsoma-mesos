@@ -1,6 +1,6 @@
 welder_user: "ubuntu"
 welder_port: 8890
-welder_dir: "/opt/welder"
+welder_src_dir: "{{ welder_data_dir }}/src"
 welder_etc_dir: "{{ appsoma_etc_dir }}/welder"
 welder_log_dir: "{{ appsoma_log_dir }}"
 welder_data_dir: "{{ data_mount_point }}/welder"
@@ -33,7 +33,7 @@ scheduler: "rhino"
 rhino_url: "http://{{ scheduler_ip }}:8899/"
 
 use_https: False
-key_path: "{{ welder_dir }}/certificate.key"
-cert_path: "{{ welder_dir }}/certificate.crt"
+key_path: "{{ welder_src_dir }}/certificate.key"
+cert_path: "{{ welder_src_dir }}/certificate.crt"
 
 

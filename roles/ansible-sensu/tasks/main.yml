@@ -64,7 +64,7 @@
 
 - name: Install Sensu master client config
   template: src="sensu_master_client.json.j2" dest=/etc/sensu/conf.d/client.json
-  when: sensu_mode == "master"
+  when: sensu_mode == "master" or sensu_mode == "client-master"
   notify: Restart Sensu Client
 
 - name: Install InfluxDB config json
@@ -100,7 +100,7 @@
 
 - name: Install Master Checks
   template: src="master_checks.json.j2" dest="/etc/sensu/conf.d/master_checks.json"
-  when: sensu_mode == "master"
+  when: sensu_mode == "master" or sensu_mode == "client-master"
   notify:
     - Restart Sensu Server
     - Restart Sensu API
@@ -123,7 +123,7 @@
 
 - name: Install Master Metrics
   template: src="master_metrics.json.j2" dest="/etc/sensu/conf.d/master_metrics.json"
-  when: sensu_mode == "master"
+  when: sensu_mode == "master" or sensu_mode == "client-master"
   notify:
     - Restart Sensu Server
     - Restart Sensu API
