@@ -29,7 +29,10 @@ cat >/tmp/mesos-dns-marathon.json <<EOL
 			"image": "appsoma/mesos-dns"
 		}
 	},
-	"constraints": [[ "node_type", "LIKE", "master" ]],
+	"constraints": [
+		[ "node_type", "LIKE", "master" ],
+		[ "hostname", "UNIQUE"]
+	],
 	"cpus": 0.1,
 	"mem": 256,
 	"instances": 1
