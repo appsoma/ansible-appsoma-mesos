@@ -36,5 +36,4 @@
     - role: ../roles/ansible-kafka-mesos
       zookeeper_hosts: "{{ zookeeper_hosts_with_port }}"
       zookeeper_hosts_no_port_list: "{{ zookeeper_hosts_no_port.split(',') }}"
-      framework_host: "{{ hostvars[inventory_hostname]['private_dns_name'] }}"
       when: inventory_hostname == groups[inventory_group_master][0]

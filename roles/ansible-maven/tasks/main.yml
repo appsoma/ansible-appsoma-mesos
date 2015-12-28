@@ -10,7 +10,7 @@
     dest: "/opt/maven/apache-maven-{{ maven_version }}-bin.tar.gz"
   register: download_maven
 
-- name: Expand Maven tareball
+- name: Expand Maven tarball
   command: tar -xzvf "/opt/maven/apache-maven-{{ maven_version }}-bin.tar.gz" -C /opt/maven/
   when: download_maven.changed
 

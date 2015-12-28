@@ -21,7 +21,7 @@ defaults
   option http-server-close
 
 listen stats
-  bind {{ hostvars[groups[inventory_group_master][0]]['private_ip_address'] }}:9090
+  bind {{ hostvars[inventory_hostname].private_ip_address }}:9090
   balance
   mode http
   stats enable

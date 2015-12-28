@@ -156,6 +156,7 @@
     - role: ansible-haProxy
       zookeeper_host_list: "{{zookeeper_hosts_with_port}}"
       haproxy_pem_file: "cluster_vars/{{ cluster_name }}/haproxy.pem"
+      when: inventory_hostname == groups[inventory_group_master][0]
 
     # Install Appsoma Rhino
     - role: ../roles/ansible-rhino
