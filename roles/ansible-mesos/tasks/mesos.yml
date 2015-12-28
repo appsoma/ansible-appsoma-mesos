@@ -92,7 +92,7 @@
     - Restart mesos-slave
 
 - name: Start and enable mesos-master
-  service: name=mesos-master state=started
+  service: name=mesos-master state=started enabled=true
   when: mesos_install_mode == "master" or mesos_install_mode == "master-slave"
 
 - name: Remove "latest" slave link to prevent re-use failures
@@ -101,5 +101,5 @@
   failed_when: false
 
 - name: Start and enable mesos-slave
-  service: name=mesos-slave state=started
+  service: name=mesos-slave state=started enabled=true
   when: mesos_install_mode == "slave" or mesos_install_mode == "master-slave"
