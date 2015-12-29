@@ -65,6 +65,11 @@
       with_items: groups[inventory_group_master]
       when: hostvars[ item ].short_name == "master_0"
 
+    - name: Set master_1 hostname
+      set_fact: master_1_hostname="{{ item }}"
+      with_items: groups[inventory_group_master]
+      when: hostvars[ item ].short_name == "master_1"
+
     - name: Set Mesos master run mode
       set_fact: mesos_mode="{{ 'master-slave' if run_slave_on_master is defined and run_slave_on_master else 'master' }}"
 
@@ -172,7 +177,7 @@
     - role: ansible-mesos-dns
       zookeeper_host_list: "{{ zookeeper_hosts_with_port }}"
       marathon_host: "{{ hostvars[master_0_hostname].private_ip_address }}"
-      mesos_dns_hosts: "{{ groups[inventory_group_master] }}"
+      mesos_dns_hosts: "{{ [ master_0_hostname, master_1_hostname ] if (groups[inventory_group_master] | length) > 1 else [ master_0_hostname ] }}"
       is_mesos_dns_starter: true
 
     - role: ansible-cassandra-marathon
