@@ -30,9 +30,7 @@ cat >/tmp/mesos-dns-marathon.json <<EOL
 		}
 	},
 	"constraints": [
-		{% for node in mesos_dns_hosts %}
-		[ "node_name", "LIKE", "{{ hostvars[node].short_name }}.{{ cluster_name }}.internal" ],
-		{% endfor %}
+		[ "node_name", "LIKE", "master_[{{ '0-1' if (mesos_dns_hosts | length > 1) else '0' }}].{{ cluster_name }}.internal" ],
 		[ "hostname", "UNIQUE"]
 	],
 	"cpus": 0.1,

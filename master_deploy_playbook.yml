@@ -162,6 +162,12 @@
     - role: ansible-marathon
       zookeeper_hostnames: "{{ zookeeper_hosts_with_port  }}"
 
+    - role: ansible-mesos-dns
+      zookeeper_host_list: "{{ zookeeper_hosts_with_port }}"
+      marathon_host: "{{ hostvars[master_0_hostname].private_ip_address }}"
+      mesos_dns_hosts: "{{ [ master_0_hostname, master_1_hostname ] if (groups[inventory_group_master] | length) > 1 else [ master_0_hostname ] }}"
+      is_mesos_dns_starter: true
+
     # Install High Availability Proxy
     - role: ansible-haProxy
       zookeeper_host_list: "{{zookeeper_hosts_with_port}}"
@@ -173,12 +179,6 @@
       zookeeper_hostnames: "{{ zookeeper_hosts_with_port }}"
       db_folder: "{{ data_mount_point }}/rhino_db"
       when: hostvars[inventory_hostname].short_name == "master_0"
-
-    - role: ansible-mesos-dns
-      zookeeper_host_list: "{{ zookeeper_hosts_with_port }}"
-      marathon_host: "{{ hostvars[master_0_hostname].private_ip_address }}"
-      mesos_dns_hosts: "{{ [ master_0_hostname, master_1_hostname ] if (groups[inventory_group_master] | length) > 1 else [ master_0_hostname ] }}"
-      is_mesos_dns_starter: true
 
     - role: ansible-cassandra-marathon
       marathon_host: "{{ hostvars[master_0_hostname].private_ip_address }}"
