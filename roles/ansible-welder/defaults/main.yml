@@ -5,6 +5,16 @@ welder_etc_dir: "{{ appsoma_etc_dir }}/welder"
 welder_log_dir: "{{ appsoma_log_dir }}"
 welder_data_dir: "{{ data_mount_point }}/welder"
 welder_support_dir: "{{ welder_data_dir }}/support"
+
+# The following are what are emitted into the config file
+# Because this yml file assumes that welder is running in a container
+# the following are in container folder space
+welder_config_data_dir: "/welder"
+welder_config_projects_dir: "/welder/projects"
+welder_config_uploads_dir: "/welder/uploads"
+welder_config_support_dir: "/welder/support"
+welder_config_log_dir: "/welder/log"
+
 welder_db_type: "mongo"
 
 welder_use_tls: false
