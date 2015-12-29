@@ -111,7 +111,7 @@
         - browserify
         - mocha
         - nodejs-websocket
-        - phantomjs
+#        - phantomjs
         - process
         - require
         - scribe-js
