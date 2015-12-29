@@ -25,6 +25,7 @@
           {% for item in groups[inventory_group_master] -%}
             {{ comma() }}{{ hostvars[item].private_ip_address }}:{{ zookeeper_client_port }}
           {%- endfor %}
+
     - name:  Set zookeeper private IP list
       set_fact:
         zookeeper_hosts_no_port: |
@@ -32,8 +33,14 @@
           {% for item in groups[inventory_group_master] -%}
             {{ comma() }}{{ hostvars[item].private_ip_address }}
           {%- endfor %}
+
+    - name: Set master_0 hostname
+      set_fact: master_0_hostname="{{ item }}"
+      with_items: groups[inventory_group_master]
+      when: hostvars[ item ].short_name == "master_0"
+
   roles:
     - role: ../roles/ansible-kafka-mesos
       zookeeper_hosts: "{{ zookeeper_hosts_with_port }}"
       zookeeper_hosts_no_port_list: "{{ zookeeper_hosts_no_port.split(',') }}"
-      when: inventory_hostname == groups[inventory_group_master][0]
+      when: inventory_hostname == master_0_hostname

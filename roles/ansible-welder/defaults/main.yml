@@ -1,6 +1,6 @@
 welder_user: "ubuntu"
 welder_port: 8890
-welder_src_dir: "{{ welder_data_dir }}/src"
+welder_src_dir: "/opt/welder"
 welder_etc_dir: "{{ appsoma_etc_dir }}/welder"
 welder_log_dir: "{{ appsoma_log_dir }}"
 welder_data_dir: "{{ data_mount_point }}/welder"

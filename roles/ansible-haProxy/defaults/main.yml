@@ -1,7 +1,6 @@
 use_package: false
 use_source: true
 haproxy_version: "v1.5.0"
-marathon_server: "{{ hostvars[groups[inventory_group_master][0]]['private_ip_address'] }}:8080"
 haproxy_pem_file: "cluster_vars/{{ cluster_name }}/haproxy.pem"
 #gandalf_version: "v0.2"
 gandalf_log_dir : "{{ appsoma_log_dir }}"

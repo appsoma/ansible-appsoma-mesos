@@ -51,10 +51,10 @@
   notify:
     - Restart Marathon
 
-- name: Set --hostname option
-  lineinfile: line={{ marathon_hostname }} dest=/etc/marathon/conf/hostname create=yes
-  notify:
-    - Restart Marathon
+#- name: Set --hostname option
+#  lineinfile: line={{ marathon_hostname }} dest=/etc/marathon/conf/hostname create=yes
+#  notify:
+#    - Restart Marathon
 
 - name: Set --http-port option
   lineinfile: line={{ marathon_port }} dest=/etc/marathon/conf/http_port create=yes

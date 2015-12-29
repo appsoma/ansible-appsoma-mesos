@@ -41,10 +41,15 @@
     - name: Set zookeeper private IP list with port
       set_fact:
         zookeeper_hosts_with_port: |
-          {% set comma = joiner(':' + zookeeper_client_port + ',') %}
+          {% set comma = joiner(',') %}
           {% for item in groups[inventory_group_master] -%}
             {{ comma() }}{{ hostvars[item].private_ip_address }}:{{ zookeeper_client_port }}
           {%- endfor %}
+
+    - name: Set master_0 hostname
+      set_fact: master_0_hostname="{{ item }}"
+      with_items: inventory_group_master
+      when: hostvars[ item ].short_name == "master_0"
 
     - name: Save zookeeper private IP list to bash profile
       lineinfile: dest=/etc/profile.d/appsoma_env.sh line="export ZK_HOST_LIST={{ zookeeper_hosts_with_port }}" state=present create=yes
@@ -119,8 +124,8 @@
       when: use_docker_registry is not defined or not use_docker_registry
 
     - role: ansible-docker
-      registry_host: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
-      marathon_host: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
+      registry_host: "{{ hostvars[master_0_hostname].private_ip_address }}"
+      marathon_host: "{{ hostvars[groups[master_0_hostname].private_ip_address }}"
       when: use_docker_registry is defined and use_docker_registry
 
     # Create an users
@@ -235,8 +240,8 @@
     # Install Mesos DNS in a container
     - role: ansible-mesos-dns
       zookeeper_host_list: "{{ zookeeper_hosts_with_port }}"
-      marathon_host: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
-      mesos_dns_hosts: [ "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}" ]
+      marathon_host: "{{ zookeeper_hosts }}"
+      mesos_dns_hosts: [ "{{ ].private_ip_address }}" ]
       is_mesos_dns_starter: "{{ true if inventory_hostname in groups[inventory_group_master][0] else false }}"
 
     - role: ansible-filebeat
@@ -253,26 +258,26 @@
     - role: ../roles/ansible-rhino
       zookeeper_hostnames: "{{ zookeeper_hosts_with_port }}"
       db_folder: "{{ data_mount_point }}/rhino_db"
-      when: inventory_hostname == groups[inventory_group_master][0]
+      when: inventory_hostname == master_0_hostname
 
     # Install Mesosphere Marathon
     - role: ansible-cassandra-marathon
-      marathon_host: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
-      when: inventory_hostname == groups[inventory_group_master][0]
+      marathon_host: "{{ hostvars[master_0_hostname].private_ip_address }}"
+      when: inventory_hostname == master_0_hostname
 
     # Install Kafka Mesos framework
     - role: ../roles/ansible-kafka-mesos
       zookeeper_hosts: "{{ zookeeper_hosts_with_port }}"
       zookeeper_hosts_no_port_list: "{{ zookeeper_hosts_no_port.split(',') }}"
       framework_host: "{{ hostvars[inventory_hostname]['private_dns_name'] }}"
-      when: "use_kafka is defined and use_kafka and inventory_hostname == groups[inventory_group_master][0]"
+      when: "use_kafka is defined and use_kafka and inventory_hostname == master_0_hostname"
 
     # Install Storm Mesos framework
     - role: ../roles/ansible-storm-mesos
       zookeeper_hosts: "{{ zookeeper_hosts_with_port }}"
       zookeeper_hosts_no_port_list: "{{ zookeeper_hosts_no_port.split(',') }}"
       framework_host: "{{ hostvars[inventory_hostname]['private_dns_name'] }}"
-      when: "use_storm is defined and use_storm and inventory_hostname == groups[inventory_group_master][0]"
+      when: "use_storm is defined and use_storm and inventory_hostname == master_0_hostname"
 
 # Install HAProxy
 - include: playbooks/haproxy_playbook.yml

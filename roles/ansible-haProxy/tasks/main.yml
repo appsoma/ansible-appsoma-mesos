@@ -57,7 +57,7 @@
   args:
     chdir: /opt/haproxy/gandalf
   register: start_gandalf
-  failed_when: " start_gandalf.stderr != '' and ( start_gandalf.stderr.find('already exists') == -1 and start_gandalf.stderr.find('object is not callable') == -1) "
+  failed_when: "start_gandalf.stderr != '' and ( start_gandalf.stderr.find('already exists') == -1 and start_gandalf.stderr.find('object is not callable') == -1) "
 
 - name: Wait for Gandalf to start
   wait_for: host=127.0.0.1 port=2288
