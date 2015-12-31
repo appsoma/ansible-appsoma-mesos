@@ -1,0 +1,131 @@
+---
+- hosts: localhost
+  connection: local
+  vars_files:
+    - "../cluster_vars/common.yml"
+    - "../cluster_vars/{{ cluster_name }}/required_vars.yml"
+    - "../cluster_vars/{{ cluster_name }}/aws_secret_vars.yml"
+  roles:
+    - role: ../roles/ansible-cloud-inventory-parse
+      provider: "{{ cloud_provider }}"
+
+# Check for SSH port function
+- hosts: [ "{{ inventory_group_master }}" ]
+  remote_user: "{{ management_user }}"
+  gather_facts: no
+  vars_files:
+    - "../cluster_vars/common.yml"
+    - "../cluster_vars/{{ cluster_name }}/required_vars.yml"
+  roles:
+    - role: ../roles/ansible-find-ssh
+      when: alternate_ssh_port is defined
+
+- hosts: [ "{{ inventory_group_master }}" ]
+  remote_user: "{{ management_user }}"
+  sudo: True
+  vars_files:
+    - "../cluster_vars/common.yml"
+    - "../cluster_vars/{{ cluster_name }}/required_vars.yml"
+    - "../cluster_vars/{{ cluster_name }}/users.yml"
+  pre_tasks:
+    - name: Set master_0 hostname
+      set_fact: master_0_hostname="{{ item }}"
+      with_items: groups[inventory_group_master]
+      when: hostvars[ item ].short_name == "master_0"
+
+    - name: Set master_1 hostname
+      set_fact: master_1_hostname="{{ item }}"
+      with_items: groups[inventory_group_master]
+      when: hostvars[ item ].short_name == "master_1"
+
+    - name: Add AWS vars
+      include_vars: "../cluster_vars/{{ cluster_name }}/aws_secret_vars.yml"
+      no_log: true
+      when: "(cloud_provider is defined and cloud_provider == 'ec2') or (use_docker_registry is defined and use_docker_registry)"
+
+    - name: Find NFS Server IP
+      set_fact: nfs_server_ip={{ hostvars[groups[inventory_group_service][0]]['private_ip_address'] }}
+      when: groups[inventory_group_service] is defined
+
+    - name: Set zookeeper private IP list with port
+      set_fact:
+        zookeeper_hosts_with_port: |
+          {% set comma = joiner(',') %}
+          {% for item in groups[inventory_group_master] -%}
+            {{ comma() }}{{ hostvars[item].private_ip_address }}:{{ zookeeper_client_port }}
+          {%- endfor %}
+
+    - name:  Set zookeeper private IP list
+      set_fact:
+        zookeeper_hosts_no_port: |
+          {% set comma = joiner(',') %}
+          {% for item in groups[inventory_group_master] -%}
+            {{ comma() }}{{ hostvars[item].private_ip_address }}
+          {%- endfor %}
+
+  roles:
+    - role: ../roles/ansible-mesos-dns
+      zookeeper_host_list: "{{ zookeeper_hosts_with_port }}"
+      marathon_host: "{{ hostvars[master_0_hostname].private_ip_address }}"
+      mesos_dns_hosts: "{{ [ master_0_hostname, master_1_hostname ] if (groups[inventory_group_master] | length) > 1 else [ master_0_hostname ] }}"
+      is_mesos_dns_starter: true
+      when: inventory_hostname == master_0_hostname
+
+    # Install High Availability Proxy
+#    - role: ../roles/ansible-haProxy
+#      zookeeper_host_list: "{{zookeeper_hosts_with_port}}"
+#      haproxy_pem_file: "cluster_vars/{{ cluster_name }}/haproxy.pem"
+#      when: hostvars[inventory_hostname].short_name == "master_0"
+
+    # Install Appsoma Rhino
+#    - role: ../roles/ansible-rhino
+#      zookeeper_hostnames: "{{ zookeeper_hosts_with_port }}"
+#      db_folder: "{{ data_mount_point }}/rhino_db"
+#      when: hostvars[inventory_hostname].short_name == "master_0"
+
+    - role: ../roles/ansible-cassandra-marathon
+      marathon_host: "{{ hostvars[master_0_hostname].private_ip_address }}"
+      when: inventory_hostname == master_0_hostname
+
+    # Install the Kafka framework
+    - role: ../roles/ansible-kafka-mesos
+      when: "use_kafka is defined and use_kafka and inventory_hostname == master_0_hostname"
+
+    # Install the Storm framework
+    - role: ../roles/ansible-storm-mesos
+      zookeeper_hosts: "{{ zookeeper_hosts_with_port }}"
+      zookeeper_hosts_no_port_list: "{{ zookeeper_hosts_no_port.split(',') }}"
+      framework_host: "{{ hostvars[inventory_hostname]['private_dns_name'] }}"
+      when: "use_storm is defined and use_storm and inventory_hostname == master_0_hostname"
+
+    # Install monitoring
+    - role: ../roles/ansible-elk
+      when: use_monitoring is defined and use_monitoring
+
+    - role: ../roles/ansible-rabbitmq
+      when: use_monitoring is defined and use_monitoring and inventory_hostname == master_0_hostname
+
+    - role: ../roles/ansible-redis
+      when: use_monitoring is defined and use_monitoring and inventory_hostname == master_0_hostname
+
+    - role: ../roles/ansible-influxdb
+      when: use_monitoring is defined and use_monitoring and inventory_hostname == master_0_hostname
+
+    - role: ../roles/ansible-grafana
+      when: use_monitoring is defined and use_monitoring and inventory_hostname == master_0_hostname
+
+    - role: ../roles/ansible-sensu
+      sensu_mode: "master"
+      sensu_master: "{{ hostvars[master_0_hostname].private_ip_address }}"
+      mesos_master_list: "{{ zookeeper_hosts_no_port }}"
+      system_name: "{{ hostvars[inventory_hostname].system_name }}"
+      ip_address: "{{ hostvars[inventory_hostname].private_ip_address }}"
+      when: use_monitoring is defined and use_monitoring
+
+    - role: ../roles/ansible-filebeat
+      mesos_log_dir: "{{ mesos_work_dir }}/mesos_log"
+      mesos_dir: "{{ mesos_work_dir }} "
+      appsoma_dir: "{{ appsoma_log_dir }}"
+      node_type: "{{ hostvars[inventory_hostname].type }}"
+      node_name: "{{ hostvars[inventory_hostname].short_name }}"
+      when: use_monitoring is defined and use_monitoring

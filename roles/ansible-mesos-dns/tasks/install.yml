@@ -6,3 +6,13 @@
 
 - name: Start Mesos-DNS in Marathon
   shell: "{{ mesos_dns_dir }}/run_mesos_dns.sh start"
+  register: startup
+  until: startup.stderr.find('Failed to connect') == -1
+  retries: 5
+  delay: 10
+
+- name: Check if Mesos-DNS submission worked
+  shell: "curl http://{{marathon_host}}:8080/v2/apps"
+  register: apps
+  changed_when: false
+  failed_when: apps.stdout.find('"id":"/mesos-dns"') == -1
