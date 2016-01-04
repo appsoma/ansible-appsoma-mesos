@@ -23,16 +23,16 @@
   register: git_pull
 
 - name: Copy Terraform executables
-  copy: src="terraform_{{ terraform_version }}/{{ item }}" dest="/usr/local/bin/{{ item }}" owner="{{ management_user }}" mode=0777
+  copy: src="{{ root_dir }}terraform_{{ terraform_version }}/{{ item }}" dest="/usr/local/bin/{{ item }}" owner="{{ management_user }}" mode=0777
   with_items: terraform_executables
   when: is_scaler_host
 
 - name: Make Ansible cluster variable dir
-  file: path="{{ ansible_scaler_dir }}/cluster_vars/{{ cluster_name }}" state=directory owner="{{ management_user }}"
+  file: path="{{ root_dir }}{{ ansible_scaler_dir }}/cluster_vars/{{ cluster_name }}" state=directory owner="{{ management_user }}"
 
 - name: Add Ansible variable files
   copy:
-    src: "cluster_vars/{{ cluster_name }}/{{ item }}"
+    src: "{{ root_dir }}cluster_vars/{{ cluster_name }}/{{ item }}"
     dest: "{{ ansible_scaler_dir }}/cluster_vars/{{ cluster_name }}/{{ item }}"
     owner: "{{ management_user }}"
     mode: 0600

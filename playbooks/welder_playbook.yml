@@ -45,6 +45,7 @@
 
     # Install the scaler from repo
     - role: ../roles/ansible-ansible-scaler
+      root_dir: "../"
       when: "use_ansible_scaler is defined and use_ansible_scaler and inventory_hostname == master_0_hostname"
 
     - role: ../roles/ansible-welder
