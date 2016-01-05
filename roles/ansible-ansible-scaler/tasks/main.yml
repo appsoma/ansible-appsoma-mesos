@@ -28,7 +28,7 @@
   when: is_scaler_host
 
 - name: Make Ansible cluster variable dir
-  file: path="{{ root_dir }}{{ ansible_scaler_dir }}/cluster_vars/{{ cluster_name }}" state=directory owner="{{ management_user }}"
+  file: path="{{ ansible_scaler_dir }}/cluster_vars/{{ cluster_name }}" state=directory owner="{{ management_user }}"
 
 - name: Add Ansible variable files
   copy:

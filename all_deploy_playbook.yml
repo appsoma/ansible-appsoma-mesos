@@ -48,8 +48,13 @@
 
     - name: Set master_0 hostname
       set_fact: master_0_hostname="{{ item }}"
-      with_items: inventory_group_master
+      with_items: groups[inventory_group_master]
       when: hostvars[ item ].short_name == "master_0"
+
+    - name: Set master_1 hostname
+      set_fact: master_1_hostname="{{ item }}"
+      with_items: groups[inventory_group_master]
+      when: hostvars[ item ].short_name == "master_1"
 
     - name: Save zookeeper private IP list to bash profile
       lineinfile: dest=/etc/profile.d/appsoma_env.sh line="export ZK_HOST_LIST={{ zookeeper_hosts_with_port }}" state=present create=yes
@@ -125,7 +130,7 @@
 
     - role: ansible-docker
       registry_host: "{{ hostvars[master_0_hostname].private_ip_address }}"
-      marathon_host: "{{ hostvars[groups[master_0_hostname].private_ip_address }}"
+      marathon_host: "{{ hostvars[master_0_hostname].private_ip_address }}"
       when: use_docker_registry is defined and use_docker_registry
 
     # Create an users
@@ -189,39 +194,6 @@
       zookeeper_id: "{{ hostvars[inventory_hostname]['zoo_id'] }}"
       when: inventory_hostname in groups[inventory_group_master]
 
-    # Monitoring tools
-    - role: ansible-elk
-      run_once: true
-      when: inventory_hostname in groups[inventory_group_master] and false
-
-    - role: ansible-rabbitmq
-      run_once: true
-      when: inventory_hostname in groups[inventory_group_master]
-
-    - role: ansible-redis
-      run_once: true
-      when: inventory_hostname in groups[inventory_group_master]
-
-    - role: ansible-influxdb
-      run_once: true
-      when: inventory_hostname in groups[inventory_group_master]
-
-    - role: ansible-grafana
-      run_once: true
-      when: inventory_hostname in groups[inventory_group_master]
-
-    - role: ansible-sensu
-      sensu_mode: "{{ 'master' if inventory_hostname == groups[inventory_group_master][0] else 'client' }}"
-      sensu_master: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
-      marathon_host: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
-      mesos_master_list: "{{ zookeeper_hosts_no_port }}"
-      system_name: "{{ hostvars[inventory_hostname].system_name }}"
-      ip_address: "{{ hostvars[inventory_hostname].private_ip_address }}"
-
-    # Install the auto-scaler tools
-    - role: ansible-ansible-scaler
-      when: "use_ansible_scaler is defined and use_ansible_scaler and inventory_hostname in groups[inventory_group_master]"
-
     # Install Mesos
     - role: ansible-mesos
       zookeeper_hostnames: "{{ zookeeper_hosts_with_port  }}"
@@ -237,49 +209,26 @@
       zookeeper_hostnames: "{{ zookeeper_hosts_with_port  }}"
       when: inventory_hostname == groups[inventory_group_master]
 
-    # Install Mesos DNS in a container
-    - role: ansible-mesos-dns
-      zookeeper_host_list: "{{ zookeeper_hosts_with_port }}"
-      marathon_host: "{{ zookeeper_hosts }}"
-      mesos_dns_hosts: [ "{{ ].private_ip_address }}" ]
-      is_mesos_dns_starter: "{{ true if inventory_hostname in groups[inventory_group_master][0] else false }}"
-
     - role: ansible-filebeat
       mesos_log_dir: "{{ mesos_work_dir }}/mesos_log"
       mesos_dir: "{{ mesos_work_dir }} "
       appsoma_dir: "{{ appsoma_log_dir }}"
       node_type: "{{ hostvars[inventory_hostname].type }}"
       node_name: "{{ hostvars[inventory_hostname].short_name }}"
-      when: false
+      when: use_monitoring is defined and use_monitoring
 
-####### Install cluster worker frameworks and tools #######
+    - role: ansible-sensu
+      sensu_mode: "client-master"
+      sensu_master: "{{ hostvars[master_0_hostname].private_ip_address }}"
+      mesos_master_list: "{{ zookeeper_hosts_no_port }}"
+      system_name: "{{ hostvars[inventory_hostname].system_name }}"
+      ip_address: "{{ hostvars[inventory_hostname].private_ip_address }}"
+      when: use_monitoring is defined and use_monitoring
 
-    # Install Appsoma Rhino
-    - role: ../roles/ansible-rhino
-      zookeeper_hostnames: "{{ zookeeper_hosts_with_port }}"
-      db_folder: "{{ data_mount_point }}/rhino_db"
-      when: inventory_hostname == master_0_hostname
-
-    # Install Mesosphere Marathon
-    - role: ansible-cassandra-marathon
+    - role: ../roles/ansible-mesos-dns
+      zookeeper_host_list: "{{ zookeeper_hosts_with_port }}"
       marathon_host: "{{ hostvars[master_0_hostname].private_ip_address }}"
-      when: inventory_hostname == master_0_hostname
+      mesos_dns_hosts: "{{ [ master_0_hostname, master_1_hostname ] if (groups[inventory_group_master] | length) > 1 else [ master_0_hostname ] }}"
 
-    # Install Kafka Mesos framework
-    - role: ../roles/ansible-kafka-mesos
-      zookeeper_hosts: "{{ zookeeper_hosts_with_port }}"
-      zookeeper_hosts_no_port_list: "{{ zookeeper_hosts_no_port.split(',') }}"
-      framework_host: "{{ hostvars[inventory_hostname]['private_dns_name'] }}"
-      when: "use_kafka is defined and use_kafka and inventory_hostname == master_0_hostname"
-
-    # Install Storm Mesos framework
-    - role: ../roles/ansible-storm-mesos
-      zookeeper_hosts: "{{ zookeeper_hosts_with_port }}"
-      zookeeper_hosts_no_port_list: "{{ zookeeper_hosts_no_port.split(',') }}"
-      framework_host: "{{ hostvars[inventory_hostname]['private_dns_name'] }}"
-      when: "use_storm is defined and use_storm and inventory_hostname == master_0_hostname"
-
-# Install HAProxy
-- include: playbooks/haproxy_playbook.yml
-# Install welder
+- include: playbooks/marathon_services.yml
 - include: playbooks/welder_playbook.yml
