@@ -207,7 +207,7 @@
     # Install Marathon
     - role: ansible-marathon
       zookeeper_hostnames: "{{ zookeeper_hosts_with_port  }}"
-      when: inventory_hostname == groups[inventory_group_master]
+      when: inventory_hostname in groups[inventory_group_master]
 
     - role: ansible-filebeat
       mesos_log_dir: "{{ mesos_work_dir }}/mesos_log"

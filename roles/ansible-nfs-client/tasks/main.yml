@@ -1,14 +1,16 @@
 - name: install nfs client
-  apt: pkg=nfs-common state=present
+  apt: pkg={{ item }} state=present update_cache=yes
+  with_items:
+    - nfs-common
+    - rpcbind
   when: ansible_os_family == "Debian" and package_install != 'False'
 
 - name: install nfs client
-  yum: pkg=nfs-utils state=present
+  yum: pkg={{ item }} state=present
+  with_items:
+    - nfs-utils
+    - rpcbind
   when: ansible_os_family == "RedHat" and package_install != 'False'
-
-- name: Ensure rpcbind is running (CentOS)
-  service: name=rpcbind state=started enabled=yes
-  when: ansible_os_family == "RedHat"
 
 - name: Ensure portmap is running (Ubuntu prior to Trusty Thar)
   service: name=portmap state=started enabled=yes
