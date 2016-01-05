@@ -2,9 +2,9 @@
   when: is_mesos_dns_starter
 
 - name: Add Mesos-DNS as nameserver
-  lineinfile: dest=/etc/resolvconf/resolv.conf.d/head line="nameserver {{ hostvars[item].private_ip_address }}"
+  lineinfile: dest=/etc/resolvconf/resolv.conf.d/head line="nameserver {{ item }}"
   register: add_ns
-  with_items: mesos_dns_hosts
+  with_items: "mesos_dns_hosts.split(',')"
 
 - name: Add "mesos" domain search
   lineinfile: dest=/etc/resolvconf/resolv.conf.d/base line="search mesos"

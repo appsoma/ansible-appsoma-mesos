@@ -93,8 +93,8 @@
 
     - role: ../roles/ansible-mesos-dns
       zookeeper_host_list: "{{ zookeeper_hosts_with_port }}"
-      marathon_host: "{{ hostvars[master_0_hostname].private_ip_address }}"
-      mesos_dns_hosts: "{{ [ master_0_hostname, master_1_hostname ] if (groups[inventory_group_master] | length) > 1 else [ master_0_hostname ] }}"
+      marathon_host: "{{ master_0_ip }}"
+      mesos_dns_hosts: "{{ master_0_ip }}{{ ',' + master_1_ip if master_1_ip is defined else ''}}"
 
     # Install mesos in slave mode
     - role: ansible-mesos
