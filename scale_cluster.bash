@@ -9,8 +9,8 @@ do
   key="$1"
   case $key in
     --attributes)
-      ATTRIBUTES="-e extra_slave_attributes=$2"
       shift
+      ATTRIBUTES="-e extra_slave_attributes=$1"
     ;;
     --plan_only)
       PLAN_ONLY="-e terraform_plan_only=true"
