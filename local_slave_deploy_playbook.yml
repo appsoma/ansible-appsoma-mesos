@@ -91,8 +91,10 @@
       user_list: "{{ welder_user_list }}"
       dataDir: "{{ data_mount_point }}"
 
-    - role: ansible-mesos-dns
-      mesos_dns_hosts: [ "{{ mesos_master_ip_list }}" ]
+    - role: ../roles/ansible-mesos-dns
+      zookeeper_host_list: "{{ zookeeper_hosts_with_port }}"
+      marathon_host: "{{ master_0_ip }}"
+      mesos_dns_hosts: "{{ master_0_ip }}{{ ',' + master_1_ip if master_1_ip is defined else ''}}"
 
     # Install mesos in slave mode
     - role: ansible-mesos
@@ -110,3 +112,4 @@
       system_name: "{{ system_name }}"
       ip_address: "{{ ansible_default_ipv4.address }}"
       package_install: "{{ install_packages }}"
+      when: use_monitoring is defined and use_monitoring

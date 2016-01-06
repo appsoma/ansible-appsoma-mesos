@@ -8,6 +8,17 @@
   roles:
     - role: ../roles/ansible-cloud-inventory-parse
       provider: "{{ cloud_provider }}"
+  post_tasks:
+
+    - name: Set master_0 hostname
+      set_fact: master_0_hostname="{{ item }}"
+      with_items: groups[inventory_group_master]
+      when: hostvars[ item ].short_name == "master_0"
+
+    - name: Set master_1 hostname
+      set_fact: master_1_hostname="{{ item }}"
+      with_items: groups[inventory_group_master]
+      when: hostvars[ item ].short_name == "master_1"
 
 # Check for SSH port function
 - hosts: [ "{{ inventory_group_master }}" ]
@@ -59,11 +70,6 @@
           {% for item in groups[inventory_group_master] -%}
             {{ comma() }}{{ hostvars[item].private_ip_address }}
           {%- endfor %}
-          
-    - name: Set master_0 hostname
-      set_fact: master_0_hostname="{{ item }}"
-      with_items: groups[inventory_group_master]
-      when: hostvars[ item ].short_name == "master_0"
 
     - name: Set Mesos master run mode
       set_fact: mesos_mode="{{ 'master-slave' if run_slave_on_master is defined and run_slave_on_master else 'master' }}"
@@ -157,52 +163,15 @@
     - role: ansible-marathon
       zookeeper_hostnames: "{{ zookeeper_hosts_with_port  }}"
 
-    # Install High Availability Proxy
-    - role: ansible-haProxy
-      zookeeper_host_list: "{{zookeeper_hosts_with_port}}"
-      haproxy_pem_file: "cluster_vars/{{ cluster_name }}/haproxy.pem"
-      when: hostvars[inventory_hostname].short_name == "master_0"
-
-    # Install Appsoma Rhino
-    - role: ../roles/ansible-rhino
-      zookeeper_hostnames: "{{ zookeeper_hosts_with_port }}"
-      db_folder: "{{ data_mount_point }}/rhino_db"
-      when: hostvars[inventory_hostname].short_name == "master_0"
-
-    - role: ansible-mesos-dns
-      zookeeper_host_list: "{{ zookeeper_hosts_with_port }}"
-      marathon_host: "{{ hostvars[master_0_hostname].private_ip_address }}"
-      mesos_dns_hosts: "{{ groups[inventory_group_master] }}"
-      is_mesos_dns_starter: true
-
-    - role: ansible-cassandra-marathon
-      marathon_host: "{{ hostvars[master_0_hostname].private_ip_address }}"
-
-    # Install monitoring
-    - role: ansible-elk
-      when: use_monitoring is defined and use_monitoring
-
-    - role: ansible-rabbitmq
-      when: use_monitoring is defined and use_monitoring and inventory_hostname == master_0_hostname
-
-    - role: ansible-redis
-      when: use_monitoring is defined and use_monitoring and inventory_hostname == master_0_hostname
-
-    - role: ansible-influxdb
-      when: use_monitoring is defined and use_monitoring and inventory_hostname == master_0_hostname
-
-    - role: ansible-grafana
-      when: use_monitoring is defined and use_monitoring and inventory_hostname == master_0_hostname
-
     - role: ansible-sensu
-      sensu_mode: "{{ 'master' if inventory_hostname == master_0_hostname else 'client-master' }}"
+      sensu_mode: "client-master"
       sensu_master: "{{ hostvars[master_0_hostname].private_ip_address }}"
       mesos_master_list: "{{ zookeeper_hosts_no_port }}"
       system_name: "{{ hostvars[inventory_hostname].system_name }}"
       ip_address: "{{ hostvars[inventory_hostname].private_ip_address }}"
       when: use_monitoring is defined and use_monitoring
 
-    - role: ansible-filebeat
+    - role: ../roles/ansible-filebeat
       mesos_log_dir: "{{ mesos_work_dir }}/mesos_log"
       mesos_dir: "{{ mesos_work_dir }} "
       appsoma_dir: "{{ appsoma_log_dir }}"
@@ -210,21 +179,6 @@
       node_name: "{{ hostvars[inventory_hostname].short_name }}"
       when: use_monitoring is defined and use_monitoring
 
-    # Install the Kafka framework
-    - role: ansible-kafka-mesos
-      when: "use_kafka is defined and use_kafka and inventory_hostname == master_0_hostname"
-
-    # Install the Storm framework
-    - role: ansible-storm-mesos
-      zookeeper_hosts: "{{ zookeeper_hosts_with_port }}"
-      zookeeper_hosts_no_port_list: "{{ zookeeper_hosts_no_port.split(',') }}"
-      framework_host: "{{ hostvars[inventory_hostname]['private_dns_name'] }}"
-      when: "use_storm is defined and use_storm and inventory_hostname == master_0_hostname"
-
-    # Install the scaler from repo
-    - role: ansible-ansible-scaler
-      when: "use_ansible_scaler is defined and use_ansible_scaler and inventory_hostname == master_0_hostname"
-
-
+- include: playbooks/marathon_services.yml
 - include: playbooks/welder_playbook.yml
 

@@ -1,6 +1,6 @@
 ---
 - name: Ensure NFS utilities are installed.
-  apt: pkg="{{ item }}" state=installed
+  apt: pkg="{{ item }}" state=installed update_cache=yes
   with_items:
     - nfs-common
     - nfs-kernel-server

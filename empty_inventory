@@ -1,0 +1,2 @@
+"This file is intentionally not useful, since Ansible requires an inventory file, even when it's not performing"
+"any operation which requires an inventory.  This exists to handle terraform creation/scaling scripts."

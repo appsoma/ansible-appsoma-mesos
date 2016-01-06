@@ -1,6 +1,6 @@
 ansible_scaler_dir: "{{ data_mount_point }}/ansible-scaler"
 is_scaler_host: true
-
+root_dir: ""
 
 terraform_version: "0.6.4"
 terraform_cloud_provider:

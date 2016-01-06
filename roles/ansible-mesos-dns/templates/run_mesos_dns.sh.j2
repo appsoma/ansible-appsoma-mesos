@@ -30,12 +30,12 @@ cat >/tmp/mesos-dns-marathon.json <<EOL
 		}
 	},
 	"constraints": [
-		[ "node_type", "LIKE", "master" ],
+		[ "node_name", "LIKE", "master_[{{ '0-1' if masters.count > 1 else '0' }}].{{ cluster_name }}.internal" ],
 		[ "hostname", "UNIQUE"]
 	],
 	"cpus": 0.1,
 	"mem": 256,
-	"instances": 1
+	"instances": {{ masters.count if masters.count < 2 else 2 }}
 }
 EOL
 

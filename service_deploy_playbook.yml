@@ -45,6 +45,16 @@
             {{ comma() }}{{ hostvars[item].private_ip_address }}
           {%- endfor %}
 
+    - name: Set master_0 hostname
+      set_fact: master_0_hostname="{{ item }}"
+      with_items: groups[inventory_group_master]
+      when: hostvars[ item ].short_name == "master_0"
+
+    - name: Set master_1 hostname
+      set_fact: master_1_hostname="{{ item }}"
+      with_items: groups[inventory_group_master]
+      when: hostvars[ item ].short_name == "master_1"
+
     - name: Format data volume
       filesystem: fstype=ext4 dev="/dev/xvdf"
       when: inventory_hostname == groups[inventory_group_service][0]
@@ -103,12 +113,16 @@
           "opts": "{{private_lan_subnet}}(rw,sync,no_subtree_check,no_root_squash,nohide)"
       when: inventory_hostname == groups[inventory_group_service][0]
 
-    - role: ansible-mesos-dns
-      mesos_dns_hosts: [ "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}" ]
+    - role: ../roles/ansible-mesos-dns
+      zookeeper_host_list: "{{ zookeeper_hosts_with_port }}"
+      marathon_host: "{{ hostvars[master_0_hostname].private_ip_address }}"
+      mesos_dns_hosts: "{{ [ hostvars[master_0_hostname].private_ip_address ] }}{{ ',' + hostvars[master_1_hostname].private_ip_address if masters.count > 1 else ''}}"
+
 
     - role: ansible-sensu
       sensu_mode: "client"
-      sensu_master: "{{ hostvars[groups[inventory_group_master][0]]['private_ip_address'] }}"
+      sensu_master: "{{ hostvars[master_0_hostname].private_ip_address }}"
       mesos_master_list: "{{ zookeeper_hosts_no_port }}"
       system_name: "{{ hostvars[inventory_hostname].system_name }}"
       ip_address: "{{ hostvars[inventory_hostname].private_ip_address }}"
+      when: use_monitoring is defined and use_monitoring

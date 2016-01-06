@@ -37,3 +37,6 @@
 - name: Fix logrotate to rotate mesos files
   template: src=mesos.rotate.j2 dest=/etc/logrotate.d/mesos
   notify: Restart rsyslog
+
+- name: Add cron to restart rsyslog twice a day
+  lineinfile: dest=/etc/cron.d/rsyslog line="0 0,12 * * * root service rsyslog restart" state=present create=yes

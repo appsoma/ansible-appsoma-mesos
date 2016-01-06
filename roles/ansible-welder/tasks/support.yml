@@ -37,8 +37,8 @@
   sudo: yes
   sudo_user: "{{ management_user }}"
 
-- name: Compile and Start Java Kayak
-  shell: "./kayak_java.sh start"
+- name: Start Java Kayak Marathon
+  shell: "./kayak_java_http.sh start"
   args:
      chdir: "{{ welder_support_dir }}/kayak_java"
   sudo: yes

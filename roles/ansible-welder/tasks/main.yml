@@ -1,6 +1,9 @@
 - name: Create Welder dir
   file: path="{{ welder_src_dir }}" state=directory owner="{{ management_user }}" group="{{ management_user }}"
 
+- name: Create Welder data dir
+  file: path="{{ welder_data_dir }}" state=directory
+
 - include: mongo.yml
   when: welder_db_type == "mongo"
 
