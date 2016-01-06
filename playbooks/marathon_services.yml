@@ -74,7 +74,7 @@
     # Install High Availability Proxy
     - role: ../roles/ansible-haProxy
       zookeeper_host_list: "{{zookeeper_hosts_with_port}}"
-      haproxy_pem_file: "cluster_vars/{{ cluster_name }}/haproxy.pem"
+      haproxy_pem_file: "../cluster_vars/{{ cluster_name }}/haproxy.pem"
       when: hostvars[inventory_hostname].short_name == "master_0"
 
     # Install Appsoma Rhino
