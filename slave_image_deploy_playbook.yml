@@ -70,6 +70,7 @@
     - role: ansible-sensu
       sensu_mode: "client-slave"
       ip_address: "{{ hostvars[inventory_hostname].private_ip_address }}"
+      when: use_monitoring is defined and use_monitoring
 
     - role: ansible-ansible-scaler
       is_scaler_host: false
