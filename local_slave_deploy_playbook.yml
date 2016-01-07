@@ -59,6 +59,7 @@
       halo_agent_key: "{{ cp_agent_key }}"
       halo_agent_tag: "{{ cp_agent_tag }}"
       package_install: "{{ install_packages }}"
+      force_new_halo_id: true
       when: use_halo is defined and use_halo
 
     # Add UFW firewall if selected (should not be used with halo)

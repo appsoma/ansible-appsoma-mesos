@@ -15,10 +15,17 @@
   register: cphalo_id
   failed_when: false
   changed_when: cphalo_id.state == 'absent'
+  when: not force_new_halo_id
+
+- name: Test if cphalo already has a id
+  file: path=/opt/cloudpassage/data/id state=absent
+  register: cphalo_id
+  changed_when: cphalo_id.state == 'absent'
+  when: force_new_halo_id
 
 - name: Configure cphalod to create an ID
   shell: "sudo /opt/cloudpassage/bin/configure --agent-key={{ halo_agent_key }} --tag={{ halo_agent_tag }}"
-  when: "create_halo_id and cphalo_id is defined and cphalo_id.state == 'absent'"
+  when: "force_new_halo_id or (create_halo_id and cphalo_id is defined and cphalo_id.state == 'absent')"
 
 - name: Start cphalod
   shell: "/etc/init.d/cphalod start"
