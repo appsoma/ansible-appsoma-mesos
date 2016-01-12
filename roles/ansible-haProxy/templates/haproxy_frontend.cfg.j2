@@ -3,22 +3,15 @@
 {% if haproxy_use_ssl is defined and haproxy_use_ssl %}
 frontend https-in
    bind 0.0.0.0:443 ssl crt {{ haproxy_certificate_path }}
-   mode http
    reqadd X-Forwarded-Proto:\ https
-   option tcplog
-   $acls
-   $use_backends
-
-   $internals
-
 {% else %}
 frontend http-in
    bind 0.0.0.0:80
-   mode http
    reqadd X-Forwarded-Proto:\ http
+{% endif %}
+   mode http
    option tcplog
    $acls
    $use_backends
 
    $internals
-{% endif %}

@@ -4,16 +4,21 @@
 - include: source.yml
   when: use_source and not use_package
 
-- name: Create HAProxy start directory
-  file: path=/opt/haproxy state=directory
+- name: Create Pegboard directory
+  file: path="{{ pegboard_dir }}" state=directory owner="{{ management_user }}"
 
-- name: Get Gandalf bridge
+- name: Create Pegboard log directory
+  file: path="{{ pegboard_log_dir }}" state=directory
+
+- name: Get Pegboard bridge
   git:
     repo: "https://github.com/appsoma/gandalf.git"
-    dest: "/opt/haproxy/gandalf"
-    version: "{{ gandalf_version if gandalf_version is defined else 'HEAD' }}"
+    dest: "{{ pegboard_dir }}"
+    version: "{{ pegboard_version if pegboard_version is defined else 'HEAD' }}"
     update: yes
     force: yes
+  sudo: yes
+  sudo_user: "{{ management_user }}"
 
 - name: Install Python Kazoo client
   command: /usr/bin/pip install kazoo
@@ -29,40 +34,42 @@
 - name: Install zookeeper CLI
   apt: deb=/opt/haproxy/zookeepercli_1.0.10_amd64.deb state=present
 
-- include: config.yml
-
 - name: Create SSL certificate
   copy: src="{{ haproxy_pem_file }}" dest=/opt/haproxy/haproxy.pem mode=0600
   when: haproxy_use_ssl
 
-- name: Install Gandalf
-  shell: "python /opt/haproxy/gandalf/gandalf.py --zookeeper {{ zookeeper_host_list }} install"
+- name: Create backend config
+  template: src=haproxy_backend.cfg.j2 dest="{{ pegboard_dir }}/haproxy_backend.cfg" owner="{{ management_user }}"
+
+- name: Create frontend config
+  template: src=haproxy_frontend.cfg.j2 dest="{{ pegboard_dir }}/haproxy_frontend.cfg" owner="{{ management_user }}"
+
+- name: Create tcp config
+  template: src=haproxy_tcp.cfg.j2 dest="{{ pegboard_dir }}/haproxy_tcp.cfg" owner="{{ management_user }}"
+
+- name: Create general config
+  template: src=haproxy_general.cfg.j2 dest="{{ pegboard_dir }}/haproxy_general.cfg" owner="{{ management_user }}"
+
+- name: Create start/stop convenience script
+  template: src=pegboard.sh.j2 dest="{{ pegboard_dir }}/pegboard.sh" mode=0755
+
+- name: Install Pegboard
+  shell: "{{ pegboard_dir }}/pegboard.sh install"
   args:
-    chdir: /opt/haproxy/gandalf
+    chdir: "{{ pegboard_dir }}"
 
-- name: Install Gandalf stop script
-  template: src=stop_gandalf.j2 dest=/opt/haproxy/gandalf/stop_gandalf mode=0700
+- name: Stop Pegboard
+  shell: "{{ pegboard_dir }}/pegboard.sh stop"
 
-- name: Install Gandalf start script
-  template: src=start_gandalf.j2 dest=/opt/haproxy/gandalf/start_gandalf mode=0700
+- name: Start Pegboard
+  shell: "{{ pegboard_dir }}/pegboard.sh start"
+  register: start_pegboard
+  failed_when: "start_pegboard.stderr != '' and ( start_pegboard.stderr.find('already exists') == -1 and start_pegboard.stderr.find('object is not callable') == -1) "
 
-- name: Create Gandalf log directory
-  file: path="{{ gandalf_log_dir }}" state=directory
-
-- name: Stop Gandalf
-  command: /opt/haproxy/gandalf/stop_gandalf
-
-- name: Start Gandalf
-  command: /opt/haproxy/gandalf/start_gandalf
-  args:
-    chdir: /opt/haproxy/gandalf
-  register: start_gandalf
-  failed_when: "start_gandalf.stderr != '' and ( start_gandalf.stderr.find('already exists') == -1 and start_gandalf.stderr.find('object is not callable') == -1) "
-
-- name: Wait for Gandalf to start
+- name: Wait for Pegboard to start
   wait_for: host=127.0.0.1 port=2288
 
-- name: Set service configuration in zookeeper
+- name: Set service configuration in Pegboard
   command:  curl -X POST localhost:2288/apps -d "url={{ item['url'] }}" -d "app_name={{ item['app_name'] }}" -d "service_port={{ item['service_port'] }}" -d "servers={{ hostvars[groups[inventory_group_master][0]]['private_ip_address'] }}:{{ item['port'] }}"
   with_items: haproxy_dns_services
 

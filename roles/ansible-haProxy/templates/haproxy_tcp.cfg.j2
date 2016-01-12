@@ -7,11 +7,3 @@ listen $app_name-$service_port
   option tcplog
   balance leastconn
 {% endif %}
-
-{% if haproxy_use_ssl is defined and haproxy_use_ssl %}
-listen $app_name-$service_port
-  bind 0.0.0.0:$service_port ssl crt {{ haproxy_certificate_path }}
-  mode tcp
-  option tcplog
-  balance leastconn
-{% endif %}

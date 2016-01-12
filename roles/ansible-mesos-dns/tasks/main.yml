@@ -4,7 +4,7 @@
 - name: Add Mesos-DNS as nameserver
   lineinfile: dest=/etc/resolvconf/resolv.conf.d/head line="nameserver {{ item }}"
   register: add_ns
-  with_items: "mesos_dns_hosts.split(',')"
+  with_items: "{{ mesos_dns_hosts.split(',') }}"
 
 - name: Add "mesos" domain search
   lineinfile: dest=/etc/resolvconf/resolv.conf.d/base line="search mesos"

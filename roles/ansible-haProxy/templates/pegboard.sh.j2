@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+while [[ $# > 0 ]]
+do
+  key="$1"
+  case $key in
+    *)
+      ACTION="$key"
+    ;;
+  esac
+  shift
+done
+
+if [ "$ACTION" != "start" ] && [ "$ACTION" != "restart" ] && [ "$ACTION" != "stop" ] && [ "$ACTION" != "install" ]; then
+	echo "Options are start, stop, restart, and install"
+	exit 1
+fi
+
+if [ "$ACTION" == "stop" ] || [ "$ACTION" == "restart" ]; then
+	python /usr/local/bin/pegboard.py --zookeeper master.mesos:2181 stop
+fi
+
+if [ "$ACTION" == "start" ] || [ "$ACTION" == "restart" ]; then
+    python /usr/local/bin/pegboard.py --zookeeper master.mesos:2181  start
+fi
+
+if [ "$ACTION" == "install" ]; then
+    python {{ pegboard_dir }}/pegboard.py install --config-frontend {{ pegboard_dir}}/haproxy_frontend.cfg --config-backend {{ pegboard_dir }}/haproxy_backend.cfg \
+     --config-tcp {{ pegboard_dir }}/haproxy_tcp.cfg --config-general {{ pegboard_dir }}/haproxy_general.cfg --subnet-dns {{ service_discovery_dns_suffix }} \
+     --zookeeper master.mesos:2181 --marathon master.mesos:8080
+fi

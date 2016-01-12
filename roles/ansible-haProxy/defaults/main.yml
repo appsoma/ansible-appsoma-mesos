@@ -2,5 +2,7 @@ use_package: false
 use_source: true
 haproxy_version: "v1.5.0"
 haproxy_pem_file: "cluster_vars/{{ cluster_name }}/haproxy.pem"
-#gandalf_version: "v0.2"
-gandalf_log_dir : "{{ appsoma_log_dir }}"
+pegboard_version: "v0.3"
+haproxy_dir: "/opt/haproxy"
+pegboard_dir: "{{ haproxy_dir }}/pegboard"
+pegboard_log_dir : "{{ appsoma_log_dir }}"

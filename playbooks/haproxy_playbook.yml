@@ -19,17 +19,6 @@
     - "../cluster_vars/{{ cluster_name }}/users.yml"
 
   pre_tasks:
-    - name: Set zookeeper private IP list with port
-      set_fact:
-        zookeeper_hosts_with_port: |
-          {% set comma = joiner(',') %}
-          {% for item in groups[inventory_group_master] -%}
-            {{ comma() }}{{ hostvars[item].private_ip_address }}:{{ zookeeper_client_port }}
-          {%- endfor %}
-
-    - name: see hosts
-      debug: msg="{{ groups[inventory_group_master] }}"
-
     - name: Set master_0 hostname
       set_fact: master_0_hostname="{{ item }}"
       with_items: groups[inventory_group_master]
@@ -37,6 +26,5 @@
 
   roles:
     - role: ../roles/ansible-haProxy
-      zookeeper_host_list: "{{zookeeper_hosts_with_port}}"
       haproxy_pem_file: "../cluster_vars/{{ cluster_name }}/haproxy.pem"
       when: inventory_hostname == master_0_hostname

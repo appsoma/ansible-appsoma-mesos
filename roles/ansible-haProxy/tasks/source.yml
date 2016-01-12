@@ -6,18 +6,25 @@
   apt: pkg=haproxy state=absent
   when: ansible_os_family == "Debian"
 
+- name: Create HAProxy srouce directory
+  file: path="{{ haproxy_dir }}/src" state=directory owner="{{ management_user }}"
+
 - name: Fetch source
   git:
     dest: /opt/haproxy/src
     repo: https://github.com/haproxy/haproxy.git
     version: "{{ haproxy_version if haproxy_version is defined else 'HEAD' }}"
     update: yes
+  sudo: yes
+  sudo_user: "{{ management_user }}"
   register: git_pull
 
 - name: Build source
   command: make TARGET=linux2628 USE_OPENSSL=1 SSL_INC=$STATICLIBSSL/include SSL_LIB=$STATICLIBSSL/lib ADDLIB=-ldl
   args:
     chdir: /opt/haproxy/src
+  sudo: yes
+  sudo_user: "{{ management_user }}"
   register: build
   changed_when: build.stdout.find('Nothing to be done') == -1
 
