@@ -12,7 +12,7 @@
 
 - name: Get Pegboard bridge
   git:
-    repo: "https://github.com/appsoma/gandalf.git"
+    repo: "https://github.com/appsoma/pegboard.git"
     dest: "{{ pegboard_dir }}"
     version: "{{ pegboard_version if pegboard_version is defined else 'HEAD' }}"
     update: yes
@@ -70,6 +70,6 @@
   wait_for: host=127.0.0.1 port=2288
 
 - name: Set service configuration in Pegboard
-  command:  curl -X POST localhost:2288/apps -d "url={{ item['url'] }}" -d "app_name={{ item['app_name'] }}" -d "service_port={{ item['service_port'] }}" -d "servers={{ hostvars[groups[inventory_group_master][0]]['private_ip_address'] }}:{{ item['port'] }}"
+  command: curl -X POST localhost:2288/apps -d "url={{ item['url'] }}" -d "app_name={{ item['app_name'] }}" -d "service_port={{ item['service_port'] }}" -d "servers=master.mesos:{{ item['port'] }}"
   with_items: haproxy_dns_services
 

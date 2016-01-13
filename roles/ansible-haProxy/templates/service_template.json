@@ -1,0 +1,6 @@
+{
+  \"url\": \"{{ item['url'] if item['url'] is defined else item.item['url'] }}\",
+  \"service_port\": \"{{ item['service_port'] if item['service_port'] is defined else item.item['service_port'] }}\",
+  \"app_name\": \"{{ item['app_name'] if item['app_name'] is defined else item.item['app_name'] }}\",
+  \"servers\": [ \"leader.mesos:{{ item['port'] if item['port'] is defined else item.item['port']}}\" ]
+}
