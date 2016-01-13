@@ -6,3 +6,8 @@ backend srvs_$app_name
    mode http
    balance leastconn
    $servers
+
+backend srvs_internal_$app_name
+   mode http
+   balance leastconn
+   $servers
