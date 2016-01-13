@@ -20,6 +20,11 @@
     - name: Check for version to use
       debug: msg="Using version {{ welder_version if welder_version is defined else 'HEAD' }}"
 
+    - name: Add AWS vars
+      include_vars: "../cluster_vars/{{ cluster_name }}/aws_secret_vars.yml"
+      no_log: true
+      when: "(cloud_provider is defined and cloud_provider == 'ec2') or (use_docker_registry is defined and use_docker_registry)"
+
     - name: Create Appsoma etc directory
       file: path="{{ appsoma_etc_dir }}" state=directory
 
