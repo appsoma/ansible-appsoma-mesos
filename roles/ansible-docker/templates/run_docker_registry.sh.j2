@@ -1,7 +1,55 @@
-#!/bin/bash
-if [ $1 = "start" ] ; then
-	curl -X POST -H "Content-Type: application/json" -d @{{ docker_registry_dir }}/docker_registry_marathon.json http://{{ marathon_host }}:8080/v2/apps
+#!/usr/bin/env bash
+while [[ $# > 0 ]]
+do
+  key="$1"
+  case $key in
+    *)
+      ACTION="$key"
+    ;;
+  esac
+  shift
+done
 
-elif [ $1 = "stop" ] ; then
-	curl -X DELETE  -H "Content-Type: application/json" http://{{ marathon_host }}:8080/v2/apps/docker-registry
+if [ "$ACTION" != "start" ] && [ "$ACTION" != "restart" ] && [ "$ACTION" != "stop" ]; then
+	echo "Options are start, stop, restart"
+	exit 1
 fi
+
+if [ "$ACTION" == "stop" ] || [ "$ACTION" == "restart" ]; then
+	curl -H "Content-Type:application/json" -X DELETE http://master.mesos:8080/v2/apps/docker-registy
+fi
+
+if [ "$ACTION" == "start" ] || [ "$ACTION" == "restart" ]; then
+    curl -include -XPOST http://master.mesos:8080/v2/artifacts/docker-registry/config.yml --form file=@docker_registry_config.yml
+
+    cat >/tmp/docker_registry_run.json <<EOL
+{
+	"id": "/docker-registry",
+	"cpus": 0.1,
+	"mem": 256.0,
+	"instances": 1,
+	"container": {
+		"type": "DOCKER",
+		"docker": {
+			"image": "registry:2",
+			"network": "BRIDGE",
+			"portMappings": [
+				{
+					"containerPort": 9000,
+					"hostPort": 9000,
+					"protocol": "tcp"
+				}
+			]
+		}
+		]
+	},
+	"uris": [
+		"http://master.mesos:8080/v2/artifacts/docker-registry/config.yml"
+	]
+}
+EOL
+
+    curl -H "Content-Type:application/json" -X POST --data @/tmp/docker_registry_run.json http://master.mesos:8080/v2/apps
+
+fi
+echo

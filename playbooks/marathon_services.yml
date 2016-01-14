@@ -77,6 +77,9 @@
       haproxy_pem_file: "../cluster_vars/{{ cluster_name }}/haproxy.pem"
       when: hostvars[inventory_hostname].short_name == "master_0"
 
+    - role: ../roles/ansible-docker
+      install_registry: true
+
     # Install Appsoma Rhino
 #    - role: ../roles/ansible-rhino
 #      zookeeper_hostnames: "{{ zookeeper_hosts_with_port }}"

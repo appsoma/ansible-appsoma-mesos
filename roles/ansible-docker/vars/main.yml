@@ -5,7 +5,7 @@ docker_playbook_version: "0.1.2"
 docker_repo_keyserver: "hkp://p80.pool.sks-keyservers.net:80"
 docker_repo_key: "36A1D7869245C8950F966E92D8576A8BA88D21E9"
 docker_repo: "https://get.docker.io/ubuntu"
-docker_opts: "{{ '--insecure-registry ' + registry_host +':5000' if registry_host != '' else ''}}"
+docker_opts: "{{ '--insecure-registry ' + registry_host +':9000' if registry_host != '' else ''}}"
 
 docker_listen_tcp: False
 

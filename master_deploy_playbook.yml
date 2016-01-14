@@ -100,12 +100,7 @@
 
     # Install Docker
     - role: ansible-docker
-      when: use_docker_registry is not defined or not use_docker_registry
-
-    - role: ansible-docker
-      registry_host: "master.mesos"
-      marathon_host: "{{ hostvars[master_0_hostname].private_ip_address }}"
-      when: use_docker_registry is defined and use_docker_registry
+      registry_host: "{{ 'docker-registry.marathon.mesos' if use_docker_registry else '' }}"
 
     # Install Python
     - role: ansible-python

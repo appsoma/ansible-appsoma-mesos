@@ -1,7 +1,7 @@
 ---
 - include: Debian.yml
-  when: ansible_os_family == "Debian"
+  when: ansible_os_family == "Debian" and not (install_registry is defined and install_registry)
 
 - include: install_registry.yml
-  when: hostvars[inventory_hostname].private_ip_address is defined and registry_host == hostvars[inventory_hostname].private_ip_address
+  when: install_registry is defined and install_registry
 
