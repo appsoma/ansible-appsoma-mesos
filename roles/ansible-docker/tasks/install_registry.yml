@@ -4,11 +4,5 @@
 - name: Add docker registry config
   template: src=docker_registry_config.yml.j2 dest="{{ docker_registry_dir }}/docker_registry_config.yml" owner=root group=root mode=0600
 
-- name: Add docker registry Marathon run JSON file
-  template: src=docker_registry_marathon.json.j2 dest="{{ docker_registry_dir }}/docker_registry_marathon.json"
-
 - name: Add docker registry Run script
   template: src=run_docker_registry.sh.j2 dest="{{ docker_registry_dir }}/run_docker_registry.sh" mode=0700
-
-#- name: Start docker registry
-#  shell: "{{ docker_registry_command }}"
