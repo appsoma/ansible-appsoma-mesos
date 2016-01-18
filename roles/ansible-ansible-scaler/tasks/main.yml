@@ -1,10 +1,9 @@
 - name: Install Ansible repo
-  apt_repository: repo="ppa:ansible/ansible"
+  shell: "pip install ansible==1.9.4"
 
-- name: Install Ansible and git
+- name: Install git and zip
   apt: name="{{ item }}" state=present
   with_items:
-    - ansible
     - git
     - zip
 
