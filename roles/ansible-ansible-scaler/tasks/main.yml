@@ -1,5 +1,5 @@
 - name: Install Ansible repo
-  shell: "pip install ansible==1.9.4"
+  shell: "pip install ansible==1.9.4 jinja2"
 
 - name: Install git and zip
   apt: name="{{ item }}" state=present
