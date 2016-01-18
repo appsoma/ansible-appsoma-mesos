@@ -113,11 +113,10 @@
           "opts": "{{private_lan_subnet}}(rw,sync,no_subtree_check,no_root_squash,nohide)"
       when: inventory_hostname == groups[inventory_group_service][0]
 
-    - role: ../roles/ansible-mesos-dns
+    - role: ansible-mesos-dns
       zookeeper_host_list: "{{ zookeeper_hosts_with_port }}"
       marathon_host: "{{ hostvars[master_0_hostname].private_ip_address }}"
       mesos_dns_hosts: "{{ [ hostvars[master_0_hostname].private_ip_address ] }}{{ ',' + hostvars[master_1_hostname].private_ip_address if masters.count > 1 else ''}}"
-
 
     - role: ansible-sensu
       sensu_mode: "client"

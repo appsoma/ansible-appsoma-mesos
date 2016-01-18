@@ -6,7 +6,7 @@ if [ "$1" != "start" ] && [ "$1" != "restart" ] && [ "$1" != "stop" ]; then
 fi
 
 if [ "$1" == "stop" ] || [ "$1" == "restart" ]; then
-  	curl -H "Content-Type:application/json" -X DELETE http://master.mesos:8080/v2/apps/kafka-framework
+  	curl -H "Content-Type:application/json" -X DELETE http://master.mesos:8080/v2/apps/kafka
 fi
 
 if [ "$1" == "start" ] || [ "$1" == "restart" ]; then
@@ -26,7 +26,7 @@ if [ "$1" == "start" ] || [ "$1" == "restart" ]; then
    	"container": {
    		"type": "DOCKER",
    		"docker": {
-   			"image": "appsoma/kafka-mesos:latest",
+   			"image": "appsoma/kafka-mesos:0.9.0.0",
    			"network": "BRIDGE",
    			"portMappings": [
       			{

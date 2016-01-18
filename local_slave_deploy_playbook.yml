@@ -92,7 +92,7 @@
       user_list: "{{ welder_user_list }}"
       dataDir: "{{ data_mount_point }}"
 
-    - role: ../roles/ansible-mesos-dns
+    - role: ansible-mesos-dns
       zookeeper_host_list: "{{ zookeeper_hosts_with_port }}"
       marathon_host: "{{ master_0_ip }}"
       mesos_dns_hosts: "{{ master_0_ip }}{{ ',' + master_1_ip if master_1_ip is defined else ''}}"
