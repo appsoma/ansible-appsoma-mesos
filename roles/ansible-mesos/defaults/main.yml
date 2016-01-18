@@ -1,7 +1,7 @@
 ---
 package_install: true
 mesos_install_mode: "master" # {master|slave|master-slave}
-mesos_version: "0.23.0"
+mesos_version: "0.26.0"
 
 # conf file settings
 mesos_cluster_name: "mesos_cluster"

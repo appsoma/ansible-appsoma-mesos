@@ -37,15 +37,15 @@ if [ "$ACTION" == "start" ] || [ "$ACTION" == "restart" ]; then
 					"hostPort": 9000,
 					"protocol": "tcp"
 				}
-			],
-			"volumes": [
-            	{
-            		"hostPath": "{{ docker_registry_dir }}/docker_registry_config.yml",
-                    "containerPath": "/etc/docker/registry/config.yml",
-                    "mode": "RO"
-            	}
 			]
-		}
+		},
+		"volumes": [
+           	{
+                "hostPath": "{{ docker_registry_dir }}/docker_registry_config.yml",
+                "containerPath": "/etc/docker/registry/config.yml",
+                "mode": "RO"
+            }
+		]
 	}
 }
 EOL
