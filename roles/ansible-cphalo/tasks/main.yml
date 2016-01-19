@@ -42,4 +42,4 @@
   register: cphalo_restart
   failed_when: cphalo_restart.stdout != '' and cphalo_restart.stdout.find('cphalo is running') == -1 and cphalo_restart.stdout.find('Starting CloudPassage Halo Agent cphalo') == -1
   changed_when: cphalo_start.stdout.find('cphalo is running') == -1 or cphalo_start.stdout.find('...done') == 1
-  when: "start_halo_daemon" and config_needed
+  when: "start_halo_daemon and config_needed"
