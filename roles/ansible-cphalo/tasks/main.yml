@@ -17,15 +17,18 @@
   changed_when: cphalo_id.state == 'absent'
   when: not force_new_halo_id
 
-- name: Test if cphalo already has a id
+- name: Force cphalo to reconfigure a new ID
   file: path=/opt/cloudpassage/data/id state=absent
-  register: cphalo_id
-  changed_when: cphalo_id.state == 'absent'
+  register: force_new_id
+  changed_when: force_new_id.state == 'absent'
   when: force_new_halo_id
+
+- name: Check if halo needs to have a config ID created
+  set_fact: config_needed="{{ (cphalo_id is defined and cphalo_id.changed) or (force_new_halo_id is defined and force_new_halo_id) }}"
 
 - name: Configure cphalod to create an ID
   shell: "sudo /opt/cloudpassage/bin/configure --agent-key={{ halo_agent_key }} --tag={{ halo_agent_tag }}"
-  when: "cphalo_id is defined and cphalo_id.changed"
+  when: config_needed
 
 - name: Start cphalod
   shell: "/etc/init.d/cphalod start"
@@ -33,3 +36,10 @@
   failed_when: cphalo_start.stdout != '' and cphalo_start.stdout.find('cphalo is running') == -1 and cphalo_start.stdout.find('Starting CloudPassage Halo Agent cphalo') == -1
   changed_when: cphalo_start.stdout.find('cphalo is running') == -1 or cphalo_start.stdout.find('...done') == 1
   when: "start_halo_daemon"
+
+- name: Restart cphalod
+  shell: "/etc/init.d/cphalod stop; /etc/init.d/cphalod start"
+  register: cphalo_restart
+  failed_when: cphalo_restart.stdout != '' and cphalo_restart.stdout.find('cphalo is running') == -1 and cphalo_restart.stdout.find('Starting CloudPassage Halo Agent cphalo') == -1
+  changed_when: cphalo_start.stdout.find('cphalo is running') == -1 or cphalo_start.stdout.find('...done') == 1
+  when: "start_halo_daemon" and config_needed
