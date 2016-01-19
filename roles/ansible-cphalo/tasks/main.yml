@@ -25,7 +25,7 @@
 
 - name: Configure cphalod to create an ID
   shell: "sudo /opt/cloudpassage/bin/configure --agent-key={{ halo_agent_key }} --tag={{ halo_agent_tag }}"
-  when: "force_new_halo_id or (create_halo_id and cphalo_id is defined and cphalo_id.state == 'absent')"
+  when: "cphalo_id is defined and cphalo_id.changed"
 
 - name: Start cphalod
   shell: "/etc/init.d/cphalod start"
