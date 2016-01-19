@@ -1,4 +1,8 @@
 ---
+
+- name: Specify OpenJDK 1.8
+  lineinfile: dest=/etc/init/marathon.conf line="env JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" insertbefore="^exec"
+
 - name: Create Marathon conf directory
   file: path=/etc/marathon/conf state=directory
 
