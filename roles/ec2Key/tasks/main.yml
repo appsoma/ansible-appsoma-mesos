@@ -1,4 +1,0 @@
-- name: ec2_key
-  aws_access_key: "{{ aws_access_key }}"
-  aws_secret_key: "{{ aws_secret_key }}"
-  name: {{ ec2_key_name }}

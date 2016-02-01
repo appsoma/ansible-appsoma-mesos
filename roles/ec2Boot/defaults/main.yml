@@ -1,4 +1,0 @@
-instance_type: "t2.micro"       # Instance type for AWS
-count: 1
-
-

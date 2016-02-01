@@ -3,5 +3,5 @@
   when: ansible_os_family == "Debian" and not (install_registry is defined and install_registry)
 
 - include: install_registry.yml
-  when: install_registry is defined and install_registry
+  when: use_docker_registry is defined and use_docker_registry and inventory_hostname == groups[inventory_group_master][0]
 

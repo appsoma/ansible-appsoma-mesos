@@ -29,22 +29,6 @@
   remote_user: "{{ management_user }}"
   sudo: yes
   pre_tasks:
-    - name:  Set zookeeper private IP list with ports
-      set_fact:
-        zookeeper_hosts_with_port: |
-          {% set comma = joiner(':' + zookeeper_client_port + ',') %}
-          {% for item in groups[inventory_group_master] -%}
-            {{ comma() }}{{ hostvars[item].private_ip_address }}:{{ zookeeper_client_port }}
-          {%- endfor %}
-
-    - name:  Set zookeeper private IP list
-      set_fact:
-        zookeeper_hosts_no_port: |
-          {% set comma = joiner(',') %}
-          {% for item in groups[inventory_group_master] -%}
-            {{ comma() }}{{ hostvars[item].private_ip_address }}
-          {%- endfor %}
-
     - name: Set master_0 hostname
       set_fact: master_0_hostname="{{ item }}"
       with_items: groups[inventory_group_master]
@@ -73,7 +57,7 @@
     - role: ansible-ntp
 
     # Install sysdig for troubleshooting
-    - role: ansible-sysdig
+    #- role: ansible-sysdig
 
     # Install CloudPassage Halo agent if available
     - role: ansible-cphalo
@@ -114,14 +98,12 @@
       when: inventory_hostname == groups[inventory_group_service][0]
 
     - role: ansible-mesos-dns
-      zookeeper_host_list: "{{ zookeeper_hosts_with_port }}"
-      marathon_host: "{{ hostvars[master_0_hostname].private_ip_address }}"
-      mesos_dns_hosts: "{{ [ hostvars[master_0_hostname].private_ip_address ] }}{{ ',' + hostvars[master_1_hostname].private_ip_address if masters.count > 1 else ''}}"
+      mesos_dns_hosts: "{{ hostvars[master_0_hostname].private_ip_address }}{{ ',' + hostvars[master_1_hostname].private_ip_address if masters.count > 1 else ''}}"
 
     - role: ansible-sensu
       sensu_mode: "client"
-      sensu_master: "{{ hostvars[master_0_hostname].private_ip_address }}"
-      mesos_master_list: "{{ zookeeper_hosts_no_port }}"
+      sensu_master: "sensu-master.marathon.mesos"
+      mesos_master_list: "master.mesos"
       system_name: "{{ hostvars[inventory_hostname].system_name }}"
       ip_address: "{{ hostvars[inventory_hostname].private_ip_address }}"
       when: use_monitoring is defined and use_monitoring

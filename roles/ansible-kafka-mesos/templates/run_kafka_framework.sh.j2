@@ -26,7 +26,7 @@ if [ "$1" == "start" ] || [ "$1" == "restart" ]; then
    	"container": {
    		"type": "DOCKER",
    		"docker": {
-   			"image": "appsoma/kafka-mesos:0.9.0.0",
+   			"image": "appsoma/kafka-mesos:0.8.2.1",
    			"network": "BRIDGE",
    			"portMappings": [
       			{
@@ -37,6 +37,15 @@ if [ "$1" == "start" ] || [ "$1" == "restart" ]; then
 			]
     	}
     },
+	"healthChecks": [{
+    	"protocol": "HTTP",
+    	"gracePeriodSeconds": 600,
+    	"intervalSeconds": 30,
+    	"port": 7000,
+    	"path": "/health",
+    	"timeoutSeconds": 1,
+    	"maxConsecutiveFailures": 2
+    }],
     "uris": [
     	"http://master.mesos:8080/v2/artifacts/kafka-mesos.properties"
     ]

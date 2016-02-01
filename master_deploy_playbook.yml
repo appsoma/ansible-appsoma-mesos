@@ -85,7 +85,7 @@
     - role: ansible-ntp
 
     # Install sysdig for troubleshooting
-    - role: ansible-sysdig
+    #- role: ansible-sysdig
 
     # Install CloudPassage Halo agent if available
     - role: ansible-cphalo
