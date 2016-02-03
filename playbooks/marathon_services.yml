@@ -81,10 +81,8 @@
       install_registry: true
 
     # Install Appsoma Rhino
-#    - role: ../roles/ansible-rhino
-#      zookeeper_hostnames: "{{ zookeeper_hosts_with_port }}"
-#      db_folder: "{{ data_mount_point }}/rhino_db"
-#      when: hostvars[inventory_hostname].short_name == "master_0"
+    - role: ../roles/ansible-rhino
+      when: hostvars[inventory_hostname].short_name == "master_0"
 
     - role: ../roles/ansible-cassandra-marathon
       marathon_host: "{{ hostvars[master_0_hostname].private_ip_address }}"

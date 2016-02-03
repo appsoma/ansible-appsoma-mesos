@@ -30,9 +30,8 @@ db_folder: "{{ data_mount_point }}/welder_db"
 db_host: "mongo.marathon.mesos"
 db_port: 27017
 
-marathon_host: "master.mesos"
-scheduler_ip: "master.mesos"
-zookeeper_hosts: "master.mesos:2181"
+marathon_host: "leader.mesos"
+zookeeper_hosts: "leader.mesos:2181"
 marathon_url: "http://{{ marathon_host }}:8080"
 
 project_folder: "{{ welder_data_dir }}/projects"
@@ -40,7 +39,7 @@ upload_folder: "/{{ welder_data_dir }}/uploads"
 service_log_folder: "{{ welder_data_dir }}/log"
 
 scheduler: "rhino"
-rhino_url: "http://{{ scheduler_ip }}:8899/"
+rhino_url: "http://rhino.marathon.mesos:8899/"
 
 use_https: False
 key_path: "{{ welder_src_dir }}/certificate.key"

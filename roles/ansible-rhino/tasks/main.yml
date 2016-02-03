@@ -1,44 +1,13 @@
 - name: fetch Rhino from github
   git:
-    dest: /opt/rhino
+    dest: "{{ rhino_dir }}"
     repo: https://github.com/appsoma/rhino.git
     version: "{{ rhino_version if rhino_version is defined else 'HEAD' }}"
     update: yes
-  register: fetched_rhino
 
-#- name: Create Rhino directory
-#  file: path=/opt/rhino state=directory
-
-#- name: Fetch Rhino container setup script
-#  get_url:
-#    url: https://raw.githubusercontent.com/appsoma/rhino/master/rhino_in_container.bash
-#    dest: /opt/rhino/rhino_in_container.bash
-#  register: fetched_rhino
-
-- name: Set rhino script executable
-  file: path=/opt/rhino/rhino_in_container.bash mode=0744 state=file
-
-- name: Create Rhino config
-  template: src=rhino_container_config.j2 dest=/opt/rhino/rhino_container_config
-
-- name: Create Rhino log dir
-  file: path="{{ rhino_log_dir }}" state=directory
-
-- name: Check if Rhino is running
-  shell: "docker ps -qf name=rhino*"
-  register: rhino_containers_running
-  changed_when: rhino_containers_running.stdout == ""
-
-- name: stop Rhino in Docker
-  shell: "sudo ./rhino_in_container.bash --stop {{ '--dev' if use_dev else '' }}"
+- name: start Rhino in marathon
+  shell: "./rhino_marathon.sh start"
   args:
-    chdir: "/opt/rhino"
-  when: fetched_rhino.changed or rhino_containers_running.changed
+    chdir: "{{ rhino_dir }}"
 
-- name: start Rhino in Docker
-  shell: "sudo ./rhino_in_container.bash --start --no-questions {{ '--dev' if use_dev else '' }}"
-  args:
-    chdir: "/opt/rhino"
-  register: start_rhino
-  changed_when: start_rhino.stdout.find('Already Running') == -1
 

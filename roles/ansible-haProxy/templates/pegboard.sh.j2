@@ -25,6 +25,6 @@ fi
 
 if [ "$ACTION" == "install" ]; then
     python {{ pegboard_dir }}/pegboard.py install --config-frontend {{ pegboard_dir}}/haproxy_frontend.cfg --config-backend {{ pegboard_dir }}/haproxy_backend.cfg \
-     --config-tcp {{ pegboard_dir }}/haproxy_tcp.cfg --config-general {{ pegboard_dir }}/haproxy_general.cfg --subnet-dns {{ service_discovery_dns_suffix }} \
+     --config-tcp {{ pegboard_dir }}/haproxy_tcp.cfg --config-general {{ pegboard_dir }}/haproxy_general.cfg --subnet-dns .{{ service_discovery_dns_suffix }} \
      --zookeeper master.mesos:2181 --marathon master.mesos:8080
 fi
