@@ -3,6 +3,6 @@ require 'jumpcloud'
 jc = JumpCloud.new()
 
 jc.update_settings({
-  "displayName" => "{{ hostvars[inventory_hostname].system_name }}",
+  "displayName" => "{{ system_name if system_name is defined else hostvars[inventory_hostname].system_name }}",
   "tags" => ["Welder Users", "Test" ]
 })
