@@ -128,11 +128,15 @@
     - role: ansible-docker
       registry_host: "{{ 'docker-registry.marathon.mesos' if use_docker_registry else '' }}"
 
-    # Create an users
+    # Configure Jumpcloud
+    - role: ansible-jumpcloud
+      when: jumpcloud_key is defined
+
+    # Create local users
     - role: ansible-welder-user
       group: "{{ welder_group }}"
       user_list: "{{ welder_user_list }}"
-      dataDir: "{{ data_mount_point }}"
+      when: jumpcloud_key is not defined
 
     # Install NTP for time sync
     - role: ansible-ntp

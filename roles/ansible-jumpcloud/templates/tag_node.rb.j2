@@ -1,0 +1,8 @@
+require 'jumpcloud'
+
+jc = JumpCloud.new()
+
+jc.update_settings({
+  "displayName" => "{{ hostvars[inventory_hostname].system_name }}",
+  "tags" => ["Welder Users", "Test" ]
+})

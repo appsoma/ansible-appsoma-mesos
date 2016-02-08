@@ -1,0 +1,38 @@
+- name: Install curl package (Debian based)
+  apt: pkg='{{ item }}' state=installed
+  with_items:
+    - curl
+    - ruby
+  when: ansible_os_family == 'Debian'
+
+- name: Install curl package (RedHat based)
+  yum: name='{{ item }}' state=installed
+  with_items:
+    - curl
+    - ruby
+  when: ansible_os_family == 'RedHat'
+
+- name: Check if JumpCloud is already installed
+  shell: "[ -d /opt/jc ] && echo 'Found' || echo ''"
+  register: jc_installed
+
+- name: Update time
+  shell: "ntpdate -u pool.ntp.org"
+  when: "not jc_installed.stdout"
+
+- name: Install JumpCloud
+  shell: "curl --header 'x-connect-key: {{ jumpcloud_key }}' https://kickstart.jumpcloud.com/Kickstart | sudo bash"
+  when: "not jc_installed.stdout"
+
+- name: Install JumpCloud gem
+  command: gem install jumpcloud
+
+- name: Copy tagging script
+  template: src=tag_node.rb.j2 dest=/tmp/tag_node.rb
+
+- name: Tag server in JumpCloud
+  command: ruby /tmp/tag_node.rb
+
+- name: Start JumpCloud Agent
+  service: name=jcagent state=started
+

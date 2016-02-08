@@ -83,12 +83,15 @@
       marathon_host: "{{ hostvars[groups[inventory_group_master][0]].private_ip_address }}"
       when: use_docker_registry is defined and use_docker_registry
 
-    # Create an Appsoma user as a member of the docker group (permission to run /usr/bin/docker)
+    # Configure Jumpcloud
+    - role: ansible-jumpcloud
+      when: jumpcloud_key is defined
+
+    # Create local users
     - role: ansible-welder-user
-      dataDir: "{{ nfs_data_mount }}"
       group: "{{ welder_group }}"
       user_list: "{{ welder_user_list }}"
-      enableDocker: true
+      when: jumpcloud_key is not defined
 
     # Configure node as an NFS server
     - role: ansible-nfs-server
