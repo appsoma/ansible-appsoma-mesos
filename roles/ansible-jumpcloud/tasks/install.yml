@@ -1,0 +1,21 @@
+- name: Install package dependencies (Debian based)
+  apt: pkg='{{ item }}' state=installed
+  with_items:
+    - curl
+    - ruby
+  when: ansible_os_family == 'Debian' and package_install
+
+- name: Install package dependencies (RedHat based)
+  yum: name='{{ item }}' state=installed
+  with_items:
+    - curl
+    - ruby
+  when: ansible_os_family == 'RedHat' and package_install
+
+- name: Install JumpCloud
+  shell: "curl --header 'x-connect-key: {{ jumpcloud_key }}' https://kickstart.jumpcloud.com/Kickstart | sudo bash"
+  when: "not jc_installed.stdout and package_install"
+
+- name: Install JumpCloud gem
+  command: gem install jumpcloud
+  when: package_install

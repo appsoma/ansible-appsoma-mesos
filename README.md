@@ -207,8 +207,6 @@ The welder server will be listening on the master at the port specified in roles
 
 The users you have defined in `cluster_vars/{{ cluster_name }}/users.yml` are available to log in to Welder, using the password defined.  These users do not have SSH access to the cluster.
 
-The `welder_group:` section of `cluster_vars/{{ cluster_name }}/users.yml` defines a group that all Welder users will be a part of.
-
 ## Developing with Welder
 The Welder source is checked out into `/opt/welder` on the master. The service can be started by running `service welder start` and `service welder-widgets start`. 
 Logs for the service are saved in `/var/log/appsoma/welder.log`.

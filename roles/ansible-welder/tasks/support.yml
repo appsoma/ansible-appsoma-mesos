@@ -1,6 +1,6 @@
 
 - name: Create Support dir
-  file: path="{{ welder_support_dir }}" state=directory owner="{{ management_user }}" group="{{ welder_group['name'] }}" mode=2775
+  file: path="{{ welder_support_dir }}" state=directory owner="{{ management_user }}" group="welder" mode=2775
 
 - name: Clone Support source
   git:

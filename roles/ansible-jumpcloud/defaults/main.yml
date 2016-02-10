@@ -1,0 +1,2 @@
+package_install: true
+configure_agent: true

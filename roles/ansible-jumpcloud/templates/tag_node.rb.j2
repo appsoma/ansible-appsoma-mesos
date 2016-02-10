@@ -1,8 +1,10 @@
 require 'jumpcloud'
 
-jc = JumpCloud.new()
+JumpCloud.set_system_name("{{ system_name if system_name is defined else hostvars[inventory_hostname].system_name }}")
+JumpCloud.set_system_tags("Welder Users", "Test")
+#jc = JumpCloud.new()
 
-jc.update_settings({
-  "displayName" => "{{ system_name if system_name is defined else hostvars[inventory_hostname].system_name }}",
-  "tags" => ["Welder Users", "Test" ]
-})
+#jc.update_settings({
+#  "displayName" => "{{ system_name if system_name is defined else hostvars[inventory_hostname].system_name }}",
+#  "tags" => ["Welder Users", "Test" ]
+#})

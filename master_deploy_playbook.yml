@@ -112,12 +112,11 @@
         - browserify
         - mocha
         - nodejs-websocket
-#        - phantomjs
         - process
         - require
         - scribe-js
         - supervisor
-      tags: ["nodejs"]
+      when: use_service_dev is defined and use_service_dev
 
     # Configure NFS
     - role: ansible-nfs-client
@@ -132,7 +131,7 @@
 
     # Create local users
     - role: ansible-welder-user
-      group: "{{ welder_group }}"
+      group: "welder"
       user_list: "{{ welder_user_list }}"
       when: jumpcloud_key is not defined
 
@@ -142,8 +141,10 @@
       java_versions: [7, 8]
 
     - role: ansible-go
+      when: use_service_dev is defined and use_service_dev
 
     - role: ../roles/ansible-maven
+      when: use_service_dev is defined and use_service_dev
 
     # Install zookeeper
     - role: ansible-zookeeper

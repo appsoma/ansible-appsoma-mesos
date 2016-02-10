@@ -54,6 +54,10 @@
     # Configure NFS
     - role: ansible-nfs-client
 
+    # Configure Jumpcloud
+    - role: ansible-jumpcloud
+      configure_agent: false
+
     # Install Python
     - role: ansible-python
 
@@ -78,6 +82,7 @@
   post_tasks:
     - name: Stop sensu
       service: name=sensu-client state=stopped enabled=false
+      when: use_monitoring is defined and use_monitoring
 
     - name: Stop mesos-slave
       service: name=mesos-slave state=stopped enabled=false

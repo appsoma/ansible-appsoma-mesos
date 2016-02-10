@@ -4,6 +4,12 @@
 - name: Create Welder data dir
   file: path="{{ welder_data_dir }}" state=directory
 
+- name: Add Welder user group
+  group:
+    name: "welder"
+    gid: "4000"
+    state: present
+
 - include: mongo.yml
   when: welder_db_type == "mongo"
 
@@ -14,13 +20,13 @@
   file: path="{{ welder_log_dir }}" state=directory
 
 - name: Create project folder
-  file: path="{{ project_folder }}" state=directory owner="{{ welder_user }}" group="{{ welder_group['name'] }}" mode=2775
+  file: path="{{ project_folder }}" state=directory owner="{{ welder_user }}" group="welder" mode=2775
 
 - name: Create upload folder
-  file: path="{{ upload_folder }}" state=directory  owner="{{ welder_user }}" group="{{ welder_group['name'] }}" mode=2775
+  file: path="{{ upload_folder }}" state=directory  owner="{{ welder_user }}" group="welder" mode=2775
 
 - name: Create service log folder
-  file: path="{{ upload_folder }}" state=directory  owner="{{ welder_user }}" group="{{ welder_group['name'] }}" mode=2775
+  file: path="{{ upload_folder }}" state=directory  owner="{{ welder_user }}" group="welder" mode=2775
 
 - include: container.yml
   when: use_container

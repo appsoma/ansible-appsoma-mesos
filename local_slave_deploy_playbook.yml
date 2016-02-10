@@ -92,7 +92,7 @@
 
     # Create local users
     - role: ansible-welder-user
-      group: "{{ welder_group }}"
+      group: "welder"
       user_list: "{{ welder_user_list }}"
       when: jumpcloud_key is not defined
 

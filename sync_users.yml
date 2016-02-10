@@ -24,6 +24,6 @@
 
   roles:
     - role: ansible-welder-user
-      group: "{{ welder_group }}"
+      group: "welder"
       user_list: "{{ welder_user_list }}"
       dataDir: "{{ data_mount_point }}"

@@ -1,6 +1,4 @@
-welder_group:
-  name: welder
-  gid: 3000
+
 welder_user_list:
   - { username: appsoma, uid: 2001, password: zoink012 }
   - { username: demo, uid: 2003, password: zoink123 }

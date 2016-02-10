@@ -2,7 +2,7 @@
 resource "aws_instance" "service" {
 
   availability_zone = "${var.aws_info.zone}"
-  ami = "${lookup(var.aws_image, var.aws_info.region)}"
+  ami = "{{ slave_ami if slave_ami is defined else '${lookup(var.aws_image, var.aws_info.region)}' }}"
   instance_type = "${var.aws_instance_type.service}"
   key_name = "${var.boot_key.name}"
   subnet_id = "${aws_subnet.subnet.id}"
@@ -43,7 +43,7 @@ resource "aws_instance" "service" {
 resource "aws_instance" "master" {
 
   availability_zone = "${var.aws_info.zone}"
-  ami = "${lookup(var.aws_image, var.aws_info.region)}"
+  ami = "{{ slave_ami if slave_ami is defined else '${lookup(var.aws_image, var.aws_info.region)}' }}"
   instance_type = "${var.aws_instance_type.master}"
   key_name = "${var.boot_key.name}"
   subnet_id = "${aws_subnet.subnet.id}"

@@ -13,7 +13,7 @@
 # To make changes as other users, be sure to "chmod -R g+w {{ project_folder }}/demo_project"
 
 - name: Create Demo project folder
-  file: path="{{ project_folder }}/demo_project" state=directory owner="demo" group="{{ welder_group['name'] }}" mode=2775
+  file: path="{{ project_folder }}/demo_project" state=directory owner="demo" group="welder" mode=2775
 
 - name: Clone Demo Project source
   git:
@@ -30,7 +30,7 @@
   failed_when: "(git_pull.failed and git.pull.msg is defined and git_pull.msg.find('modifications exist') == -1)"
 
 - name: Create Monitor project folder
-  file: path="{{ project_folder }}/monitor_project" state=directory owner="{{ management_user }}" group="{{ welder_group['name'] }}" mode=2775
+  file: path="{{ project_folder }}/monitor_project" state=directory owner="{{ management_user }}" group="welder" mode=2775
 
 - name: Clone Monitor Project source
   git:

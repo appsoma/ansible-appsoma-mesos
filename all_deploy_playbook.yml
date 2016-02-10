@@ -134,7 +134,7 @@
 
     # Create local users
     - role: ansible-welder-user
-      group: "{{ welder_group }}"
+      group: "welder"
       user_list: "{{ welder_user_list }}"
       when: jumpcloud_key is not defined
 
@@ -166,13 +166,11 @@
         - browserify
         - mocha
         - nodejs-websocket
-#        - phantomjs
         - process
         - require
         - scribe-js
         - supervisor
-      tags: ["nodejs"]
-      when: inventory_hostname in groups[inventory_group_master]
+      when: "(inventory_hostname in groups[inventory_group_master]) and (use_service_dev is defined and use_service_dev)"
 
     # Make sure we have JDKs
     - role: ansible-java
@@ -181,10 +179,10 @@
       when: "inventory_hostname in groups[inventory_group_master] or (inventory_group_slave in groups and inventory_hostname in groups[inventory_group_slave])"
 
     - role: ansible-go
-      when: inventory_hostname in groups[inventory_group_master]
+      when: "(inventory_hostname in groups[inventory_group_master]) and (use_service_dev is defined and use_service_dev)"
 
     - role: ansible-maven
-      when: inventory_hostname in groups[inventory_group_master]
+      when: "(inventory_hostname in groups[inventory_group_master]) and (use_service_dev is defined and use_service_dev)"
 
 ####### Cluster management software #######
     # Install zookeeper
