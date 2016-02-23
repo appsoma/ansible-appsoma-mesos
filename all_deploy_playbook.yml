@@ -133,10 +133,10 @@
       when: jumpcloud_key is defined
 
     # Create local users
-    - role: ansible-welder-user
-      group: "welder"
-      user_list: "{{ welder_user_list }}"
-      when: jumpcloud_key is not defined
+#    - role: ansible-welder-user
+#      group: "{{ welder_group }}"
+#      user_list: "{{ welder_user_list }}"
+#      when: jumpcloud_key is not defined
 
     # Install NTP for time sync
     - role: ansible-ntp

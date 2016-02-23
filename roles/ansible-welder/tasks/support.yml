@@ -29,6 +29,7 @@
      chdir: "{{ welder_support_dir }}/pump_java"
   sudo: yes
   sudo_user: "{{ management_user }}"
+  when: use_service_dev is defined and use_service_dev
 
 - name: Package Java Message Pump
   shell: ". /etc/profile.d/maven.sh; mvn package"
@@ -36,6 +37,7 @@
      chdir: "{{ welder_support_dir }}/pump_java"
   sudo: yes
   sudo_user: "{{ management_user }}"
+  when: use_service_dev is defined and use_service_dev
 
 - name: Start Java Kayak Marathon
   shell: "./kayak_java_http.sh start"
@@ -51,7 +53,7 @@
      chdir: "{{ welder_support_dir }}/kayak_java"
   sudo: yes
   sudo_user: "{{ management_user }}"
-  when: not use_container
+  when: not use_container and (use_service_dev is defined and use_service_dev)
 
 
 
