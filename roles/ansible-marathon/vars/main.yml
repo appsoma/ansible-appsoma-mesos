@@ -1,7 +1,7 @@
 ---
 marathon_hostname: "{{ inventory_hostname }}"
 marathon_version: "0.13.0"
-marathon_port: 8080
+marathon_port: "8080"
 marathon_apt_repo: "deb http://repos.mesosphere.io/{{ansible_distribution|lower}} {{ansible_distribution_release|lower}} main"
 
 # command line flags:
