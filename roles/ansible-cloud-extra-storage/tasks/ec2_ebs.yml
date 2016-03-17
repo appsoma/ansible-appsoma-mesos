@@ -1,6 +1,8 @@
 - name: Format EBS disk volumes
   filesystem: fstype=ext4 dev="{{ item.device_name }}" force=yes
   with_items: "{{ additional_volume_list }}"
+  register: format
+  failed_when: "format.err is defined and format.err.find('is mounted') == -1"
 
 - name: Mount EBS disk volumes
   mount: name="{{ item.mount_point }}" src="{{ item.device_name }}" fstype=ext4 state=mounted

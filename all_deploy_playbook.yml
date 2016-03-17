@@ -70,6 +70,9 @@
             {{ comma() }}{{ hostvars[item].private_ip_address }}
           {%- endfor %}
 
+    - name: Trim trailing newline from zookeeper
+      set_fact: zookeeper_hosts_with_port="{{ zookeeper_hosts_with_port | replace ('\n', '') }}"
+
     - name: Set Service instance store list
       set_fact: instance_stores="{{ service_nodes.instance_stores if service_nodes.instance_stores is defined else [] }}"
       when: inventory_hostname in groups[inventory_group_service]
