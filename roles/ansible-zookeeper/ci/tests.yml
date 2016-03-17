@@ -2,7 +2,7 @@
 
 - hosts: localhost
   connection: local
-  sudo: yes
+  become: yes
   
   tasks:
     - shell: echo stat | nc 127.0.0.1 2181

@@ -26,11 +26,11 @@
   when: ansible_pkg_mgr == "yum"
 
 - name: install NVM (Node Version Manager)
-  sudo: True
+  become: yes
   git: repo=https://github.com/creationix/nvm.git dest={{ nvm_install_path }}
 
 - name: activate NVM for all users
-  sudo: True
+  become: yes
   template: src=../templates/activate-nvm.sh.j2  dest=/etc/profile.d/activate-nvm.sh  owner=root group=root mode=0755
 
 
@@ -39,14 +39,14 @@
 # to avoid "setlocale LC_CTYPE" error
 
 - name: copy scripts to server
-  sudo: True
+  become: yes
   copy: src="../files/{{ item }}"  dest="/tmp/"  mode="a+x" force=no
   with_items:
     - check-nodejs-version.sh
     - install-nodejs.sh
 
 - name: query installed Node.js versions
-  sudo: True
+  become: yes
   shell: LC_ALL="en_US.UTF-8"  /tmp/check-nodejs-version.sh  {{ nvm_exe_path }}
   #script: ../files/check-nodejs-version.sh  {{ nvm_exe_path }}
   register: nodejs_info
@@ -54,7 +54,7 @@
 
 
 - name: apply nvm.sh and set default version
-  sudo: True
+  become: yes
   shell: LC_ALL="en_US.UTF-8"  /tmp/install-nodejs.sh  {{ nvm_exe_path }}  {{ nodejs_version }}
   #script: ../files/install-nodejs.sh  {{ nvm_exe_path }}  {{ nodejs_version }}
   when: not (nodejs_info.stdout|from_json).ok  or  (nodejs_info.stdout|from_json).version.default != "{{ nodejs_version }}"
@@ -65,7 +65,7 @@
 # fix: Debian/Ubuntu root doesn't load /etc/profile.d/* automatically
 #
 - name: link executable path of node
-  sudo: True
+  become: yes
   file:
     src:  "{{ nvm_install_path }}/versions/node/{{ nodejs_version }}/bin/{{ item }}"
     dest: "/usr/local/bin/{{ item }}"
@@ -75,5 +75,5 @@
     - npm
 
 - name: Install global packages
-  npm: name="{{item}}" state=present global=yes
-  with_items: nodejs_global_packages
+  npm: name="{{ item }}" state=present global=yes
+  with_items: "{{ nodejs_global_packages }}"

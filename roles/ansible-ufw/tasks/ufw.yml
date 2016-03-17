@@ -9,7 +9,7 @@
 
 - name: Add ports
   command: "ufw allow {{ item }}"
-  with_items: extra_ports
+  with_items: "{{ extra_ports }}"
 
 - name: Configure default allow forward policy
   command: ufw default allow forward

@@ -2,7 +2,7 @@
 
 - hosts: localhost
   connection: local
-  sudo: yes
+  become: yes
   
   tasks:
     # Test for java

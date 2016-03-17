@@ -9,13 +9,13 @@
     version: "{{ welder_support_version if welder_support_version is defined else 'HEAD' }}"
     update: yes
     force: yes
-  sudo: yes
-  sudo_user: "{{ management_user }}"
+  become: yes
+  become_user: "{{ management_user }}"
 
 - name: Run NPM for wsyak
   shell: "cd {{ welder_support_dir }}/wsyak; npm install;"
-  sudo: yes
-  sudo_user: "{{ management_user }}"
+  become: yes
+  become_user: "{{ management_user }}"
   register: npmwsyak
   failed_when: npmwsyak.stderr.find('ERROR') != -1
   changed_when: npmwsyak.stdout != ''
@@ -27,32 +27,32 @@
   shell: ". /etc/profile.d/maven.sh; mvn compile"
   args:
      chdir: "{{ welder_support_dir }}/pump_java"
-  sudo: yes
-  sudo_user: "{{ management_user }}"
+  become: yes
+  become_user: "{{ management_user }}"
   when: use_service_dev is defined and use_service_dev
 
 - name: Package Java Message Pump
   shell: ". /etc/profile.d/maven.sh; mvn package"
   args:
      chdir: "{{ welder_support_dir }}/pump_java"
-  sudo: yes
-  sudo_user: "{{ management_user }}"
+  become: yes
+  become_user: "{{ management_user }}"
   when: use_service_dev is defined and use_service_dev
 
 - name: Start Java Kayak Marathon
   shell: "./kayak_java_http.sh start"
   args:
      chdir: "{{ welder_support_dir }}/kayak_java"
-  sudo: yes
-  sudo_user: "{{ management_user }}"
+  become: yes
+  become_user: "{{ management_user }}"
   when: use_container
 
 - name: Compile Java Kayak
   shell: ". /etc/profile.d/appsoma_env.sh; . /etc/profile.d/maven.sh; ./kayak_java_build.sh start"
   args:
      chdir: "{{ welder_support_dir }}/kayak_java"
-  sudo: yes
-  sudo_user: "{{ management_user }}"
+  become: yes
+  become_user: "{{ management_user }}"
   when: not use_container and (use_service_dev is defined and use_service_dev)
 
 

@@ -5,7 +5,7 @@
 
 - hosts: localhost
   connection: local
-  sudo: yes
+  become: yes
   vars:
     travis: "{{ lookup('env','TRAVIS') |default('false', true) }}"
 

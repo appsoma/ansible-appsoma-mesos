@@ -29,7 +29,7 @@
   command: gem install --conservative "{{ item }}"
   register: all_gem_plugins
   changed_when: all_gem_plugins.stdout != ""
-  with_items: all_plugins
+  with_items: "{{ all_plugins }}"
   notify: Restart Sensu Client
   when: package_install
 
@@ -37,16 +37,15 @@
   command: gem install --conservative "{{ item }}"
   register: mesos_gem_plugins
   changed_when: mesos_gem_plugins.stdout != ""
-  with_items: mesos_plugins
-  when: inventory_group_master in group_names or inventory_group_slave in group_names
+  with_items: "{{ mesos_plugins }}"
+  when: "{{package_install and (inventory_group_master in group_names or inventory_group_slave in group_names) }}"
   notify: Restart Sensu Client
-  when: package_install
 
 - name: Install Sensu plugins for master nodes
   command: gem install --conservative "{{ item }}"
   register: master_gem_plugins
   changed_when: master_gem_plugins.stdout != ""
-  with_items: master_plugins
+  with_items: "{{ master_plugins }}"
   when: inventory_group_master in group_names and package_install
   notify: Restart Sensu Client
 

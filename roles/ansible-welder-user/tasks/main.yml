@@ -15,7 +15,7 @@
     shell: "/bin/bash"
     state: present
   no_log: true
-  with_items: user_list
+  with_items: "{{ user_list }}"
 
 - name: Add management user to Welder user group
   user: name="{{ management_user }}" groups="welder" append=yes

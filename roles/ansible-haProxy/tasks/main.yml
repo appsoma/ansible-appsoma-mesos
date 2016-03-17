@@ -17,8 +17,8 @@
     version: "{{ pegboard_version if pegboard_version is defined else 'HEAD' }}"
     update: yes
     force: yes
-  sudo: yes
-  sudo_user: "{{ management_user }}"
+  become: yes
+  become_user: "{{ management_user }}"
 
 - name: Install Python Kazoo client
   command: /usr/bin/pip install kazoo
@@ -71,5 +71,5 @@
 
 - name: Set service configuration in Pegboard
   command: curl -X POST localhost:2288/apps -d "url={{ item['url'] }}" -d "app_name={{ item['app_name'] }}" -d "service_port={{ item['service_port'] }}" -d "servers=leader.mesos:{{ item['port'] }}"
-  with_items: haproxy_dns_services
+  with_items: "{{ haproxy_dns_services }}"
 

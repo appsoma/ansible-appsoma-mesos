@@ -12,7 +12,7 @@
 - hosts: [ "{{ inventory_group_master }}" ]
 
   remote_user: "{{ management_user }}"
-  sudo: True
+  become: yes
   vars_files:
     - "../cluster_vars/common.yml"
     - "../cluster_vars/{{ cluster_name }}/required_vars.yml"
@@ -21,7 +21,7 @@
   pre_tasks:
     - name: Set master_0 hostname
       set_fact: master_0_hostname="{{ item }}"
-      with_items: groups[inventory_group_master]
+      with_items: "{{ groups[inventory_group_master] }}"
       when: hostvars[ item ].short_name == "master_0"
 
   roles:

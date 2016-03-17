@@ -13,21 +13,21 @@
     version: "{{ welder_version if welder_version is defined else 'HEAD' }}"
     update: yes
     force: yes
-  sudo: yes
-  sudo_user: "{{ management_user }}"
+  become: yes
+  become_user: "{{ management_user }}"
   register: git_pull
   notify: Restart Welder
 
 - name: Add Certificate
   copy: src="{{ welder_cert_path }}" dest="{{  welder_etc_dir }}/certificate.crt" mode=0600
-  sudo: yes
-  sudo_user: "{{ welder_user }}"
+  become: yes
+  become_user: "{{ welder_user }}"
   when: welder_use_tls
 
 - name: Add Certificate key
   copy: src="{{ welder_key_path }}" dest="{{  welder_etc_dir }}/certificate.key" mode=0600
-  sudo: yes
-  sudo_user: "{{ welder_user }}"
+  become: yes
+  become_user: "{{ welder_user }}"
   when: welder_use_tls
 
 - name: Fetch Welder configuration template
@@ -47,8 +47,8 @@
 
 - name: Run NPM for widgets
   shell: "cd {{  welder_src_dir }}/widgets; npm install;"
-  sudo: yes
-  sudo_user: "{{ welder_user }}"
+  become: yes
+  become_user: "{{ welder_user }}"
   register: npmwidgets
   failed_when: npmwidgets.stderr.find('ERROR') != -1
   changed_when: npmwidgets.stdout != ''
@@ -56,15 +56,15 @@
 
 - name: Browserify widgets
   shell: "cd {{  welder_src_dir }}/widgets; ./build"
-  sudo: yes
-  sudo_user: "{{ welder_user }}"
+  become: yes
+  become_user: "{{ welder_user }}"
   register: browserifywidgets
   failed_when: browserifywidgets.stderr.find('ERROR') != -1
 
 - name: Run NPM for welder
   shell: "cd {{  welder_src_dir }}; npm install"
-  sudo: yes
-  sudo_user: "{{ welder_user }}"
+  become: yes
+  become_user: "{{ welder_user }}"
   register: npmwelder
   failed_when: npmwelder.stderr.find('ERROR') != -1
   changed_when: npmwelder.stdout != ''

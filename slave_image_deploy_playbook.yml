@@ -22,7 +22,7 @@
 
 - hosts: [ "{{ inventory_group_slave }}" ]
   remote_user: "{{ management_user }}"
-  sudo: True
+  become: yes
   vars_files:
     - "cluster_vars/common.yml"
     - "cluster_vars/{{ cluster_name }}/required_vars.yml"

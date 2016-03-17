@@ -12,12 +12,12 @@
 
     - name: Set master_0 hostname
       set_fact: master_0_hostname="{{ item }}"
-      with_items: groups[inventory_group_master]
+      with_items: "{{ groups[inventory_group_master] }}"
       when: hostvars[ item ].short_name == "master_0"
 
     - name: Set master_1 hostname
       set_fact: master_1_hostname="{{ item }}"
-      with_items: groups[inventory_group_master]
+      with_items: "{{ groups[inventory_group_master] }}"
       when: hostvars[ item ].short_name == "master_1"
 
 # Check for SSH port function
@@ -33,7 +33,7 @@
 
 - hosts: [ "{{ inventory_group_master }}" ]
   remote_user: "{{ management_user }}"
-  sudo: True
+  become: yes
   vars_files:
     - "cluster_vars/common.yml"
     - "cluster_vars/{{ cluster_name }}/required_vars.yml"
@@ -57,6 +57,9 @@
             {{ comma() }}{{ hostvars[item].private_ip_address }}:{{ zookeeper_client_port }}
           {%- endfor %}
 
+    - name: Trim trailing newline from zookeeper
+      set_fact: zookeeper_hosts_with_port="{{ zookeeper_hosts_with_port | replace ('\n', '') }}"
+
     - name: Save zookeeper private IP list to bash profile
       lineinfile: dest=/etc/profile.d/appsoma_env.sh line="export ZK_HOST_LIST={{ zookeeper_hosts_with_port }}" state=present create=yes
 
@@ -76,7 +79,7 @@
 
     - name: Add ssh keys to management user
       authorized_key: key="{{ item }}" state=present user=ubuntu exclusive=no
-      with_items: additional_ssh_keys
+      with_items: "{{ additional_ssh_keys }}"
       when: additional_ssh_keys is defined
 
   roles:

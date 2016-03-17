@@ -12,7 +12,7 @@
 
 - name: Make sure export locations exist
   file: path="{{ item['path'] }}" state=directory
-  with_items: nfs_exports
+  with_items: "{{ nfs_exports }}"
   notify: refresh exports
 
 - name: Copy exports file.

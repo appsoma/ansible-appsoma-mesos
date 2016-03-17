@@ -45,18 +45,18 @@
 
 - name: Remove optional --zk option
   file: path=/etc/marathon/conf/zk state=absent
-  when: marathon_zookeeper_state == ""
+  when: "marathon_zookeeper_state == ''"
   notify:
     - Restart Marathon
 
 - name: Set optional --zk option
   template: src=zk.j2 dest=/etc/marathon/conf/zk
-  when: marathon_zookeeper_state != ""
+  when: "marathon_zookeeper_state != ''"
   notify:
     - Restart Marathon
 
 - name: Set --http-port option
-  lineinfile: line={{ marathon_port }} dest=/etc/marathon/conf/http_port create=yes
+  lineinfile: line="{{ marathon_port }}" dest="/etc/marathon/conf/http_port" create=yes
   notify:
     - Restart Marathon
 

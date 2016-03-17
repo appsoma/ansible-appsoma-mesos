@@ -14,44 +14,44 @@
     version: "{{ kafka_mesos_version if kafka_mesos_version is defined else 'HEAD' }}"
     update: yes
     force: yes
-  sudo: yes
-  sudo_user: "{{ management_user }}"
+  become: yes
+  become_user: "{{ management_user }}"
   register: git_pull
 
 - name: Build kafka-mesos
   shell: "./gradlew jar"
   args:
      chdir: "{{ kafka_dir }}"
-  sudo: yes
-  sudo_user: "{{ management_user }}"
+  become: yes
+  become_user: "{{ management_user }}"
   when: git_pull.changed
 
 - name: Download Kafka tarball
   get_url:
     url: "https://archive.apache.org/dist/kafka/0.8.2.1/kafka_2.10-0.8.2.1.tgz"
     dest: "{{ kafka_dir }}/kafka_2.10-0.8.2.1.tgz"
-  sudo: yes
-  sudo_user: "{{ management_user }}"
+  become: yes
+  become_user: "{{ management_user }}"
 
 - name: Create broker creation script
   template: src="add_broker.sh.j2" dest="{{ kafka_dir }}/add_broker.sh" mode=0755
-  sudo: yes
-  sudo_user: "{{ management_user }}"
+  become: yes
+  become_user: "{{ management_user }}"
 
 - name: Set Configuration
   template: src="kafka-mesos.properties.j2" dest="{{ kafka_dir }}/kafka-mesos.properties"
-  sudo: yes
-  sudo_user: "{{ management_user }}"
+  become: yes
+  become_user: "{{ management_user }}"
 
 - name: Copy framework startup script
   template: src="run_kafka_framework.sh.j2" dest="{{ kafka_dir }}/run_kafka_framework.sh" mode=0755
-  sudo: yes
-  sudo_user: "{{ management_user }}"
+  become: yes
+  become_user: "{{ management_user }}"
 
 - name: Start Kafka-Mesos in Marathon
   shell: "{{ kafka_dir }}/run_kafka_framework.sh start"
-  sudo: yes
-  sudo_user: "{{ management_user }}"
+  become: yes
+  become_user: "{{ management_user }}"
 
 #- name: Set init script
 #  template: src=init_kafka-mesos.conf.j2 dest=/etc/init/kafka-mesos.conf

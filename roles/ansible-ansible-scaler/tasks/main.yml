@@ -17,13 +17,13 @@
     version: "{{ ansible_scaler_version if ansible_scaler_version is defined else 'HEAD' }}"
     update: yes
     force: yes
-  sudo: yes
-  sudo_user: "{{ management_user }}"
+  become: yes
+  become_user: "{{ management_user }}"
   register: git_pull
 
 - name: Copy Terraform executables
   copy: src="{{ root_dir }}terraform_{{ terraform_version }}/{{ item }}" dest="/usr/local/bin/{{ item }}" owner="{{ management_user }}" mode=0777
-  with_items: terraform_executables
+  with_items: "{{ terraform_executables }}"
   when: is_scaler_host
 
 - name: Make Ansible cluster variable dir

@@ -5,8 +5,8 @@
     version: "{{ welder_version if welder_version is defined else 'HEAD' }}"
     update: yes
     force: yes
-  sudo: yes
-  sudo_user: "{{ management_user }}"
+  become: yes
+  become_user: "{{ management_user }}"
   register: git_pull
 
 - name: Fetch Welder configuration template

@@ -10,8 +10,8 @@
     dest: /opt/storm
     version: HEAD
     update: no
-  sudo: yes
-  sudo_user: "{{ storm_user }}"
+  become: yes
+  become_user: "{{ storm_user }}"
   register: git_pull
 
 - name: Create storm config
@@ -25,22 +25,21 @@
   shell: ". /etc/profile.d/maven.sh; bin/build-release.sh"
   args:
     chdir: "/opt/storm"
-  sudo: yes
-  sudo_user: "{{ storm_user }}"
+  become: yes
+  become_user: "{{ storm_user }}"
   register: storm_build
-  failed_when: false
   failed_when: storm_build.stdout.find('BUILD SUCCESS') == -1
 
 - name: Expand storm release locally
   no_log: yes
   unarchive: src="/opt/storm/storm-mesos-{{ storm_version }}.tgz" dest="/opt/storm/" copy=no
-  sudo: yes
-  sudo_user: "{{ storm_user }}"
+  become: yes
+  become_user: "{{ storm_user }}"
 
 - name: Copy storm mesos release to mounted dir
   command: "cp /opt/storm/storm-mesos-{{ storm_version }}.tgz {{ data_mount_point}}/storm/storm-mesos-{{ storm_version }}.tgz"
-  sudo: yes
-  sudo_user: "{{ storm_user }}"
+  become: yes
+  become_user: "{{ storm_user }}"
 
 - name: Create storm server upstart script
   template: src=init_storm-mesos.conf.j2 dest=/etc/init/storm-mesos.conf

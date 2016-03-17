@@ -58,4 +58,3 @@
     instance_id: "{{ hostvars[item].id }}"
   with_items: "{{ groups[provider_group_prefix[provider] + inventory_group_slave] | default([]) }}"
   when: groups[provider_group_prefix[provider] + inventory_group_slave] is defined
-  when: groups[provider_group_prefix[provider] + inventory_group_slave] is defined

@@ -23,8 +23,8 @@
     accept_hostkey: true
     update: yes
     track_submodules: yes
-  sudo: yes
-  sudo_user: "demo"
+  become: yes
+  become_user: "demo"
   register: git_pull
   failed_when: false
   failed_when: "(git_pull.failed and git.pull.msg is defined and git_pull.msg.find('modifications exist') == -1)"
@@ -40,8 +40,8 @@
     accept_hostkey: true
     update: yes
     track_submodules: yes
-  sudo: yes
-  sudo_user: "{{ management_user }}"
+  become: yes
+  become_user: "{{ management_user }}"
   register: git_pull
   failed_when: false
   failed_when: "(git_pull.failed and git.pull.msg is defined and git_pull.msg.find('modifications exist') == -1)"

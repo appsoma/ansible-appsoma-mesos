@@ -6,7 +6,7 @@
     pkg: "openjdk-{{item}}-jdk"
     state: present 
     update_cache: yes
-  with_items: java_versions
+  with_items: "{{ java_versions }}"
   when: add_jdk
 
 - name: Install JRE packages
@@ -14,7 +14,7 @@
     pkg: "openjdk-{{java_version}}-jre-headless"
     state: present
     update_cache: yes
-  with_items: java_versions
+  with_items: "{{ java_versions }}"
 
 - name: Resolve {{java_libjvm_path}}
   shell: find {{java_libjvm_path}}
